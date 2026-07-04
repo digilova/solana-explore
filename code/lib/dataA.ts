@@ -13,6 +13,37 @@ export interface MarketRowA {
 
 export type AccessKindA = "kyc" | "restricted" | "check";
 
+export interface VariantFactA {
+  k: string;
+  v: string;
+  tip?: string;
+}
+
+export interface VariantVerificationA {
+  label: string;
+  status: "verified" | "risk" | "pending";
+  note: string;
+}
+
+export interface VariantHealthMetricA {
+  label: string;
+  value: string;
+  grade: "Healthy" | "Watch" | "Weak";
+  width: string;
+}
+
+export interface VariantDetailsA {
+  description: string;
+  facts: VariantFactA[];
+  verification: VariantVerificationA[];
+  links: { label: string; href: string; title: string }[];
+  health: {
+    score: number;
+    status: string;
+    metrics: VariantHealthMetricA[];
+  };
+}
+
 export interface VariantDefA {
   sym: string;
   title: string;
@@ -29,6 +60,7 @@ export interface VariantDefA {
   accessKind: AccessKindA;
   accessHint: string;
   markets: number;
+  details: VariantDetailsA;
   spot: MarketRowA[];
   pools: MarketRowA[];
 }
@@ -74,6 +106,25 @@ function tail(sym: string, count: number, startLiq: number, startVol: number, se
   return rows;
 }
 
+const placeholderLinks = [
+  { label: "Explorer", href: "#", title: "Explorer link pending real mint address." },
+  { label: "Orb", href: "#", title: "Orb profile link pending real token profile." },
+  { label: "Issuer docs", href: "#", title: "Issuer documentation link pending source URL." },
+  { label: "Mint", href: "#", title: "Mint address pending verified on-chain address." },
+];
+
+function verification(rugRisk: string): VariantVerificationA[] {
+  return [
+    { label: "CoinGecko", status: "verified", note: "Listed profile, illustrative in prototype." },
+    { label: "Jupiter", status: "verified", note: "Routable market, illustrative in prototype." },
+    { label: "RugCheck", status: "risk", note: `risk: ${rugRisk} — illustrative prototype signal.` },
+  ];
+}
+
+function health(score: number, status: string, metrics: VariantHealthMetricA[]): VariantDetailsA["health"] {
+  return { score, status, metrics };
+}
+
 export function getVariantDefsA(): VariantDefA[] {
   return [
     {
@@ -92,6 +143,28 @@ export function getVariantDefsA(): VariantDefA[] {
       accessKind: "kyc",
       markets: 20,
       accessHint: "Backpack Securities requires identity verification to mint or redeem. On-chain trading may have different rules.",
+      details: {
+        description:
+          "SPCX is the deepest SpaceX-linked variant in this prototype, with issuer-stated tokenized equity exposure and KYC requirements for minting or redemption.",
+        facts: [
+          { k: "Instrument", v: "Tokenized equity" },
+          {
+            k: "Backing",
+            v: "Backed 1:1 (issuer-stated)",
+            tip: "Issuer-stated backing should be checked against the latest issuer disclosure before relying on it.",
+          },
+          { k: "Redemption", v: "Via issuer, KYC required" },
+          { k: "Domicile", v: "Not specified", tip: "No structured disclosure found in this prototype dataset." },
+        ],
+        verification: verification("81/100"),
+        links: placeholderLinks,
+        health: health(84, "Established", [
+          { label: "Liquidity", value: "$7.03M", grade: "Healthy", width: "94%" },
+          { label: "Distribution", value: "20 markets", grade: "Healthy", width: "86%" },
+          { label: "Trading", value: "$29.49M", grade: "Healthy", width: "98%" },
+          { label: "Holders", value: "4.4K wallets", grade: "Weak", width: "38%" },
+        ]),
+      },
       spot: [mkRow("Orca", "SPCX/USDC", 778010, 10620000, 18200, 4400, 189.44), mkRow("Meteora", "SPCX/USDC", 2800000, 6970000, 12400, 3100, 189.4)].concat(
         tail("SPCX", 18, 620000, 3400000, 7, 189.42)
       ),
@@ -116,6 +189,28 @@ export function getVariantDefsA(): VariantDefA[] {
       accessKind: "restricted",
       markets: 20,
       accessHint: "Geo-restricted by the issuer — not available to US persons and other blocked regions.",
+      details: {
+        description:
+          "SPCXx gives SpaceX exposure through Backed's xStocks structure, with stronger disclosure coverage than smaller variants but explicit geographic restrictions.",
+        facts: [
+          { k: "Instrument", v: "Tokenized equity" },
+          {
+            k: "Backing",
+            v: "Backed 1:1 (issuer-stated)",
+            tip: "Issuer-stated backing and proof-of-reserve cadence should be checked before execution.",
+          },
+          { k: "Redemption", v: "Via issuer, eligibility applies" },
+          { k: "Domicile", v: "Switzerland (issuer-stated)" },
+        ],
+        verification: verification("74/100"),
+        links: placeholderLinks,
+        health: health(76, "Established", [
+          { label: "Liquidity", value: "$1.21M", grade: "Healthy", width: "72%" },
+          { label: "Distribution", value: "20 markets", grade: "Healthy", width: "82%" },
+          { label: "Trading", value: "$1.61M", grade: "Healthy", width: "70%" },
+          { label: "Holders", value: "860 wallets", grade: "Watch", width: "52%" },
+        ]),
+      },
       spot: [mkRow("Byreal", "SPCXx/USDC", 207410, 788900, 2900, 860, 188.12), mkRow("Raydium", "SPCX/SPCXx", 108600, 424790, 1700, 420, 188.08)].concat(
         tail("SPCXx", 18, 95000, 300000, 23, 188.1)
       ),
@@ -140,6 +235,24 @@ export function getVariantDefsA(): VariantDefA[] {
       accessKind: "check",
       markets: 11,
       accessHint: "Tessera has not published clear access rules here. Check their documentation before trading.",
+      details: {
+        description:
+          "TSPX appears as a pre-IPO exposure variant with meaningful liquidity but less complete structure disclosure, making issuer verification the key diligence step.",
+        facts: [
+          { k: "Instrument", v: "Pre-IPO exposure" },
+          { k: "Backing", v: "Not specified", tip: "No reserve report or audit found in this prototype dataset." },
+          { k: "Redemption", v: "Not specified", tip: "No structured redemption disclosure found in this prototype dataset." },
+          { k: "Domicile", v: "Not specified", tip: "Check issuer docs before relying on this field." },
+        ],
+        verification: verification("58/100"),
+        links: placeholderLinks,
+        health: health(58, "Developing", [
+          { label: "Liquidity", value: "$611.06K", grade: "Watch", width: "56%" },
+          { label: "Distribution", value: "11 markets", grade: "Watch", width: "58%" },
+          { label: "Trading", value: "$912.76K", grade: "Watch", width: "54%" },
+          { label: "Holders", value: "1.9K wallets", grade: "Weak", width: "34%" },
+        ]),
+      },
       spot: [mkRow("Meteora", "TSPX/USDC", 632780, 712980, 7300, 1900, 187.7), mkRow("Meteora", "tSpaceX/USDC", 3750, 0, 0, 0, 187.6)].concat(
         tail("TSPX", 9, 42000, 90000, 31, 187.65)
       ),
@@ -161,6 +274,24 @@ export function getVariantDefsA(): VariantDefA[] {
       accessKind: "check",
       markets: 20,
       accessHint: "PreStocks has not published clear access rules here. Check their documentation before trading.",
+      details: {
+        description:
+          "SPACEX by PreStocks broadens venue coverage but has thin primary liquidity and limited structured disclosures, so it reads as a higher-diligence variant.",
+        facts: [
+          { k: "Instrument", v: "Pre-IPO exposure" },
+          { k: "Backing", v: "Not specified", tip: "No reserve report or audit found in this prototype dataset." },
+          { k: "Redemption", v: "Not specified", tip: "No structured redemption disclosure found in this prototype dataset." },
+          { k: "Domicile", v: "Not specified", tip: "Check issuer docs before relying on this field." },
+        ],
+        verification: verification("42/100"),
+        links: placeholderLinks,
+        health: health(31, "Speculative", [
+          { label: "Liquidity", value: "$33.62K", grade: "Weak", width: "28%" },
+          { label: "Distribution", value: "20 markets", grade: "Healthy", width: "76%" },
+          { label: "Trading", value: "$80.82K", grade: "Weak", width: "30%" },
+          { label: "Holders", value: "180 wallets", grade: "Weak", width: "22%" },
+        ]),
+      },
       spot: [mkRow("Meteora", "SPACEX/USDC", 24310, 38700, 563, 180, 190.1), mkRow("Meteora", "SPACEX/SPCXx", 451170, 32070, 240, 96, 190.0)].concat(
         tail("SPACEX", 18, 18000, 22000, 41, 190.05)
       ),
@@ -182,6 +313,28 @@ export function getVariantDefsA(): VariantDefA[] {
       accessKind: "restricted",
       markets: 2,
       accessHint: "Ondo's permissioned token — eligibility limits apply. Confirm you qualify before trading.",
+      details: {
+        description:
+          "SPCXon is a permissioned Ondo tokenized equity variant with very limited tracked liquidity, making access terms and issuer controls the main evaluation points.",
+        facts: [
+          { k: "Instrument", v: "Tokenized equity" },
+          {
+            k: "Backing",
+            v: "Backed (issuer-stated)",
+            tip: "Issuer publishes backing verification; check report date before relying on it.",
+          },
+          { k: "Redemption", v: "Via issuer, permissioned" },
+          { k: "Domicile", v: "Not specified", tip: "No structured disclosure found in this prototype dataset." },
+        ],
+        verification: verification("35/100"),
+        links: placeholderLinks,
+        health: health(12, "Thin market", [
+          { label: "Liquidity", value: "$132.77", grade: "Weak", width: "8%" },
+          { label: "Distribution", value: "2 markets", grade: "Weak", width: "14%" },
+          { label: "Trading", value: "$15.45K", grade: "Weak", width: "18%" },
+          { label: "Holders", value: "19 trades", grade: "Weak", width: "10%" },
+        ]),
+      },
       spot: [mkRow("Meteora", "SPCXon/USDT", 143.71, 0, 0, 0, 186.25), mkRow("Meteora", "SPCXon/USDC", 7.25, 0, 0, 0, 186.15)],
       pools: [],
     },
