@@ -1,0 +1,13 @@
+.DS_Store
+*.pem
+
+# Next.js app
+code/node_modules/
+code/.next/
+code/out/
+code/.vercel/
+code/npm-debug.log*
+code/.env*
+
+# Editor / local tooling
+.agents/
