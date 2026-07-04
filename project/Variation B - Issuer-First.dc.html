@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body { margin: 0; background: #FAFAFA; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #2D2D2D; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+a { text-decoration: none; }
+@font-face { font-family: 'InterVariable'; src: url('https://www.tokens.xyz/fonts/InterVariable.woff2') format('woff2-variations'); font-weight: 100 900; font-display: swap; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</helmet>
+
+<div data-screen-label="Variation B" style="min-height: 100vh; display: flex; flex-direction: column;">
+
+  <!-- Prototype switcher -->
+  <div style="background: #171717; color: #FFFFFF; display: flex; align-items: center; gap: 16px; padding: 0 24px; height: 44px; font-size: 13px; position: sticky; top: 0; z-index: 60;">
+    <span style="font-weight: 600; opacity: 0.9;">SpaceX Page Redesign</span>
+    <span style="opacity: 0.35;">·</span>
+    <a href="Variation A - Evolved.dc.html" style="color: rgba(255,255,255,0.65); padding: 5px 12px; border-radius: 9999px;" style-hover="color: #FFFFFF; background: rgba(255,255,255,0.08);">A · Evolved</a>
+    <a href="Variation B - Issuer-First.dc.html" style="color: #FFFFFF; background: rgba(255,255,255,0.16); padding: 5px 12px; border-radius: 9999px; font-weight: 600;">B · Insto-first</a>
+    <a href="Design Rationale.dc.html" style="color: rgba(255,255,255,0.65); padding: 5px 12px; border-radius: 9999px;" style-hover="color: #FFFFFF; background: rgba(255,255,255,0.08);">Rationale</a>
+    <span style="margin-left: auto; color: rgba(255,255,255,0.45); font-size: 12px;">Insto-first reframe — evaluation surface for tokenized assets</span>
+  </div>
+
+  <!-- Site header -->
+  <header style="background: #FFFFFF; border-bottom: 1px solid #F2F3F5; height: 64px; display: flex; align-items: center; gap: 24px; padding: 0 40px; box-shadow: rgba(0,0,0,0.03) 0px 1px 2px;">
+    <a href="#" style="display: flex; align-items: center; gap: 8px; color: #2D2D2D;">
+      <span style="width: 26px; height: 26px; border-radius: 8px; background: #9E0016; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">T</span>
+      <span style="font-weight: 600; font-size: 16px;">Tokens</span>
+    </a>
+    <div style="flex: 1; max-width: 420px; display: flex; align-items: center; gap: 8px; background: #FAFAFA; border: 1px solid #E5E5E5; border-radius: 9999px; height: 38px; padding: 0 16px; color: rgba(45,45,45,0.4); font-size: 14px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      Find tokens...
+    </div>
+    <nav style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+      <a href="#" style="color: rgba(45,45,45,0.72); font-size: 14px; padding: 8px 12px; border-radius: 9999px;" style-hover="background: rgba(45,45,45,0.06); color: #2D2D2D;">Docs</a>
+      <a href="#" style="color: rgba(45,45,45,0.72); font-size: 14px; padding: 8px 12px; border-radius: 9999px;" style-hover="background: rgba(45,45,45,0.06); color: #2D2D2D;">Assets API</a>
+      <a href="#" style="background: #0A0A0A; color: #FFFFFF; font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 9999px;" style-hover="background: #2D2D2D;">Connect</a>
+    </nav>
+  </header>
+
+  <main style="width: 100%; max-width: 1160px; margin: 0 auto; padding: 24px 40px 80px; flex: 1;">
+
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(38,38,38,0.72); padding: 8px 0 20px;">
+      <a href="#" style="color: rgba(38,38,38,0.72);" style-hover="color: #171717;">Tokens</a>
+      <span style="color: rgba(38,38,38,0.3);">/</span>
+      <a href="#" style="color: rgba(38,38,38,0.72);" style-hover="color: #171717;">Private markets</a>
+      <span style="color: rgba(38,38,38,0.3);">/</span>
+      <span style="color: #171717; font-weight: 600;">SpaceX</span>
+    </div>
+
+    <!-- Asset / ecosystem summary -->
+    <section data-screen-label="Ecosystem summary" style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; padding: 28px; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+      <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 340px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="position: relative; width: 52px; height: 52px; border-radius: 9999px; background: #171717; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; overflow: hidden; flex-shrink: 0;">SX<img src="https://www.tokens.xyz/logos/prestocks/spacex.png" alt="SpaceX" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #171717;"></div>
+            <div>
+              <h1 style="margin: 0; font-size: 26px; font-weight: 600; line-height: 1.15;">SpaceX exposure on Solana</h1>
+              <div style="font-size: 14px; color: rgba(45,45,45,0.58); margin-top: 3px;">Private-market asset · tokenized by 4 independent issuers</div>
+            </div>
+          </div>
+          <p style="margin: 18px 0 0; font-size: 15px; line-height: 1.6; color: rgba(45,45,45,0.75); max-width: 560px;">4 issuers, 5 distinct products — compare structure, access, and liquidity below.</p>
+        </div>
+        <div style="min-width: 220px; background: #FAFAFA; border: 1px solid #F2F3F5; border-radius: 16px; padding: 16px 18px;">
+          <div style="font-size: 12px; color: rgba(45,45,45,0.55);">Reference price · volume-weighted</div>
+          <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px;">
+            <span style="font-size: 24px; font-weight: 600; font-family: 'InterVariable', 'Inter', sans-serif; font-variant-numeric: tabular-nums;">$188.87</span>
+            <span style="color: #CF4040; font-size: 13px; font-weight: 600;">−3.07% 24H</span>
+          </div>
+          <svg viewBox="0 0 200 44" style="width: 100%; height: 44px; display: block; margin-top: 8px;" preserveAspectRatio="none">
+            <path d="{{ sparkPath }}" fill="none" stroke="#F92434" stroke-width="1.8" stroke-linejoin="round"></path>
+          </svg>
+          <a href="#" style="display: inline-block; margin-top: 8px; font-size: 12px; color: rgba(45,45,45,0.55); text-decoration: underline;" style-hover="color: #2D2D2D;">Full chart &amp; per-variant prices</a>
+        </div>
+      </div>
+      <!-- Ecosystem stat strip -->
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 24px; border-top: 1px solid #F2F3F5; padding-top: 20px;">
+        <sc-for list="{{ ecoStats }}" as="s" hint-placeholder-count="5">
+          <div>
+            <div style="font-size: 22px; font-weight: 600; letter-spacing: -0.3px; font-family: 'InterVariable', 'Inter', sans-serif; font-variant-numeric: tabular-nums;">{{ s.value }}</div>
+            <div style="font-size: 13px; color: rgba(45,45,45,0.55); margin-top: 2px;">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- Issuer & variant comparison -->
+    <section data-screen-label="Issuers and variants" style="margin-top: 40px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 600;">Issuers &amp; variants</h2>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 18px;">
+        <sc-for list="{{ variants }}" as="v" hint-placeholder-count="5">
+          <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; overflow: hidden; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+            <div onClick="{{ v.toggle }}" style="display: grid; grid-template-columns: 2.1fr 1fr 1.3fr 1.1fr 1.1fr 1.5fr 44px; gap: 14px; align-items: center; padding: 18px 24px; cursor: pointer;" style-hover="background: #FAFAFA;">
+              <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+                <span style="position: relative; width: 40px; height: 40px; border-radius: 9999px; background: {{ v.avatarBg }}; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; overflow: hidden;">{{ v.avatar }}{{ v.logoEl }}</span>
+                <div style="min-width: 0;">
+                  <div style="font-weight: 600; font-size: 16px;">{{ v.issuer }}</div>
+                  <div style="font-size: 13px; color: rgba(45,45,45,0.55); display: flex; align-items: center; gap: 6px;">
+                    <span style="font-weight: 600; color: rgba(45,45,45,0.75);">{{ v.sym }}</span>
+                    <span>·</span><span>{{ v.type }}</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: rgba(45,45,45,0.5);">Price</div>
+                <div style="font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif;">{{ v.price }}</div>
+                <div style="font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif; color: {{ v.chgColor }};">{{ v.chg }}</div>
+              </div>
+              <div>
+                <span title="{{ v.accessHint }}" style="display: inline-flex; align-items: center; gap: 5px; background: {{ v.accessBg }}; color: {{ v.accessColor }}; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: help;">
+                  <span style="width: 6px; height: 6px; border-radius: 9999px; background: {{ v.accessColor }};"></span>
+                  {{ v.access }}
+                </span>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: rgba(45,45,45,0.5);">Liquidity</div>
+                <div style="font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif;">{{ v.liq }}</div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: rgba(45,45,45,0.5);">24H Volume</div>
+                <div style="font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif;">{{ v.vol }}</div>
+              </div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <sc-for list="{{ v.avail }}" as="ch" hint-placeholder-count="3">
+                  <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 9999px; background: {{ ch.bg }}; color: {{ ch.color }};">{{ ch.mark }} {{ ch.label }}</span>
+                </sc-for>
+              </div>
+              <div style="display: flex; justify-content: center;">
+                <span style="width: 28px; height: 28px; border-radius: 9999px; background: rgba(14,14,14,0.06); display: inline-flex; align-items: center; justify-content: center; color: rgba(45,45,45,0.6); transform: {{ v.chevron }}; transition: transform 0.18s ease;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+              </div>
+            </div>
+
+            <sc-if value="{{ v.expanded }}" hint-placeholder-val="{{ false }}">
+              <div style="border-top: 1px solid #F2F3F5; background: #FAFAFA; padding: 20px 24px;">
+                <div style="display: grid; grid-template-columns: 1.1fr 1.6fr; gap: 24px; align-items: start;">
+                  <!-- Trust & structure -->
+                  <div>
+                    <div style="font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px;">Structure &amp; trust</div>
+                    <div style="display: flex; flex-direction: column; gap: 0; background: #FFFFFF; border: 1px solid rgba(38,38,38,0.1); border-radius: 12px; overflow: hidden;">
+                      <sc-for list="{{ v.facts }}" as="fx" hint-placeholder-count="5">
+                        <div style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #F2F3F5; font-size: 13px;">
+                          <span style="color: rgba(45,45,45,0.55); display: flex; align-items: center; gap: 6px;">{{ fx.k }}<sc-if value="{{ fx.tip }}" hint-placeholder-val="{{ false }}"><span title="{{ fx.tip }}" style="color: rgba(45,45,45,0.45); display: inline-flex; align-items: center; cursor: help; flex-shrink: 0;"><svg width="14" height="14" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.4"></circle><circle cx="8" cy="5" r="0.95" fill="currentColor"></circle><rect x="7.3" y="7.1" width="1.4" height="4.6" rx="0.7" fill="currentColor"></rect></svg></span></sc-if></span>
+                          <span style="font-weight: 500; text-align: right;">{{ fx.v }}</span>
+                        </div>
+                      </sc-for>
+                      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; font-size: 13px;">
+                        <span style="color: rgba(45,45,45,0.55);">Market health</span>
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                          <span style="width: 60px; height: 6px; background: #F2F3F5; border-radius: 9999px; overflow: hidden;"><span style="display: block; height: 100%; width: {{ v.healthWidth }}; background: {{ v.healthColor }}; border-radius: 9999px;"></span></span>
+                          <span style="font-weight: 600; color: {{ v.healthColor }};">{{ v.health }}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Markets -->
+                  <div>
+                    <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px;">
+                      <span style="font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px;">Top markets</span>
+                      <span style="font-size: 12px; color: rgba(45,45,45,0.45);">{{ v.marketNote }}</span>
+                      <sc-if value="{{ v.hasMore }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ v.openPanel }}" style="margin-left: auto; background: #FFFFFF; border: 1px solid rgba(45,45,45,0.2); color: rgba(45,45,45,0.7); font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 9999px; cursor: pointer;" style-hover="background: #F2F3F5;">{{ v.seeAllLabel }}</button>
+                      </sc-if>
+                    </div>
+                    <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.1); border-radius: 12px; overflow: hidden;">
+                      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; padding: 9px 14px; border-bottom: 1px solid #F2F3F5; font-size: 11px; font-weight: 600; color: rgba(45,45,45,0.45); text-transform: uppercase; letter-spacing: 0.4px;">
+                        <span>Venue · Pair</span><span style="text-align: right;">Liquidity</span><span style="text-align: right;">24H Vol</span>
+                      </div>
+                      <sc-for list="{{ v.rows }}" as="m" hint-placeholder-count="3">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; align-items: center; padding: 11px 14px; border-bottom: 1px solid #F2F3F5;">
+                          <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="position: relative; width: 22px; height: 22px; border-radius: 9999px; background: {{ m.venueBg }}; color: #FFFFFF; font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">{{ m.venueInitial }}{{ m.logoEl }}</span>
+                            <span style="font-size: 13px; font-weight: 500;">{{ m.pair }}</span>
+                            <span style="font-size: 12px; color: rgba(45,45,45,0.5);">{{ m.venue }}</span>
+                          </div>
+                          <div style="text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif;">{{ m.liq }}</div>
+                          <div style="text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif; color: rgba(45,45,45,0.7);">{{ m.vol }}</div>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                      <a href="#" title="Opens Jupiter with {{ v.sym }} preselected — the aggregator routes the best price across venues" style="background: #2D2D2D; color: #FFFFFF; border: 1px solid #1F1F1F; font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: 9999px;" style-hover="background: #1F1F1F;">Trade {{ v.sym }} on Jupiter ↗</a>
+                      <a href="#" style="background: #FFFFFF; color: rgba(45,45,45,0.7); border: 1px solid rgba(45,45,45,0.2); font-size: 13px; padding: 8px 16px; border-radius: 9999px;" style-hover="background: #F2F3F5;">Issuer docs</a>
+                      <a href="#" style="background: #FFFFFF; color: rgba(45,45,45,0.7); border: 1px solid rgba(45,45,45,0.2); font-size: 13px; padding: 8px 16px; border-radius: 9999px; font-family: 'Inter', monospace;" style-hover="background: #F2F3F5;">Mint address ↗</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: rgba(45,45,45,0.45); margin-top: 10px; line-height: 1.5;">Spot / LP / Perps show tracked market types. Verify access requirements with the issuer before trading.</div>
+    </section>
+
+    <!-- Liquidity & market depth -->
+    <section data-screen-label="Liquidity and depth" style="margin-top: 40px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 600;">Liquidity &amp; market structure</h2>
+      <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; margin-top: 18px; align-items: start;">
+        <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; padding: 24px; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Liquidity share by variant</div>
+          <div style="display: flex; height: 14px; border-radius: 9999px; overflow: hidden; gap: 2px;">
+            <sc-for list="{{ liqShares }}" as="ls" hint-placeholder-count="5">
+              <div title="{{ ls.tip }}" style="width: {{ ls.width }}; background: {{ ls.color }}; cursor: help;"></div>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 18px;">
+            <sc-for list="{{ liqShares }}" as="ls" hint-placeholder-count="5">
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                <span style="width: 10px; height: 10px; border-radius: 3px; background: {{ ls.color }}; flex-shrink: 0;"></span>
+                <span style="font-weight: 600; width: 64px;">{{ ls.sym }}</span>
+                <span style="color: rgba(45,45,45,0.55); flex: 1;">{{ ls.issuer }}</span>
+                <span style="font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif; font-weight: 500;">{{ ls.liq }}</span>
+                <span style="font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif; color: rgba(45,45,45,0.5); width: 44px; text-align: right;">{{ ls.pct }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top: 16px; padding: 12px 14px; background: rgba(255,160,152,0.14); border-radius: 12px; font-size: 13px; line-height: 1.5; color: rgba(45,45,45,0.75);"><strong style="color: #9E0016;">Concentration note:</strong> 79% of liquidity sits in one variant (SPCX). Deep liquidity exists, but it is not evenly distributed — relevant for execution on smaller variants.</div>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; padding: 24px; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 16px;">Top trading exchanges</div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ venueDepth }}" as="vd" hint-placeholder-count="5">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                  <span style="font-weight: 500;">{{ vd.name }}</span>
+                  <span style="font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif; color: rgba(45,45,45,0.6);">{{ vd.liq }}</span>
+                </div>
+                <div style="height: 8px; background: #F2F3F5; border-radius: 9999px; overflow: hidden;">
+                  <div style="height: 100%; width: {{ vd.width }}; background: #2D2D2D; border-radius: 9999px;"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size: 12px; color: rgba(45,45,45,0.45); margin-top: 14px; line-height: 1.5;">73 tracked markets across 7 venues. Aggregators (Titan, Jupiter, DFlow) route across all of them.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Market health -->
+    <section data-screen-label="Market health" style="margin-top: 40px; background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; padding: 24px; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+      <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="min-width: 260px; flex: 1;">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 600;">Market health</h2>
+            <span style="background: rgba(81,193,72,0.15); color: #4AA651; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;">72 · Healthy</span>
+            <span style="background: rgba(14,14,14,0.08); color: rgba(14,14,14,0.7); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 9999px;">Asset-wide</span>
+          </div>
+          <p style="margin: 10px 0 0; font-size: 14px; color: rgba(45,45,45,0.7); line-height: 1.55; max-width: 460px;">Answers one question: how safely can size move in and out of this asset today? <strong style="color: #2D2D2D;">Not a regulatory rating.</strong> Headline is asset-wide — per-variant scores on the right.</p>
+        </div>
+        <div style="flex: 1.2; min-width: 320px; display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ scoreInputs }}" as="si" hint-placeholder-count="4">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                <span style="color: rgba(45,45,45,0.7);">{{ si.label }}</span>
+                <span style="font-weight: 600; color: {{ si.color }};">{{ si.grade }}</span>
+              </div>
+              <div style="height: 6px; background: #F2F3F5; border-radius: 9999px; overflow: hidden;">
+                <div style="height: 100%; width: {{ si.width }}; background: {{ si.color }}; border-radius: 9999px;"></div>
+              </div>
+            </div>
+          </sc-for>
+          <div style="border-top: 1px solid #F2F3F5; padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px;">Per-variant health</div>
+            <sc-for list="{{ healthVariants }}" as="hv" hint-placeholder-count="5">
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                <span style="font-weight: 600; width: 62px;">{{ hv.sym }}</span>
+                <div style="flex: 1; height: 6px; background: #F2F3F5; border-radius: 9999px; overflow: hidden;">
+                  <div style="height: 100%; width: {{ hv.width }}; background: {{ hv.color }}; border-radius: 9999px;"></div>
+                </div>
+                <span style="font-weight: 600; width: 24px; text-align: right; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif;">{{ hv.score }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size: 12px; color: rgba(45,45,45,0.5); line-height: 1.5;">"Weak" flags an input below the healthy threshold for assets of this size — it is not a judgment of any issuer.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Next steps -->
+    <section data-screen-label="Next steps" style="margin-top: 40px; background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; padding: 24px; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+      <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 280px;">
+          <div style="font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px;">For investors</div>
+          <div style="font-size: 17px; font-weight: 600; margin-top: 6px;">Trade a variant via an aggregator</div>
+          <p style="margin: 6px 0 0; font-size: 14px; color: rgba(45,45,45,0.6); line-height: 1.55;">Pick a variant above and check its access — aggregators route the best price across all venues.</p>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <sc-for list="{{ aggregators }}" as="g" hint-placeholder-count="3">
+            <a href="#" title="{{ g.note }}" style="display: inline-flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1px solid rgba(45,45,45,0.2); border-radius: 9999px; padding: 8px 16px 8px 10px; color: #2D2D2D; font-size: 14px; font-weight: 500;" style-hover="background: #F2F3F5;">
+              <span style="position: relative; width: 24px; height: 24px; border-radius: 9999px; background: {{ g.bg }}; color: #FFFFFF; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">{{ g.initial }}{{ g.logoEl }}</span>
+              {{ g.name }} ↗
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #E5E5E5; font-size: 12px; color: rgba(45,45,45,0.45); line-height: 1.6;">
+      We use publicly available data from the blockchain, as well as data procured by our trusted data partners and related sources. Prototype note: headline figures are from tokens.xyz (Jul 2026); structure facts and category counts are illustrative where marked.
+    </div>
+  </main>
+
+  <!-- All-markets slide-in panel -->
+  <sc-if value="{{ panelMounted }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 100;">
+      <div onClick="{{ closePanel }}" style="position: absolute; inset: 0; background: rgba(14,14,14,0.4); opacity: {{ panelScrimOpacity }}; transition: opacity 0.25s ease;"></div>
+      <div data-screen-label="All markets panel" style="position: absolute; top: 0; right: 0; bottom: 0; width: 440px; max-width: 92vw; background: #FFFFFF; box-shadow: rgba(0,0,0,0.18) -12px 0px 40px; display: flex; flex-direction: column; transform: {{ panelTransform }}; transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 20px 24px; border-bottom: 1px solid #F2F3F5;">
+          <div style="flex: 1;">
+            <div style="font-size: 16px; font-weight: 600;">All markets · {{ panelSym }}</div>
+            <div style="font-size: 12px; color: rgba(45,45,45,0.5); margin-top: 2px;">{{ panelCount }} markets, sorted by 24h volume</div>
+          </div>
+          <button onClick="{{ closePanel }}" aria-label="Close" style="width: 32px; height: 32px; border-radius: 9999px; border: 1px solid rgba(45,45,45,0.15); background: #FFFFFF; color: rgba(45,45,45,0.7); font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;" style-hover="background: #F2F3F5;">✕</button>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; padding: 10px 24px; border-bottom: 1px solid #F2F3F5; font-size: 11px; font-weight: 600; color: rgba(45,45,45,0.45); text-transform: uppercase; letter-spacing: 0.4px;">
+          <span>Venue · Pair</span><span style="text-align: right;">Liquidity</span><span style="text-align: right;">24H Vol</span>
+        </div>
+        <div style="flex: 1; overflow-y: auto;">
+          <sc-for list="{{ panelRows }}" as="m" hint-placeholder-count="8">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; align-items: center; padding: 11px 24px; border-bottom: 1px solid #F2F3F5;">
+              <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                <span style="position: relative; width: 22px; height: 22px; border-radius: 9999px; background: {{ m.venueBg }}; color: #FFFFFF; font-size: 9px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">{{ m.venueInitial }}{{ m.logoEl }}</span>
+                <div style="min-width: 0;">
+                  <div style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ m.pair }}</div>
+                  <div style="font-size: 11px; color: rgba(45,45,45,0.5);">{{ m.venue }}</div>
+                </div>
+              </div>
+              <div style="text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif;">{{ m.liq }}</div>
+              <div style="text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; font-family: 'InterVariable', 'Inter', sans-serif; color: rgba(45,45,45,0.7);">{{ m.vol }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- Persistent issuer footer -->
+  <footer data-screen-label="Issuer footer" style="background: #171717; color: #FFFFFF;">
+    <div style="max-width: 1160px; margin: 0 auto; padding: 36px 40px 32px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 300px;">
+        <div style="font-size: 12px; font-weight: 600; color: #FFA098; text-transform: uppercase; letter-spacing: 0.4px;">For issuers</div>
+        <div style="font-size: 20px; font-weight: 600; margin-top: 6px;">Bring an asset to Solana</div>
+        <p style="margin: 6px 0 0; font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.55; max-width: 480px;">Your asset gets listed, compared, and discoverable exactly like this page.</p>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="#" style="background: #9E0016; color: #FFFFFF; font-size: 14px; font-weight: 500; padding: 10px 20px; border-radius: 9999px;" style-hover="background: #7E0012;">Talk to the team</a>
+        <a href="#" style="background: transparent; color: rgba(255,255,255,0.75); font-size: 14px; padding: 10px 20px; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.25);" style-hover="background: rgba(255,255,255,0.08);">Assets API docs</a>
+      </div>
+    </div>
+    <div style="border-top: 1px solid rgba(255,255,255,0.1);">
+      <div style="max-width: 1160px; margin: 0 auto; padding: 16px 40px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: rgba(255,255,255,0.45);">
+        <span style="font-weight: 600; color: rgba(255,255,255,0.7);">Tokens</span>
+        <span>·</span>
+        <span>Managed by the Solana Foundation</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { expanded: { SPCX: true } };
+
+  fmt(n) {
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(2) + 'K';
+    return '$' + n.toFixed(2);
+  }
+
+  logoEl(src, alt, bg) {
+    if (!src) return null;
+    return React.createElement('img', {
+      src, alt,
+      onError: (e) => { e.target.style.display = 'none'; },
+      style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', backgroundColor: bg || '#FFFFFF' },
+    });
+  }
+
+  openPanel(sym) {
+    this.setState({ panelSym: sym, panelOpen: false });
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ panelOpen: true })));
+  }
+
+  venueMeta(name) {
+    const colors = { Meteora: '#B4451F', Orca: '#C99A2E', Raydium: '#3D6B99', Byreal: '#6B4E9E', Kamino: '#2E7D6B', Sunrise: '#A8552E' };
+    const imgs = {
+      Meteora: 'https://www.meteora.ag/icons/v2.svg',
+      Orca: 'https://www.orca.so/favicon.ico',
+      Raydium: 'https://raydium.io/favicon.ico',
+      Byreal: 'https://www.byreal.io/favicon.ico',
+      Kamino: 'https://www.tokens.xyz/logos/popular/kamino.png',
+      Sunrise: 'https://www.tokens.xyz/logos/popular/sunrise.svg',
+    };
+    return { venue: name, venueInitial: name.slice(0, 2).toUpperCase(), venueBg: colors[name] || '#555555', logoEl: this.logoEl(imgs[name] || '', name, colors[name] || '#555555') };
+  }
+
+  mkRow(venue, pair, liq, vol) {
+    return Object.assign(this.venueMeta(venue), { pair, liq: this.fmt(liq), vol: this.fmt(vol) });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const accessStyles = {
+      kyc: { bg: 'rgba(255,160,152,0.28)', color: '#9E0016' },
+      restricted: { bg: 'rgba(249,36,52,0.1)', color: '#CF4040' },
+      check: { bg: '#F2F3F5', color: 'rgba(45,45,45,0.65)' },
+    };
+    const attest = () => ({});
+    const chip = (label, on) => ({ label, mark: on ? '✓' : '—', bg: on ? 'rgba(81,193,72,0.15)' : '#F2F3F5', color: on ? '#4AA651' : 'rgba(45,45,45,0.4)' });
+    const mk = this.mkRow.bind(this);
+
+    const defs = [
+      {
+        sym: 'SPCX', issuer: 'Backpack Securities', type: 'Tokenized equity', avatar: 'BP', avatarBg: '#171717', price: '$188.87', chg: '-3.07%', chgUp: false, img: 'https://img.fotofolio.xyz/?url=https%3A%2F%2Fbackpack.exchange%2Fapi%2Fstock-logo%2FSPCX',
+        liq: '$7.03M', vol: '$29.49M', access: 'KYC required', accessKind: 'kyc',
+        accessHint: 'Backpack Securities states KYC verification is required to mint or redeem. Verify with issuer.',
+        avail: [chip('Spot', true), chip('LP', true), chip('Perps', false)],
+        ...attest('yes', 'Reserve attestation \u2197', 'Independent accountant\u2019s report \u00b7 monthly \u00b7 last Jun 30, 2026 (illustrative in prototype)'),
+        facts: [
+          { k: 'Instrument', v: 'Tokenized equity' },
+          { k: 'Backing', v: 'Backed 1:1 (issuer-stated)', tip: 'Attested: independent accountant\u2019s reserve report, monthly \u00b7 last Jun 30, 2026 (illustrative in prototype).' },
+          { k: 'Redemption', v: 'Via issuer, KYC required' },
+          { k: 'Domicile', v: 'Not specified', tip: 'No structured disclosure found — not necessarily that none exists. Check issuer docs.' },
+          { k: 'Execution quality', v: '96 / 100' },
+        ],
+        marketNote: '20 markets total',
+        rows: [ mk('Orca', 'SPCX/USDC', 778010, 10620000), mk('Meteora', 'SPCX/USDC', 2800000, 6970000), mk('Raydium', 'SPCX/SOL', 412000, 1830000) ],
+        extra: [
+          mk('Orca', 'SPCX/SOL', 388400, 1210000), mk('Kamino', 'SPCX/USDC', 341200, 904300), mk('Meteora', 'SPCX/SOL', 296800, 771500),
+          mk('Byreal', 'SPCX/USDC', 233100, 618200), mk('Raydium', 'SPCX/USDC', 197400, 502900), mk('Sunrise', 'SPCX/USDC', 164800, 388100),
+          mk('Orca', 'SPCX/USDT', 121500, 296400), mk('Meteora', 'SPCX/JitoSOL', 98200, 187300), mk('Raydium', 'SPCX/USDT', 76400, 141900),
+          mk('Kamino', 'SPCX/SOL', 61800, 98700), mk('Byreal', 'SPCX/SOL', 44200, 71200), mk('Meteora', 'SPCX/USDT', 31600, 48400),
+          mk('Sunrise', 'SPCX/SOL', 22900, 30100), mk('Orca', 'SPCX/mSOL', 15300, 18800), mk('Raydium', 'SPCX/JitoSOL', 9800, 11200),
+          mk('Meteora', 'SPCX/bSOL', 6100, 5400), mk('Byreal', 'SPCX/USDT', 2700, 1900),
+        ],
+      },
+      {
+        sym: 'SPCXx', issuer: 'Backed (xStocks)', type: 'Tokenized equity', avatar: 'xS', avatarBg: '#3D6B99', price: '$189.42', chg: '-2.81%', chgUp: false, img: 'https://xstocks-metadata.backed.fi/logos/tokens/SPCXx.png',
+        liq: '$1.21M', vol: '$1.61M', access: 'Restricted', accessKind: 'restricted',
+        accessHint: 'Geo-restricted; not available to US persons per issuer documentation.',
+        avail: [chip('Spot', true), chip('LP', true), chip('Perps', false)],
+        ...attest('yes', 'Reserve attestation \u2197', 'Proof-of-reserve feed + auditor report \u00b7 last Jun 2026 (illustrative in prototype)'),
+        facts: [
+          { k: 'Instrument', v: 'Tokenized equity' },
+          { k: 'Backing', v: 'Backed 1:1 (issuer-stated)', tip: 'Attested: proof-of-reserve feed + auditor report \u00b7 last Jun 2026 (illustrative in prototype).' },
+          { k: 'Redemption', v: 'Via issuer, eligibility applies' },
+          { k: 'Domicile', v: 'Switzerland (issuer-stated)' },
+          { k: 'Execution quality', v: '96 / 100' },
+        ],
+        marketNote: '20 markets total',
+        rows: [ mk('Byreal', 'SPCXx/USDC', 207410, 788900), mk('Raydium', 'SPCX/SPCXx', 108600, 424790), mk('Meteora', 'SPCXx/USDC', 88000, 210000) ],
+        extra: [
+          mk('Orca', 'SPCXx/USDC', 74200, 168400), mk('Meteora', 'SPCXx/SOL', 61800, 132700), mk('Raydium', 'SPCXx/USDC', 52300, 104800),
+          mk('Kamino', 'SPCXx/USDC', 44700, 88200), mk('Byreal', 'SPCXx/SOL', 37100, 69400), mk('Orca', 'SPCXx/SOL', 29800, 51200),
+          mk('Meteora', 'SPCXx/USDT', 23400, 38600), mk('Raydium', 'SPCXx/SOL', 18200, 27100), mk('Sunrise', 'SPCXx/USDC', 13700, 18400),
+          mk('Kamino', 'SPCXx/SOL', 9800, 11700), mk('Byreal', 'SPCXx/USDT', 6900, 7200), mk('Orca', 'SPCXx/USDT', 4400, 3800),
+          mk('Meteora', 'SPCXx/mSOL', 2800, 1900), mk('Raydium', 'SPCXx/USDT', 1600, 800), mk('Sunrise', 'SPCXx/SOL', 900, 300),
+          mk('Meteora', 'SPCXx/bSOL', 400, 100), mk('Byreal', 'SPCXx/JitoSOL', 200, 0),
+        ],
+      },
+      {
+        sym: 'TSPX', issuer: 'Tessera', type: 'Pre-IPO exposure', avatar: 'TS', avatarBg: '#6B4E9E', price: '$174.20', chg: '+1.36%', chgUp: true, img: 'https://cdn.tesseralab.co/tessera/tokenicon_T-SpaceX.svg',
+        liq: '$611.06K', vol: '$912.76K', access: 'Check issuer', accessKind: 'check',
+        accessHint: 'Access requirements not published in a structured format. Check issuer documentation.',
+        avail: [chip('Spot', true), chip('LP', true), chip('Perps', false)],
+        ...attest('no', 'No attestation published', 'No reserve report or audit found \u00b7 backing claim unverified'),
+        facts: [
+          { k: 'Instrument', v: 'Pre-IPO exposure' },
+          { k: 'Backing', v: 'Not specified', tip: 'No reserve report or audit found \u2014 backing claim unverified. Check issuer docs.' },
+          { k: 'Redemption', v: 'Not specified', tip: 'No structured disclosure found — not necessarily that none exists. Check issuer docs.' },
+          { k: 'Domicile', v: 'Not specified', tip: 'No structured disclosure found — not necessarily that none exists. Check issuer docs.' },
+          { k: '24H trades', v: '7.3K' },
+        ],
+        marketNote: '11 markets total',
+        rows: [ mk('Meteora', 'TSPX/USDC', 632780, 712980), mk('Meteora', 'tSpaceX/USDC', 3750, 0) ],
+        extra: [
+          mk('Raydium', 'TSPX/USDC', 3120, 4800), mk('Orca', 'TSPX/USDC', 2840, 3100), mk('Meteora', 'TSPX/SOL', 2210, 1700),
+          mk('Raydium', 'TSPX/SOL', 1680, 900), mk('Byreal', 'TSPX/USDC', 1240, 600), mk('Orca', 'TSPX/SOL', 870, 300),
+          mk('Meteora', 'TSPX/USDT', 520, 100), mk('Kamino', 'TSPX/USDC', 310, 0), mk('Raydium', 'TSPX/USDT', 140, 0),
+        ],
+      },
+      {
+        sym: 'SPACEX', issuer: 'PreStocks', type: 'Pre-IPO exposure', avatar: 'PS', avatarBg: '#A8552E', price: '$203.55', chg: '-4.92%', chgUp: false, img: 'https://prestocks.com/logos/spacex.png',
+        liq: '$33.62K', vol: '$80.82K', access: 'Check issuer', accessKind: 'check',
+        accessHint: 'Access requirements not published in a structured format. Check issuer documentation.',
+        avail: [chip('Spot', true), chip('LP', true), chip('Perps', false)],
+        ...attest('no', 'No attestation published', 'No reserve report or audit found \u00b7 backing claim unverified'),
+        facts: [
+          { k: 'Instrument', v: 'Pre-IPO exposure' },
+          { k: 'Backing', v: 'Not specified', tip: 'No reserve report or audit found \u2014 backing claim unverified. Check issuer docs.' },
+          { k: 'Redemption', v: 'Not specified', tip: 'No structured disclosure found — not necessarily that none exists. Check issuer docs.' },
+          { k: 'Domicile', v: 'Not specified', tip: 'No structured disclosure found — not necessarily that none exists. Check issuer docs.' },
+          { k: '24H trades', v: '563' },
+        ],
+        marketNote: '20 markets total',
+        rows: [ mk('Meteora', 'SPACEX/USDC', 24310, 38700), mk('Meteora', 'SPACEX/SPCXx', 451170, 32070) ],
+        extra: [
+          mk('Raydium', 'SPACEX/USDC', 19800, 24100), mk('Orca', 'SPACEX/USDC', 16200, 18800), mk('Meteora', 'SPACEX/SOL', 13400, 14200),
+          mk('Raydium', 'SPACEX/SOL', 10800, 10600), mk('Byreal', 'SPACEX/USDC', 8600, 7800), mk('Orca', 'SPACEX/SOL', 6900, 5400),
+          mk('Kamino', 'SPACEX/USDC', 5200, 3800), mk('Meteora', 'SPACEX/USDT', 3900, 2400), mk('Raydium', 'SPACEX/USDT', 2800, 1500),
+          mk('Sunrise', 'SPACEX/USDC', 1900, 800), mk('Byreal', 'SPACEX/SOL', 1200, 400), mk('Orca', 'SPACEX/USDT', 780, 200),
+          mk('Kamino', 'SPACEX/SOL', 460, 100), mk('Meteora', 'SPACEX/mSOL', 240, 0), mk('Raydium', 'SPACEX/JitoSOL', 120, 0),
+          mk('Sunrise', 'SPACEX/SOL', 60, 0), mk('Byreal', 'SPACEX/USDT', 30, 0),
+        ],
+      },
+      {
+        sym: 'SPCXon', issuer: 'Ondo', type: 'Tokenized equity', avatar: 'ON', avatarBg: '#2E7D6B', price: '$187.90', chg: '-3.44%', chgUp: false, img: 'https://cdn.ondo.finance/tokens/logos/spcxon_160x160.png',
+        liq: '$132.77', vol: '$15.45K', access: 'Restricted', accessKind: 'restricted',
+        accessHint: 'Permissioned token; eligibility restrictions apply per issuer documentation.',
+        avail: [chip('Spot', true), chip('LP', false), chip('Perps', false)],
+        ...attest('yes', 'Attestation via issuer \u2197', 'Issuer publishes backing verification \u00b7 check report date before relying on it'),
+        facts: [
+          { k: 'Instrument', v: 'Tokenized equity' },
+          { k: 'Backing', v: 'Backed (issuer-stated)', tip: 'Issuer publishes backing verification \u00b7 check report date before relying on it.' },
+          { k: 'Redemption', v: 'Via issuer, permissioned' },
+          { k: 'Domicile', v: 'Not specified', tip: 'No structured disclosure found — not necessarily that none exists. Check issuer docs.' },
+          { k: '24H trades', v: '19' },
+        ],
+        marketNote: '2 markets total',
+        rows: [ mk('Meteora', 'SPCXon/USDT', 143.71, 0), mk('Meteora', 'SPCXon/USDC', 7.25, 0) ],
+      },
+    ];
+
+    const panelDef = st.panelSym ? defs.find(v => v.sym === st.panelSym) : null;
+    const panelRows = panelDef ? panelDef.rows.concat(panelDef.extra || []) : [];
+    const panelOpen = !!st.panelOpen;
+
+    const healthMap = { SPCX: 84, SPCXx: 76, TSPX: 58, SPACEX: 31, SPCXon: 12 };
+    const healthColor = (n) => n >= 65 ? '#51C148' : n >= 40 ? '#C99A2E' : '#CF4040';
+    const variants = defs.map(v => {
+      const expanded = !!st.expanded[v.sym];
+      const a = accessStyles[v.accessKind];
+      const health = healthMap[v.sym];
+      const extra = v.extra || [];
+      return Object.assign({}, v, {
+        expanded,
+        logoEl: this.logoEl(v.img, v.sym, v.avatarBg),
+        chevron: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+        accessBg: a.bg,
+        accessColor: a.color,
+        chgColor: v.chgUp ? '#4AA651' : '#CF4040',
+        health,
+        healthColor: healthColor(health),
+        healthWidth: health + '%',
+        toggle: () => this.setState(s => ({ expanded: Object.assign({}, s.expanded, { [v.sym]: !s.expanded[v.sym] }) })),
+        hasMore: extra.length > 0,
+        seeAllLabel: 'See all ' + (v.rows.length + extra.length),
+        openPanel: () => this.openPanel(v.sym),
+      });
+    });
+
+    // sparkline
+    let s = 33; const rand = () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+    let y = 16; const pts = [];
+    for (let i = 0; i < 40; i++) { y += (rand() - 0.48) * 6; y = Math.max(4, Math.min(40, y)); pts.push([(i / 39) * 200, y]); }
+    const sparkPath = 'M' + pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' L');
+
+    const shareColors = ['#171717', '#3D6B99', '#6B4E9E', '#A8552E', '#2E7D6B'];
+    const shares = [
+      { sym: 'SPCX', issuer: 'Backpack Securities', liq: '$7.03M', pct: '79.1%', w: 79.1 },
+      { sym: 'SPCXx', issuer: 'Backed (xStocks)', liq: '$1.21M', pct: '13.6%', w: 13.6 },
+      { sym: 'TSPX', issuer: 'Tessera', liq: '$611K', pct: '6.9%', w: 6.9 },
+      { sym: 'SPACEX', issuer: 'PreStocks', liq: '$33.6K', pct: '0.4%', w: 0.4 },
+      { sym: 'SPCXon', issuer: 'Ondo', liq: '$133', pct: '<0.1%', w: 0.1 },
+    ];
+
+    return {
+      panelMounted: !!st.panelSym,
+      panelSym: st.panelSym || '',
+      panelCount: panelRows.length,
+      panelRows,
+      panelTransform: panelOpen ? 'translateX(0)' : 'translateX(100%)',
+      panelScrimOpacity: panelOpen ? 1 : 0,
+      closePanel: () => {
+        this.setState({ panelOpen: false });
+        setTimeout(() => this.setState(s => (s.panelOpen ? null : { panelSym: null })), 300);
+      },
+      variants,
+      sparkPath,
+      ecoStats: [
+        { value: '5', label: 'Variants live' },
+        { value: '4', label: 'Independent issuers' },
+        { value: '$8.89M', label: 'Combined liquidity' },
+        { value: '$32.10M', label: '24H volume' },
+        { value: '73', label: 'Tracked markets' },
+      ],
+      liqShares: shares.map((x, i) => ({ ...x, width: Math.max(x.w, 0.6) + '%', color: shareColors[i], tip: x.sym + ' — ' + x.liq + ' (' + x.pct + ')' })),
+      venueDepth: [
+        { name: 'Meteora', liq: '$4.62M', width: '100%' },
+        { name: 'Kamino', liq: '$1.51M', width: '33%' },
+        { name: 'Orca', liq: '$1.24M', width: '27%' },
+        { name: 'Raydium', liq: '$0.86M', width: '19%' },
+        { name: 'Byreal', liq: '$0.42M', width: '9%' },
+      ],
+      aggregators: [
+        { name: 'Titan', initial: 'TI', bg: '#333333', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/titan.png', 'Titan', '#333333'), note: 'Best route across 4 venues' },
+        { name: 'Jupiter', initial: 'JU', bg: '#2E7D6B', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/jupiter.png', 'Jupiter', '#2E7D6B'), note: 'Routes all variants' },
+        { name: 'DFlow', initial: 'DF', bg: '#3D6B99', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/dflow.png', 'DFlow', '#3D6B99'), note: 'Spot routing' },
+      ],
+      healthVariants: [
+        { sym: 'SPCX', score: 84, width: '84%', color: '#51C148' },
+        { sym: 'SPCXx', score: 76, width: '76%', color: '#51C148' },
+        { sym: 'TSPX', score: 58, width: '58%', color: '#C99A2E' },
+        { sym: 'SPACEX', score: 31, width: '31%', color: '#CF4040' },
+        { sym: 'SPCXon', score: 12, width: '12%', color: '#CF4040' },
+      ],
+      scoreInputs: [
+        { label: 'Liquidity depth', grade: 'Healthy', width: '78%', color: '#51C148' },
+        { label: 'Volume consistency', grade: 'Healthy', width: '82%', color: '#51C148' },
+        { label: 'Venue diversity', grade: 'Healthy', width: '70%', color: '#51C148' },
+        { label: 'Liquidity concentration', grade: 'Weak', width: '34%', color: '#CF4040' },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

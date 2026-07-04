@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body { margin: 0; background: #FAFAFA; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #2D2D2D; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+a { text-decoration: none; }
+</style>
+</helmet>
+
+<div data-screen-label="Design Rationale" style="min-height: 100vh;">
+
+  <!-- Prototype switcher -->
+  <div style="background: #171717; color: #FFFFFF; display: flex; align-items: center; gap: 16px; padding: 0 24px; height: 44px; font-size: 13px; position: sticky; top: 0; z-index: 60;">
+    <span style="font-weight: 600; opacity: 0.9;">SpaceX Page Redesign</span>
+    <span style="opacity: 0.35;">·</span>
+    <a href="Variation A - Evolved.dc.html" style="color: rgba(255,255,255,0.65); padding: 5px 12px; border-radius: 9999px;" style-hover="color: #FFFFFF; background: rgba(255,255,255,0.08);">A · Evolved</a>
+    <a href="Variation B - Issuer-First.dc.html" style="color: rgba(255,255,255,0.65); padding: 5px 12px; border-radius: 9999px;" style-hover="color: #FFFFFF; background: rgba(255,255,255,0.08);">B · Insto-first</a>
+    <a href="Design Rationale.dc.html" style="color: #FFFFFF; background: rgba(255,255,255,0.16); padding: 5px 12px; border-radius: 9999px; font-weight: 600;">Rationale</a>
+  </div>
+
+  <main style="max-width: 860px; margin: 0 auto; padding: 48px 40px 96px;">
+
+    <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.5px; line-height: 1.2;">Design rationale</h1>
+    <p style="margin: 12px 0 0; font-size: 16px; line-height: 1.6; color: rgba(45,45,45,0.65);">Tokens.xyz SpaceX asset detail page redesign — information architecture, required explorations, and recommendation. Companion to the two clickable prototypes above.</p>
+
+    <!-- IA -->
+    <section style="margin-top: 48px;">
+      <h2 style="margin: 0 0 12px; font-size: 21px; font-weight: 600;">1 · Revised information architecture</h2>
+      <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.65; color: rgba(45,45,45,0.75);">The current page mixes four concepts. The redesign enforces one canonical hierarchy and renders each level exactly once:</p>
+      <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 20px 24px; font-size: 14px; line-height: 1.7;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div><strong>Asset</strong> <span style="color: rgba(45,45,45,0.55);">— SpaceX. Owns the reference price, aggregate stats, and market-health score. Everything asset-level is explicitly labeled "across all variants".</span></div>
+          <div style="padding-left: 20px;"><strong>Variant / Issuer</strong> <span style="color: rgba(45,45,45,0.55);">— SPCX, SPCXx, TSPX, SPACEX, SPCXon. A financial product with issuer, type, backing, and access — not just a ticker. Rendered once, in one comparison module.</span></div>
+          <div style="padding-left: 40px;"><strong>Market / Venue</strong> <span style="color: rgba(45,45,45,0.55);">— Orca, Meteora, Raydium, Byreal, Kamino… Lives inside the variant's expanded row; never a competing page section.</span></div>
+          <div style="padding-left: 60px;"><strong>Pair</strong> <span style="color: rgba(45,45,45,0.55);">— SPCX/USDC etc. A row inside a market list.</span></div>
+        </div>
+      </div>
+      <p style="margin: 16px 0 0; font-size: 15px; line-height: 1.65; color: rgba(45,45,45,0.75);">The structural fix behind most of the PRD's problems: <strong>variants appear exactly once per page</strong>. The former four appearances (header dropdown, markets groupings, standalone Variants section, variant sub-page) collapse into a single expandable comparison module. The header chip becomes a jump link into it; markets nest inside it; the sub-page becomes its expanded state.</p>
+    </section>
+
+    <!-- Two variations -->
+    <section style="margin-top: 48px;">
+      <h2 style="margin: 0 0 12px; font-size: 21px; font-weight: 600;">2 · The two directions</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <a href="Variation A - Evolved.dc.html" style="display: block; background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 20px 24px; color: #2D2D2D;" style-hover="border-color: rgba(38,38,38,0.3);">
+          <div style="font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px;">Variation A</div>
+          <div style="font-size: 17px; font-weight: 600; margin-top: 6px;">Evolved current experience</div>
+          <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.65);">Keeps the token-page shape: chart on top, stats, then one Variants &amp; Markets module. Adds issuer identity, access labels, inline market expansion, and an explained health score. Retail users lose nothing; issuers gain legibility.</p>
+        </a>
+        <a href="Variation B - Issuer-First.dc.html" style="display: block; background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 20px 24px; color: #2D2D2D;" style-hover="border-color: rgba(38,38,38,0.3);">
+          <div style="font-size: 12px; font-weight: 600; color: #9E0016; text-transform: uppercase; letter-spacing: 0.4px;">Variation B</div>
+          <div style="font-size: 17px; font-weight: 600; margin-top: 6px;">Insto-first reframe</div>
+          <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.65);">Leads with ecosystem summary (5 variants · 4 issuers · $8.89M liquidity), demotes price to a compact module, and treats each issuer card as a product sheet: structure, backing, redemption, access, then markets. Ends with ecosystem proof and dual next-step paths.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Spot/Futures/Liquidity exploration -->
+    <section style="margin-top: 48px;">
+      <h2 style="margin: 0 0 12px; font-size: 21px; font-weight: 600;">3 · Exploration: Spot / Futures / Liquidity</h2>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 18px 22px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 15px; font-weight: 600;">Option A — Market filter tabs</span>
+            <span style="background: rgba(81,193,72,0.15); color: #4AA651; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;">Used in Variation A</span>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.7);"><strong>Solves:</strong> the module no longer competes with variants for attention; it's clearly a lens on markets, not a different product. <strong>Clearer:</strong> what the toggle changes (the market list, nothing else). Futures shows an honest empty state instead of vanishing. <strong>Tradeoff:</strong> availability per variant isn't visible until you filter — you can't see at a glance that SPCXon has no pools.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 18px 22px;">
+          <span style="font-size: 15px; font-weight: 600;">Option B — Task-based labels (Trade / Hedge / Provide Liquidity)</span>
+          <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.7);"><strong>Solves:</strong> maps to user intent rather than market jargon; friendliest for retail. <strong>Clearer:</strong> what the user will accomplish. <strong>Tradeoff:</strong> intent labels are actions, and this page is an evaluation surface — "Hedge" with zero futures markets is a broken promise, and institutional users distrust marketing verbs on data pages. Rejected for both variations.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 18px 22px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 15px; font-weight: 600;">Option C — Availability metadata in the variant table</span>
+            <span style="background: rgba(81,193,72,0.15); color: #4AA651; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;">Used in Variation B</span>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.7);"><strong>Solves:</strong> market-type availability becomes a comparison attribute (Spot ✓ · LP ✓ · Perps —), visible per variant without any interaction. <strong>Clearer:</strong> the shape of each product's market structure at a glance — exactly what an issuer scans for. <strong>Tradeoff:</strong> no way to filter the whole page by market type; chips add density to each row.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dropdown exploration -->
+    <section style="margin-top: 48px;">
+      <h2 style="margin: 0 0 12px; font-size: 21px; font-weight: 600;">4 · Exploration: the "5+ variants" dropdown</h2>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 18px 22px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 15px; font-weight: 600;">Option A — Remove it</span>
+            <span style="background: rgba(81,193,72,0.15); color: #4AA651; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;">Used in Variation B</span>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.7);">B's hero already says "5 variants · 4 issuers" in the ecosystem strip, and the issuer cards are the very next section — a dropdown would duplicate them within one screen. Removing it is only safe because the comparison module is that close to the top.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 18px 22px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 15px; font-weight: 600;">Option B — Keep as jump link</span>
+            <span style="background: rgba(81,193,72,0.15); color: #4AA651; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;">Used in Variation A</span>
+          </div>
+          <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.7);">A keeps the chart on top, so variants sit below the fold; the header chip ("5 variants · 4 issuers ↓") preserves the current page's scent — you learn immediately that this asset is plural — but clicking scrolls to the single comparison module instead of opening a redundant card list. Zero duplication, familiar affordance.</p>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 18px 22px;">
+          <span style="font-size: 15px; font-weight: 600;">Option C — Keep as quick switcher</span>
+          <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.7);">A compact switcher implies the page re-renders per variant — which recreates the old "am I looking at asset or variant data?" ambiguity the IA just fixed. Worth revisiting only if per-variant sub-pages return (e.g. deep-linked variant views). Rejected for now.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Remove / merge / demote -->
+    <section style="margin-top: 48px;">
+      <h2 style="margin: 0 0 12px; font-size: 21px; font-weight: 600;">5 · Removed, merged, demoted</h2>
+      <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; overflow: hidden;">
+        <div style="display: grid; grid-template-columns: 1.4fr 0.8fr 2fr; gap: 12px; padding: 12px 22px; border-bottom: 1px solid #F2F3F5; font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px;">
+          <span>Module</span><span>Decision</span><span>Why</span>
+        </div>
+        <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="6">
+          <div style="display: grid; grid-template-columns: 1.4fr 0.8fr 2fr; gap: 12px; padding: 14px 22px; border-bottom: 1px solid #F2F3F5; font-size: 14px; line-height: 1.5;">
+            <span style="font-weight: 500;">{{ d.module }}</span>
+            <span><span style="background: {{ d.bg }}; color: {{ d.color }}; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;">{{ d.decision }}</span></span>
+            <span style="color: rgba(45,45,45,0.7);">{{ d.why }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- Audiences -->
+    <section style="margin-top: 48px;">
+      <h2 style="margin: 0 0 12px; font-size: 21px; font-weight: 600;">6 · How each variation serves each audience</h2>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <sc-for list="{{ audiences }}" as="au" hint-placeholder-count="3">
+          <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 16px; padding: 18px 22px;">
+            <div style="font-size: 15px; font-weight: 600;">{{ au.who }}</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; font-size: 14px; line-height: 1.6; color: rgba(45,45,45,0.7);">
+              <div><span style="font-weight: 600; color: #2D2D2D;">A:</span> {{ au.a }}</div>
+              <div><span style="font-weight: 600; color: #9E0016;">B:</span> {{ au.b }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- Recommendation -->
+    <section style="margin-top: 48px; background: #171717; border-radius: 22px; padding: 32px; color: #FFFFFF;">
+      <h2 style="margin: 0 0 16px; font-size: 21px; font-weight: 600;">7 · Recommendation</h2>
+      <div style="font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.85); display: flex; flex-direction: column; gap: 14px;">
+        <p style="margin: 0;"><strong style="color: #FFFFFF;">Ship A first.</strong> It fixes every named defect — variant repetition, the misleading "View 18 more", hidden overview data, missing access context, the competing Spot/Futures module, the unexplained score — while staying recognizable to the existing audience. Low regression risk, incremental engineering, immediately testable against the live page.</p>
+        <p style="margin: 0;"><strong style="color: #FFFFFF;">B is the stronger long-term vision.</strong> The PRD's primary user is the issuer, and only B answers the issuer's actual question — "will Solana make my asset look credible?" — with ecosystem framing, product-sheet variant cards, fragmentation honesty, and an explicit issuer path. B is also the layout that generalizes to T-bills, gold, and other RWAs where a price chart should not dominate.</p>
+        <p style="margin: 0;"><strong style="color: #FFFFFF;">Migration path:</strong> A's comparison module, access labels, and health-score explainer are shared components with B — build them once. Then B can ship behind an audience toggle or as the default for private-market/RWA asset classes while pure-crypto tokens keep A's chart-first order.</p>
+        <p style="margin: 0;"><strong style="color: #FFFFFF;">Tradeoffs to weigh:</strong> B demotes the chart, which may reduce retail engagement time on the page; its structure facts create a data-sourcing obligation (issuer disclosures must be maintained, and "Not specified" must stay honest); and the concentration callout is candid in a way marketing may push back on — but that candor is precisely the trust signal issuers are evaluating.</p>
+      </div>
+    </section>
+
+    <div style="margin-top: 40px; font-size: 13px; color: rgba(45,45,45,0.5); line-height: 1.6;">
+      Copy rules applied throughout: no "compliant" claims; access labels limited to Open / Restricted / KYC required / Check issuer / Unknown; issuer statements attributed ("issuer-stated"); market-health score explicitly framed as not a regulatory rating.
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const tag = {
+      removed: { bg: 'rgba(249,36,52,0.1)', color: '#CF4040' },
+      merged: { bg: 'rgba(255,160,152,0.28)', color: '#9E0016' },
+      demoted: { bg: '#F2F3F5', color: 'rgba(45,45,45,0.65)' },
+      changed: { bg: 'rgba(81,193,72,0.15)', color: '#4AA651' },
+    };
+    const d = (module, kind, label, why) => ({ module, decision: label, why, bg: tag[kind].bg, color: tag[kind].color });
+    return {
+      decisions: [
+        d('Standalone lower Variants section', 'removed', 'Removed', 'Fully absorbed by the single comparison module; it was the main source of repetition.'),
+        d('Variant grouping inside Markets', 'merged', 'Merged', 'Markets now nest inside each variant\u2019s expanded row \u2014 the hierarchy renders itself.'),
+        d('"View 18 more" navigation', 'changed', 'Replaced', 'Inline expansion with "Show all X markets" \u2194 "Show fewer markets"; user never loses page context.'),
+        d('Top "5+ variants" dropdown', 'changed', 'Repurposed', 'Jump link in A (chart pushes variants below fold); removed in B (comparison is the second section).'),
+        d('Spot / Futures / Liquidity module', 'merged', 'Merged', 'Filter tabs inside Markets in A; per-variant availability chips in B. No longer a competing module.'),
+        d('Latest Updates', 'demoted', 'Demoted', 'Renamed "Market updates", moved to page bottom, capped at three items with typed tags (Listing / Activity / Issuer). Proof of activity without competing with structure.'),
+        d('Security score', 'changed', 'Reframed', '"Market health" with scope label (asset-wide, daily), input breakdown, and explicit "not a regulatory rating" framing.'),
+      ],
+      audiences: [
+        {
+          who: 'Issuers (primary)',
+          a: 'Sees their identity surfaced in a familiar retail context: issuer column, access labels, exec-quality badge. Answers \u201cwould my asset look credible in the existing format?\u201d',
+          b: 'The page is built around their evaluation: product-sheet cards, structure disclosures, fragmentation honesty, ecosystem proof, and a direct \u201cbring an asset to Solana\u201d path.',
+        },
+        {
+          who: 'Retail / crypto-native investors',
+          a: 'Nothing is taken away \u2014 chart, price, stats, and buy paths stay on top; access labels prevent surprise KYC walls at the venue.',
+          b: 'Price is one click deeper but compare-then-trade is arguably safer: access and structure are visible before venue selection.',
+        },
+        {
+          who: 'Sophisticated / institutional investors',
+          a: 'Gains issuer, type, and access columns plus richer expanded market data (trades, wallets) that the overview previously hid.',
+          b: 'Best fit: instrument type, backing, redemption, domicile, concentration analysis, and per-venue depth \u2014 the diligence checklist in page form.',
+        },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

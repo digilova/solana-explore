@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style data-omelette-print-defaults>
+@media print {
+  @page { margin: 0.5in; }
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  figure, table, pre, blockquote, img, svg, tr, [class~="card" i] { break-inside: avoid; }
+  img, svg { max-width: 100%; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body { margin: 0; background: #FAFAFA; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #2D2D2D; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+a { text-decoration: none; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</helmet>
+
+<div data-screen-label="Variation A" style="min-height: 100vh; display: flex; flex-direction: column;">
+
+  <!-- Prototype switcher -->
+  <div style="background: #171717; color: #FFFFFF; display: flex; align-items: center; gap: 16px; padding: 0 24px; height: 44px; font-size: 13px; position: sticky; top: 0; z-index: 60;">
+    <span style="font-weight: 600; opacity: 0.9;">SpaceX Page Redesign</span>
+    <span style="opacity: 0.35;">·</span>
+    <a href="Variation A - Evolved.dc.html" style="color: #FFFFFF; background: rgba(255,255,255,0.16); padding: 5px 12px; border-radius: 9999px; font-weight: 600;">A · Evolved</a>
+    <a href="Variation B - Issuer-First.dc.html" style="color: rgba(255,255,255,0.65); padding: 5px 12px; border-radius: 9999px;" style-hover="color: #FFFFFF; background: rgba(255,255,255,0.08);">B · Insto-first</a>
+    <a href="Design Rationale.dc.html" style="color: rgba(255,255,255,0.65); padding: 5px 12px; border-radius: 9999px;" style-hover="color: #FFFFFF; background: rgba(255,255,255,0.08);">Rationale</a>
+    <span style="margin-left: auto; color: rgba(255,255,255,0.45); font-size: 12px;">Evolved current experience — familiar flow, issuer signals added</span>
+  </div>
+
+  <!-- Site header -->
+  <header style="background: #FFFFFF; border-bottom: 1px solid #F2F3F5; height: 64px; display: flex; align-items: center; gap: 24px; padding: 0 40px; box-shadow: rgba(0,0,0,0.03) 0px 1px 2px;">
+    <a href="#" style="display: flex; align-items: center; gap: 8px; color: #2D2D2D;">
+      <span style="width: 26px; height: 26px; border-radius: 8px; background: #9E0016; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">T</span>
+      <span style="font-weight: 600; font-size: 16px;">Tokens</span>
+    </a>
+    <div style="flex: 1; max-width: 420px; display: flex; align-items: center; gap: 8px; background: #FAFAFA; border: 1px solid #E5E5E5; border-radius: 9999px; height: 38px; padding: 0 16px; color: rgba(45,45,45,0.4); font-size: 14px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      Find tokens...
+    </div>
+    <nav style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+      <a href="#" style="color: rgba(45,45,45,0.72); font-size: 14px; padding: 8px 12px; border-radius: 9999px;" style-hover="background: rgba(45,45,45,0.06); color: #2D2D2D;">Docs</a>
+      <a href="#" style="color: rgba(45,45,45,0.72); font-size: 14px; padding: 8px 12px; border-radius: 9999px;" style-hover="background: rgba(45,45,45,0.06); color: #2D2D2D;">Assets API</a>
+      <a href="#" style="background: #0A0A0A; color: #FFFFFF; font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 9999px;" style-hover="background: #2D2D2D;">Connect</a>
+    </nav>
+  </header>
+
+  <main style="width: 100%; max-width: 1160px; margin: 0 auto; padding: 24px 40px 80px; flex: 1;">
+
+    <!-- Breadcrumb -->
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(38,38,38,0.72); padding: 8px 0 20px;">
+      <a href="#" style="color: rgba(38,38,38,0.72);" style-hover="color: #171717;">Tokens</a>
+      <span style="color: rgba(38,38,38,0.3);">/</span>
+      <span style="color: #171717; font-weight: 600;">SpaceX</span>
+    </div>
+
+    <!-- Asset header -->
+    <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+      <div style="position: relative; width: 52px; height: 52px; border-radius: 9999px; background: #171717; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; overflow: hidden; flex-shrink: 0;">SX<img src="https://www.tokens.xyz/logos/prestocks/spacex.png" alt="SpaceX" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #171717;"></div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <h1 style="margin: 0; font-size: 28px; font-weight: 600; line-height: 1.15;">SpaceX</h1>
+          <span style="background: rgba(14,14,14,0.08); color: rgba(14,14,14,0.88); font-size: 12px; font-weight: 500; padding: 4px 8px; border-radius: 9999px;">Asset</span>
+        </div>
+        <div style="font-size: 14px; color: rgba(45,45,45,0.58); margin-top: 2px;">Umbrella asset · tokenized SpaceX exposure on Solana</div>
+      </div>
+      <button onClick="{{ jumpToVariants }}" style="margin-left: auto; display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1px solid rgba(45,45,45,0.2); border-radius: 9999px; height: 38px; padding: 8px 16px; font-family: inherit; font-size: 14px; color: rgba(45,45,45,0.78); cursor: pointer;" style-hover="background: #F2F3F5; border-color: rgba(45,45,45,0.3);">
+        <span style="font-weight: 600; color: #2D2D2D;">5 variants</span>
+        <span style="color: rgba(45,45,45,0.5);">4 issuers</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12l7 7 7-7"></path></svg>
+      </button>
+    </div>
+
+    <!-- Price + chart card -->
+    <section data-screen-label="Chart" style="margin-top: 24px; background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; padding: 24px; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+      <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+        <div>
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <span style="font-size: 34px; font-weight: 600; letter-spacing: -0.5px;">$188.87</span>
+            <span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(249,36,52,0.12); color: #CF4040; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 6px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-10h16z"></path></svg>
+              3.07% · 24H
+            </span>
+          </div>
+          <div style="font-size: 13px; color: rgba(45,45,45,0.55); margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+            Reference price · volume-weighted across all 5 variants
+            <span title="This price aggregates every SpaceX variant. Individual variants trade at different prices — compare them below." style="width: 16px; height: 16px; border-radius: 9999px; background: rgba(45,45,45,0.08); color: rgba(45,45,45,0.6); font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; cursor: help;">?</span>
+          </div>
+        </div>
+        <div style="margin-left: auto; display: flex; gap: 4px; background: #F2F3F5; border-radius: 9999px; padding: 4px;">
+          <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="4">
+            <button onClick="{{ r.select }}" style="border: none; font-family: inherit; font-size: 13px; padding: 6px 14px; border-radius: 9999px; cursor: pointer; background: {{ r.bg }}; color: {{ r.color }}; font-weight: {{ r.weight }};">{{ r.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="margin-top: 16px;">
+        <svg viewBox="0 0 800 220" style="width: 100%; height: auto; display: block;" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="chartFillA" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#F92434" stop-opacity="0.14"></stop>
+              <stop offset="100%" stop-color="#F92434" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="55" x2="800" y2="55" stroke="#F2F3F5" stroke-width="1"></line>
+          <line x1="0" y1="110" x2="800" y2="110" stroke="#F2F3F5" stroke-width="1"></line>
+          <line x1="0" y1="165" x2="800" y2="165" stroke="#F2F3F5" stroke-width="1"></line>
+          <path d="{{ chartArea }}" fill="url(#chartFillA)"></path>
+          <path d="{{ chartPath }}" fill="none" stroke="#F92434" stroke-width="2" stroke-linejoin="round"></path>
+        </svg>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: rgba(45,45,45,0.45); margin-top: 8px;">
+          <span>{{ chartStart }}</span><span>{{ chartEnd }}</span>
+        </div>
+      </div>
+      <!-- Stats row -->
+      <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 20px; border-top: 1px solid #F2F3F5; padding-top: 20px;">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="6">
+          <div style="background: #FAFAFA; border: 1px solid #F2F3F5; border-radius: 8px; padding: 12px 16px;">
+            <div style="font-size: 12px; color: rgba(45,45,45,0.55);">{{ s.label }}</div>
+            <div style="font-size: 17px; font-weight: 600; margin-top: 4px;">{{ s.value }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: rgba(45,45,45,0.45); margin-top: 12px;">Asset-level totals, combined across all SpaceX variants on Solana.</div>
+    </section>
+
+    <!-- Variants & Markets -->
+    <section id="variants-section" data-screen-label="Variants and Markets" style="margin-top: 32px;">
+      <div style="display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+        <div>
+          <h2 style="margin: 0; font-size: 20px; font-weight: 600;">Variants &amp; Markets</h2>
+          <p style="margin: 6px 0 0; font-size: 15px; color: rgba(45,45,45,0.58); max-width: 620px; line-height: 1.5;">Compare available SpaceX variants by issuer, liquidity, activity, and access. Expand a row to inspect its markets without leaving this page.</p>
+        </div>
+        <div style="margin-left: auto; display: flex; gap: 4px; background: #F2F3F5; border-radius: 9999px; padding: 4px;">
+          <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+            <button onClick="{{ f.select }}" style="border: none; font-family: inherit; font-size: 13px; padding: 7px 16px; border-radius: 9999px; cursor: pointer; background: {{ f.bg }}; color: {{ f.color }}; font-weight: {{ f.weight }};">{{ f.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; overflow: hidden; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+        <!-- Table header -->
+        <div style="display: grid; grid-template-columns: 2.1fr 1.5fr 1.3fr 1fr 1fr 1.2fr 48px; gap: 12px; align-items: center; padding: 14px 24px; border-bottom: 1px solid #F2F3F5; font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px;">
+          <span>Variant</span><span>Issuer</span><span>Type</span><span style="text-align: right;">Liquidity</span><span style="text-align: right;">24H Vol</span><span>Access</span><span></span>
+        </div>
+
+        <sc-if value="{{ isFutures }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 48px 24px; text-align: center;">
+            <div style="font-size: 15px; font-weight: 600; color: #2D2D2D;">No futures markets tracked</div>
+            <div style="font-size: 14px; color: rgba(45,45,45,0.55); margin-top: 6px; line-height: 1.5;">No SpaceX variant currently has a tracked futures or perpetuals market on Solana.<br>Spot and liquidity-pool markets are available under the other filters.</div>
+          </div>
+        </sc-if>
+
+        <sc-for list="{{ variants }}" as="v" hint-placeholder-count="5">
+          <div style="border-bottom: 1px solid #F2F3F5;">
+            <!-- Variant row -->
+            <div onClick="{{ v.toggle }}" style="display: grid; grid-template-columns: 2.1fr 1.5fr 1.3fr 1fr 1fr 1.2fr 48px; gap: 12px; align-items: center; padding: 16px 24px; cursor: pointer; background: {{ v.rowBg }};" style-hover="background: #FAFAFA;">
+              <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                <span style="position: relative; width: 36px; height: 36px; border-radius: 9999px; background: {{ v.avatarBg }}; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0; overflow: hidden;">{{ v.avatar }}{{ v.logoEl }}</span>
+                <div style="min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 600; font-size: 15px;">{{ v.sym }}</span>
+                    <sc-if value="{{ v.execQ }}" hint-placeholder-val="{{ false }}">
+                      <span title="Execution quality score — routing and fill quality measured across venues" style="background: rgba(81,193,72,0.15); color: #4AA651; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; cursor: help;">Exec Q {{ v.execQ }}</span>
+                    </sc-if>
+                  </div>
+                  <div style="font-size: 13px; color: rgba(45,45,45,0.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ v.name }}</div>
+                </div>
+              </div>
+              <div style="font-size: 14px; color: #2D2D2D; font-weight: 500;">{{ v.issuer }}</div>
+              <div style="font-size: 13px; color: rgba(45,45,45,0.65);">{{ v.type }}</div>
+              <div style="text-align: right; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums;">{{ v.liq }}</div>
+              <div style="text-align: right; font-size: 14px; font-variant-numeric: tabular-nums; color: rgba(45,45,45,0.8);">{{ v.vol }}</div>
+              <div>
+                <span title="{{ v.accessHint }}" style="display: inline-flex; align-items: center; gap: 5px; background: {{ v.accessBg }}; color: {{ v.accessColor }}; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: help;">
+                  <span style="width: 6px; height: 6px; border-radius: 9999px; background: {{ v.accessColor }};"></span>
+                  {{ v.access }}
+                </span>
+              </div>
+              <div style="display: flex; justify-content: center;">
+                <span style="width: 28px; height: 28px; border-radius: 9999px; background: rgba(14,14,14,0.06); display: inline-flex; align-items: center; justify-content: center; color: rgba(45,45,45,0.6); transform: {{ v.chevron }}; transition: transform 0.18s ease;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+              </div>
+            </div>
+
+            <!-- Inline markets -->
+            <sc-if value="{{ v.expanded }}" hint-placeholder-val="{{ false }}">
+              <div style="background: #FAFAFA; padding: 8px 24px 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0 4px; font-size: 13px; color: rgba(45,45,45,0.55);">
+                  <span style="font-weight: 600; color: #2D2D2D;">{{ v.marketCount }} {{ filterNoun }} markets</span>
+                  <span>·</span><span>{{ v.sym }} across Solana venues</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 0.9fr 0.9fr; gap: 12px; padding: 10px 16px 8px; font-size: 11px; font-weight: 600; color: rgba(45,45,45,0.45); text-transform: uppercase; letter-spacing: 0.4px;">
+                  <span>Venue · Pair</span><span style="text-align: right;">Liquidity</span><span style="text-align: right;">24H Vol</span><span style="text-align: right;">24H Trades</span><span style="text-align: right;">24H Wallets</span>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.1); border-radius: 12px; overflow: hidden;">
+                  <sc-for list="{{ v.rows }}" as="m" hint-placeholder-count="2">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 0.9fr 0.9fr; gap: 12px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F2F3F5;" style-hover="background: #FAFAFA;">
+                      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                        <span style="position: relative; width: 24px; height: 24px; border-radius: 9999px; background: {{ m.venueBg }}; color: #FFFFFF; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">{{ m.venueInitial }}{{ m.logoEl }}</span>
+                        <div style="min-width: 0;">
+                          <span style="font-size: 14px; font-weight: 500;">{{ m.pair }}</span>
+                          <span style="font-size: 12px; color: rgba(45,45,45,0.5); margin-left: 8px;">{{ m.venue }}</span>
+                        </div>
+                      </div>
+                      <div style="text-align: right; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums;">{{ m.liq }}</div>
+                      <div style="text-align: right; font-size: 14px; font-variant-numeric: tabular-nums; color: rgba(45,45,45,0.8);">{{ m.vol }}</div>
+                      <div style="text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; color: rgba(45,45,45,0.65);">{{ m.trades }}</div>
+                      <div style="text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; color: rgba(45,45,45,0.65);">{{ m.wallets }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- Expand / collapse button -->
+            <sc-if value="{{ v.hasMore }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 0 24px 16px; background: {{ v.footBg }};">
+                <button onClick="{{ v.toggle }}" style="width: 100%; border: 1px dashed rgba(45,45,45,0.2); background: transparent; border-radius: 9999px; height: 38px; font-family: inherit; font-size: 13px; font-weight: 600; color: rgba(45,45,45,0.65); cursor: pointer;" style-hover="background: rgba(45,45,45,0.04); color: #2D2D2D;">{{ v.moreLabel }}</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: rgba(45,45,45,0.45); margin-top: 10px; line-height: 1.5;">Access labels reflect issuer-stated requirements where published — verify with the issuer before trading. SpaceX-related tokenized variants may have different issuer, access, and regulatory characteristics.</div>
+    </section>
+
+    <!-- Where to buy + Market health -->
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; margin-top: 32px; align-items: start;">
+
+      <!-- Where to buy -->
+      <section data-screen-label="Where to buy" style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; padding: 24px; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600;">Buy SpaceX</h2>
+        <p style="margin: 6px 0 16px; font-size: 14px; color: rgba(45,45,45,0.58); line-height: 1.5;">Aggregators route to the best available market automatically. Exchanges list specific pairs.</p>
+        <div style="font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px;">Aggregators</div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <sc-for list="{{ aggregators }}" as="g" hint-placeholder-count="3">
+            <a href="#" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid #F2F3F5; border-radius: 12px; color: #2D2D2D;" style-hover="background: #FAFAFA; border-color: rgba(45,45,45,0.15);">
+              <span style="position: relative; width: 28px; height: 28px; border-radius: 9999px; background: {{ g.bg }}; color: #FFFFFF; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; overflow: hidden;">{{ g.initial }}{{ g.logoEl }}</span>
+              <span style="font-size: 14px; font-weight: 500;">{{ g.name }}</span>
+              <span style="margin-left: auto; font-size: 12px; color: rgba(45,45,45,0.5);">{{ g.note }}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: rgba(45,45,45,0.4);"><path d="M7 17L17 7M9 7h8v8"></path></svg>
+            </a>
+          </sc-for>
+        </div>
+        <div style="font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px; margin: 16px 0 8px;">Top trading exchanges</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <sc-for list="{{ venues }}" as="g" hint-placeholder-count="4">
+            <a href="#" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #F2F3F5; border-radius: 12px; color: #2D2D2D;" style-hover="background: #FAFAFA; border-color: rgba(45,45,45,0.15);">
+              <span style="position: relative; width: 24px; height: 24px; border-radius: 9999px; background: {{ g.bg }}; color: #FFFFFF; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; overflow: hidden;">{{ g.initial }}{{ g.logoEl }}</span>
+              <span style="font-size: 14px; font-weight: 500;">{{ g.name }}</span>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- Market health -->
+      <section data-screen-label="Market health" style="background: #FFFFFF; border: 1px solid rgba(38,38,38,0.12); border-radius: 22px; padding: 24px; box-shadow: rgba(0,0,0,0.04) 0px 1px 2px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: 600;">Market health</h2>
+          <span style="background: rgba(14,14,14,0.08); color: rgba(14,14,14,0.7); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 9999px;">Asset-wide · live</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 20px; margin-top: 16px;">
+          <div style="position: relative; width: 84px; height: 84px; flex-shrink: 0;">
+            <svg width="84" height="84" viewBox="0 0 84 84">
+              <circle cx="42" cy="42" r="36" fill="none" stroke="#F2F3F5" stroke-width="8"></circle>
+              <circle cx="42" cy="42" r="36" fill="none" stroke="#51C148" stroke-width="8" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="63" transform="rotate(-90 42 42)"></circle>
+            </svg>
+            <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 600;">72</span>
+          </div>
+          <div style="font-size: 14px; color: rgba(45,45,45,0.7); line-height: 1.5;">Answers one question: how safely can size move in and out of this asset today? <strong style="color: #2D2D2D;">Not a regulatory rating.</strong> Headline is asset-wide — expand for per-variant scores.</div>
+        </div>
+        <button onClick="{{ toggleScore }}" style="margin-top: 14px; border: none; background: rgba(14,14,14,0.06); border-radius: 9999px; height: 32px; padding: 0 14px; font-family: inherit; font-size: 13px; font-weight: 500; color: rgba(14,14,14,0.75); cursor: pointer;" style-hover="background: rgba(14,14,14,0.1);">{{ scoreLabel }}</button>
+        <sc-if value="{{ scoreOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ scoreInputs }}" as="si" hint-placeholder-count="4">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                  <span style="color: rgba(45,45,45,0.7);">{{ si.label }}</span>
+                  <span style="font-weight: 600; color: {{ si.color }};">{{ si.grade }}</span>
+                </div>
+                <div style="height: 6px; background: #F2F3F5; border-radius: 9999px; overflow: hidden;">
+                  <div style="height: 100%; width: {{ si.width }}; background: {{ si.color }}; border-radius: 9999px;"></div>
+                </div>
+              </div>
+            </sc-for>
+            <div style="border-top: 1px solid #F2F3F5; padding-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 12px; font-weight: 600; color: rgba(45,45,45,0.5); text-transform: uppercase; letter-spacing: 0.4px;">Per-variant health</div>
+              <sc-for list="{{ healthVariants }}" as="hv" hint-placeholder-count="5">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                  <span style="font-weight: 600; width: 62px;">{{ hv.sym }}</span>
+                  <div style="flex: 1; height: 6px; background: #F2F3F5; border-radius: 9999px; overflow: hidden;">
+                    <div style="height: 100%; width: {{ hv.width }}; background: {{ hv.color }}; border-radius: 9999px;"></div>
+                  </div>
+                  <span style="font-weight: 600; width: 24px; text-align: right; font-variant-numeric: tabular-nums;">{{ hv.score }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size: 12px; color: rgba(45,45,45,0.5); line-height: 1.5;">Recomputed daily from on-chain data. "Weak" flags an input below the healthy threshold for assets of this size — it is not a judgment of any issuer.</div>
+          </div>
+        </sc-if>
+      </section>
+    </div>
+
+    <!-- Market updates -->
+    <section data-screen-label="Market updates" style="margin-top: 32px;">
+      <div style="display: flex; align-items: baseline; gap: 12px;">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 600;">Market updates</h2>
+        <span style="font-size: 13px; color: rgba(45,45,45,0.5);">On-chain activity and listings across SpaceX variants</span>
+      </div>
+      <div style="margin-top: 14px; background: #FFFFFF; border: 1px solid rgba(38,38,38,0.1); border-radius: 16px; overflow: hidden;">
+        <sc-for list="{{ updates }}" as="u" hint-placeholder-count="3">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid #F2F3F5; font-size: 14px;">
+            <span style="background: rgba(14,14,14,0.06); padding: 2px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; color: rgba(14,14,14,0.6); flex-shrink: 0;">{{ u.tag }}</span>
+            <span style="font-weight: 500; line-height: 1.45;">{{ u.text }}</span>
+            <span style="margin-left: auto; font-size: 12px; color: rgba(45,45,45,0.5); flex-shrink: 0;">{{ u.time }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #E5E5E5; font-size: 12px; color: rgba(45,45,45,0.45); line-height: 1.6;">
+      We use publicly available data from the blockchain, as well as data procured by our trusted data partners and related sources. Prototype note: headline figures are from tokens.xyz (Jul 2026); detail rows in expanded market lists are illustrative.
+    </div>
+  </main>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { expanded: {}, filter: 'spot', range: '1D', scoreOpen: false };
+
+  constructor(props) {
+    super(props);
+    this.chartCache = {};
+  }
+
+  seeded(seed) {
+    let s = seed;
+    return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+  }
+
+  buildChart(range) {
+    if (this.chartCache[range]) return this.chartCache[range];
+    const seeds = { LIVE: 11, '1D': 42, '1W': 77, '1M': 123, ALL: 555 };
+    const drifts = { LIVE: -0.15, '1D': -0.5, '1W': -0.3, '1M': 0.25, ALL: 0.9 };
+    const rnd = this.seeded(seeds[range] || 42);
+    const n = 64;
+    let y = 90;
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      y += (rnd() - 0.5) * 22 + drifts[range];
+      y = Math.max(20, Math.min(190, y));
+      pts.push([ (i / (n - 1)) * 800, y ]);
+    }
+    const line = 'M' + pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' L');
+    const area = line + ' L800,220 L0,220 Z';
+    this.chartCache[range] = { line, area };
+    return this.chartCache[range];
+  }
+
+  fmt(n) {
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(2) + 'K';
+    return '$' + n.toFixed(2);
+  }
+  fmtC(n) {
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return String(Math.round(n));
+  }
+
+  logoEl(src, alt, bg) {
+    if (!src) return null;
+    return React.createElement('img', {
+      src, alt,
+      onError: (e) => { e.target.style.display = 'none'; },
+      style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', backgroundColor: bg || '#FFFFFF' },
+    });
+  }
+
+  venueMeta(name) {
+    const colors = { Meteora: '#B4451F', Orca: '#C99A2E', Raydium: '#3D6B99', Byreal: '#6B4E9E', Kamino: '#2E7D6B', Sunrise: '#A8552E', OMFG: '#555555', Titan: '#333333' };
+    const imgs = {
+      Meteora: 'https://www.meteora.ag/icons/v2.svg',
+      Orca: 'https://www.orca.so/favicon.ico',
+      Raydium: 'https://raydium.io/favicon.ico',
+      Byreal: 'https://www.byreal.io/favicon.ico',
+      Kamino: 'https://www.tokens.xyz/logos/popular/kamino.png',
+      Sunrise: 'https://www.tokens.xyz/logos/popular/sunrise.svg',
+      OMFG: 'https://www.tokens.xyz/logos/popular/omfg.svg',
+      Titan: 'https://www.tokens.xyz/logos/popular/titan.png',
+    };
+    return { venue: name, venueInitial: name.slice(0, 2).toUpperCase(), venueBg: colors[name] || '#555555', logoEl: this.logoEl(imgs[name] || '', name, colors[name] || '#555555') };
+  }
+
+  mkRow(venue, pair, liq, vol, trades, wallets) {
+    return Object.assign(this.venueMeta(venue), { pair, liq: this.fmt(liq), vol: this.fmt(vol), trades: this.fmtC(trades), wallets: this.fmtC(wallets) });
+  }
+
+  tail(sym, count, startLiq, startVol, seed) {
+    const venues = ['Orca', 'Raydium', 'Meteora', 'Byreal', 'Kamino', 'Sunrise'];
+    const quotes = ['USDC', 'USDT', 'SOL', 'USDC', 'JitoSOL', 'USDC'];
+    const rnd = this.seeded(seed);
+    const rows = [];
+    let liq = startLiq, vol = startVol;
+    for (let i = 0; i < count; i++) {
+      liq *= 0.45 + rnd() * 0.25;
+      vol *= 0.4 + rnd() * 0.3;
+      rows.push(this.mkRow(venues[i % 6], sym + '/' + quotes[i % 6], liq, vol, Math.max(2, vol / 900), Math.max(1, vol / 3200)));
+    }
+    return rows;
+  }
+
+  getDefs() {
+    if (this._defs) return this._defs;
+    const mk = this.mkRow.bind(this);
+    this._defs = [
+      {
+        sym: 'SPCX', name: 'SpaceX — Backpack Securities', issuer: 'Backpack Securities', type: 'Tokenized equity',
+        avatar: 'BP', avatarBg: '#171717', img: 'https://img.fotofolio.xyz/?url=https%3A%2F%2Fbackpack.exchange%2Fapi%2Fstock-logo%2FSPCX', liq: '$7.03M', vol: '$29.49M', execQ: '96',
+        access: 'KYC required', accessKind: 'kyc', markets: 20,
+        accessHint: 'Backpack Securities states KYC verification is required to mint or redeem. Secondary on-chain trading may differ — verify with issuer.',
+        spot: [
+          mk('Orca', 'SPCX/USDC', 778010, 10620000, 18200, 4400),
+          mk('Meteora', 'SPCX/USDC', 2800000, 6970000, 12400, 3100),
+        ].concat(this.tail('SPCX', 18, 620000, 3400000, 7)),
+        pools: [
+          mk('Meteora', 'SPCX/USDC pool', 2800000, 6970000, 12400, 3100),
+          mk('Kamino', 'SPCX/USDC vault', 1140000, 890000, 640, 210),
+        ].concat(this.tail('SPCX', 6, 500000, 700000, 17)),
+      },
+      {
+        sym: 'SPCXx', name: 'SpaceX xStock', issuer: 'Backed (xStocks)', type: 'Tokenized equity',
+        avatar: 'xS', avatarBg: '#3D6B99', img: 'https://xstocks-metadata.backed.fi/logos/tokens/SPCXx.png', liq: '$1.21M', vol: '$1.61M', execQ: '96',
+        access: 'Restricted', accessKind: 'restricted', markets: 20,
+        accessHint: 'xStocks are geo-restricted; not available to US persons per issuer documentation. Verify eligibility with issuer.',
+        spot: [
+          mk('Byreal', 'SPCXx/USDC', 207410, 788900, 2900, 860),
+          mk('Raydium', 'SPCX/SPCXx', 108600, 424790, 1700, 420),
+        ].concat(this.tail('SPCXx', 18, 95000, 300000, 23)),
+        pools: [
+          mk('Raydium', 'SPCX/SPCXx pool', 108600, 424790, 1700, 420),
+          mk('Meteora', 'SPCXx/USDC pool', 88000, 210000, 900, 260),
+        ].concat(this.tail('SPCXx', 5, 60000, 150000, 29)),
+      },
+      {
+        sym: 'TSPX', name: 'tSpaceX — Tessera', issuer: 'Tessera', type: 'Pre-IPO exposure',
+        avatar: 'TS', avatarBg: '#6B4E9E', img: 'https://cdn.tesseralab.co/tessera/tokenicon_T-SpaceX.svg', liq: '$611.06K', vol: '$912.76K', execQ: '',
+        access: 'Check issuer', accessKind: 'check', markets: 11,
+        accessHint: 'Access requirements not published in a structured format. Check issuer documentation before trading.',
+        spot: [
+          mk('Meteora', 'TSPX/USDC', 632780, 712980, 7300, 1900),
+          mk('Meteora', 'tSpaceX/USDC', 3750, 0, 0, 0),
+        ].concat(this.tail('TSPX', 9, 42000, 90000, 31)),
+        pools: [
+          mk('Meteora', 'TSPX/USDC pool', 632780, 712980, 7300, 1900),
+        ].concat(this.tail('TSPX', 4, 30000, 60000, 37)),
+      },
+      {
+        sym: 'SPACEX', name: 'SpaceX PreStocks', issuer: 'PreStocks', type: 'Pre-IPO exposure',
+        avatar: 'PS', avatarBg: '#A8552E', img: 'https://prestocks.com/logos/spacex.png', liq: '$33.62K', vol: '$80.82K', execQ: '',
+        access: 'Check issuer', accessKind: 'check', markets: 20,
+        accessHint: 'Access requirements not published in a structured format. Check issuer documentation before trading.',
+        spot: [
+          mk('Meteora', 'SPACEX/USDC', 24310, 38700, 563, 180),
+          mk('Meteora', 'SPACEX/SPCXx', 451170, 32070, 240, 96),
+        ].concat(this.tail('SPACEX', 18, 18000, 22000, 41)),
+        pools: [
+          mk('Meteora', 'SPACEX/SPCXx pool', 451170, 32070, 240, 96),
+        ].concat(this.tail('SPACEX', 5, 15000, 14000, 43)),
+      },
+      {
+        sym: 'SPCXon', name: 'SpaceX (Ondo Tokenized)', issuer: 'Ondo', type: 'Tokenized equity',
+        avatar: 'ON', avatarBg: '#2E7D6B', img: 'https://cdn.ondo.finance/tokens/logos/spcxon_160x160.png', liq: '$132.77', vol: '$15.45K', execQ: '',
+        access: 'Restricted', accessKind: 'restricted', markets: 2,
+        accessHint: 'Ondo tokenized equities are permissioned; eligibility restrictions apply per issuer documentation.',
+        spot: [
+          mk('Meteora', 'SPCXon/USDT', 143.71, 0, 0, 0),
+          mk('Meteora', 'SPCXon/USDC', 7.25, 0, 0, 0),
+        ],
+        pools: [],
+      },
+    ];
+    return this._defs;
+  }
+
+  renderVals() {
+    const st = this.state;
+    const chart = this.buildChart(st.range);
+    const accessStyles = {
+      open: { bg: 'rgba(81,193,72,0.15)', color: '#4AA651' },
+      kyc: { bg: 'rgba(255,160,152,0.28)', color: '#9E0016' },
+      restricted: { bg: 'rgba(249,36,52,0.1)', color: '#CF4040' },
+      check: { bg: '#F2F3F5', color: 'rgba(45,45,45,0.65)' },
+    };
+    const isFutures = st.filter === 'futures';
+    const filterNoun = st.filter === 'liquidity' ? 'liquidity-pool' : 'spot';
+
+    const variants = isFutures ? [] : this.getDefs().map((v) => {
+      const expanded = !!st.expanded[v.sym];
+      const all = st.filter === 'liquidity' ? v.pools : v.spot;
+      const rows = expanded ? all : all.slice(0, 2);
+      const a = accessStyles[v.accessKind];
+      return Object.assign({}, v, {
+        expanded,
+        rows,
+        logoEl: this.logoEl(v.img, v.sym, v.avatarBg),
+        marketCount: all.length,
+        hasMore: all.length > 2,
+        moreLabel: expanded ? 'Show fewer markets' : 'Show all ' + all.length + ' markets',
+        toggle: () => this.setState(s => ({ expanded: Object.assign({}, s.expanded, { [v.sym]: !s.expanded[v.sym] }) })),
+        chevron: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+        rowBg: expanded ? '#FAFAFA' : '#FFFFFF',
+        footBg: expanded ? '#FAFAFA' : '#FFFFFF',
+        accessBg: a.bg,
+        accessColor: a.color,
+      });
+    });
+
+    const mkTab = (id, label, cur, set) => ({
+      label,
+      select: () => set(id),
+      bg: cur === id ? '#FFFFFF' : 'transparent',
+      color: cur === id ? '#2D2D2D' : 'rgba(45,45,45,0.55)',
+      weight: cur === id ? '600' : '400',
+    });
+
+    const periodMap = {
+      LIVE: { volLabel: 'Volume Today', vol: '$18.42M', chgLabel: 'Change Today', chg: '-1.24%' },
+      '1D': { volLabel: '24H Volume', vol: '$32.10M', chgLabel: '24H Change', chg: '-3.07%' },
+      '1W': { volLabel: '1W Volume', vol: '$147.6M', chgLabel: '1W Change', chg: '-5.82%' },
+      '1M': { volLabel: '1M Volume', vol: '$612.3M', chgLabel: '1M Change', chg: '+4.15%' },
+      ALL: { volLabel: 'Total Volume', vol: '$3.94B', chgLabel: 'Change (All)', chg: '+61.4%' },
+    };
+    const periodStats = periodMap[st.range] || periodMap['1D'];
+    const rangeLabels = { LIVE: ['9:30 AM', 'Now'], '1D': ['Jul 1, 9:30 AM', 'Jul 2, 4:00 PM'], '1W': ['Jun 25', 'Jul 2'], '1M': ['Jun 2', 'Jul 2'], ALL: ['Dec 2025', 'Jul 2026'] };
+
+    return {
+      variants,
+      isFutures,
+      filterNoun,
+      ranges: ['LIVE', '1D', '1W', '1M', 'ALL'].map(r => mkTab(r, r, st.range, (id) => this.setState({ range: id }))),
+      filters: [ mkTab('spot', 'Spot', st.filter, (id) => this.setState({ filter: id })), mkTab('liquidity', 'Liquidity', st.filter, (id) => this.setState({ filter: id })), mkTab('futures', 'Futures', st.filter, (id) => this.setState({ filter: id })) ],
+      chartPath: chart.line,
+      chartArea: chart.area,
+      chartStart: rangeLabels[st.range][0],
+      chartEnd: rangeLabels[st.range][1],
+      stats: [
+        { label: 'Market Cap', value: '$104.78M' },
+        { label: 'Liquidity', value: '$8.89M' },
+        { label: periodStats.volLabel, value: periodStats.vol },
+        { label: periodStats.chgLabel, value: periodStats.chg },
+        { label: 'Supply', value: '678.05K' },
+        { label: 'FDV', value: '$104.78M' },
+      ],
+      aggregators: [
+        { rank: '1', name: 'Titan', initial: 'TI', bg: '#333333', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/titan.png', 'Titan', '#333333'), note: 'Best route across 4 venues' },
+        { rank: '2', name: 'Jupiter', initial: 'JU', bg: '#2E7D6B', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/jupiter.png', 'Jupiter', '#2E7D6B'), note: 'Routes all variants' },
+        { rank: '3', name: 'DFlow', initial: 'DF', bg: '#3D6B99', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/dflow.png', 'DFlow', '#3D6B99'), note: 'Spot routing' },
+      ],
+      venues: [
+        { name: 'Sunrise', initial: 'SU', bg: '#A8552E', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/sunrise.svg', 'Sunrise', '#A8552E') },
+        { name: 'OMFG', initial: 'OM', bg: '#555555', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/omfg.svg', 'OMFG', '#555555') },
+        { name: 'Kamino', initial: 'KA', bg: '#2E7D6B', logoEl: this.logoEl('https://www.tokens.xyz/logos/popular/kamino.png', 'Kamino', '#2E7D6B') },
+        { name: 'Orca', initial: 'OR', bg: '#C99A2E', logoEl: this.logoEl('https://www.orca.so/favicon.ico', 'Orca', '#C99A2E') },
+      ],
+      toggleScore: () => this.setState(s => ({ scoreOpen: !s.scoreOpen })),
+      scoreOpen: st.scoreOpen,
+      scoreLabel: st.scoreOpen ? 'Hide methodology' : 'How is this calculated?',
+      scoreInputs: [
+        { label: 'Liquidity depth', grade: 'Healthy', width: '78%', color: '#51C148' },
+        { label: 'Volume consistency', grade: 'Healthy', width: '82%', color: '#51C148' },
+        { label: 'Venue diversity', grade: 'Healthy', width: '70%', color: '#51C148' },
+        { label: 'Liquidity concentration', grade: 'Weak', width: '34%', color: '#CF4040' },
+      ],
+      healthVariants: [
+        { sym: 'SPCX', score: 84, width: '84%', color: '#51C148' },
+        { sym: 'SPCXx', score: 76, width: '76%', color: '#51C148' },
+        { sym: 'TSPX', score: 58, width: '58%', color: '#C99A2E' },
+        { sym: 'SPACEX', score: 31, width: '31%', color: '#CF4040' },
+        { sym: 'SPCXon', score: 12, width: '12%', color: '#CF4040' },
+      ],
+      updates: [
+        { tag: 'Listing', time: '2h ago', text: 'SPCXx/USDC pool launched on Byreal with $200K+ seeded liquidity.' },
+        { tag: 'Activity', time: '6h ago', text: '24H volume across SpaceX variants crossed $32M, led by SPCX on Backpack.' },
+        { tag: 'Issuer', time: '1d ago', text: 'Tessera published updated redemption terms for TSPX holders.' },
+      ],
+      jumpToVariants: () => {
+        const el = document.getElementById('variants-section');
+        if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 64, behavior: 'smooth' });
+      },
+    };
+  }
+}
+
+</script>
+<script>
+(async () => {
+  if (!document.title || !document.title.trim()) document.title = "Variation A - Evolved";
+  // Prepend so page-supplied @page / break rules (deck-stage's margin:0,
+  // author CSS) keep source-order precedence over the baseline.
+  const baseCss = document.createElement('style');
+  baseCss.textContent = "@media print {\n  figure, table { break-inside: avoid; }\n  *, *::before, *::after {\n    print-color-adjust: exact; -webkit-print-color-adjust: exact;\n    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;\n    animation-delay: -99s !important; animation-duration: .001s !important;\n    animation-iteration-count: 1 !important; animation-fill-mode: both !important;\n    animation-play-state: running !important; transition-duration: 0s !important;\n  }\n}";
+  document.head.prepend(baseCss);
+  if (document.readyState === 'loading') {
+    await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+  }
+  let ds = document.querySelector('deck-stage');
+  // whenDefined never resolves when nothing registers the element, so only
+  // await it when a <deck-stage> tag exists (and race a timeout regardless).
+  if (ds && !customElements.get('deck-stage')) {
+    try {
+      await Promise.race([
+        customElements.whenDefined('deck-stage'),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]);
+    } catch (e) {}
+    ds = document.querySelector('deck-stage');
+  }
+  // dc-runtime assigns window.DCLogic at init and mounts into #dc-root on
+  // DOMContentLoaded; settle on that subtree so React has rendered before
+  // print(). Non-DC pages fall through to weighing body.
+  const isDc = !ds && 'DCLogic' in window;
+  const settleRoot = ds || (isDc ? document.getElementById('dc-root') : null) || document.body;
+  if (settleRoot) {
+    // Weigh only content children — skip script/style/template so inline
+    // Babel/CSS doesn't register as stable "content" before the framework
+    // has mounted anything.
+    const MEDIA = 'img,svg,canvas,video,picture,iframe,embed,object';
+    const weigh = () => {
+      let text = 0, media = 0;
+      for (const c of settleRoot.children) {
+        const t = c.tagName;
+        if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+        text += (c.textContent || '').trim().length;
+        media += c.querySelectorAll(MEDIA).length + (c.matches(MEDIA) ? 1 : 0);
+      }
+      return text + media * 100;
+    };
+    // "Non-zero and stable" alone is not sufficient to mean rendered: generic
+    // body can carry a static shell while async main content is pending, and
+    // #dc-root can carry the root DC's static text while child refs are still
+    // .sc-placeholder boxes. Gate generic on readyState 'complete', and never
+    // accept stability while a dc-runtime placeholder is present.
+    const isGeneric = settleRoot === document.body;
+    const deadline = Date.now() + 15000;
+    let last = -1, stable = 0;
+    while (Date.now() < deadline) {
+      const n = weigh();
+      const ready =
+        (!isGeneric || document.readyState === 'complete') &&
+        !settleRoot.querySelector('.sc-placeholder');
+      if (n > 0 && n === last && ready) { if (++stable >= 2) break; } else { stable = 0; }
+      last = n;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  // Project support.js may predate runtime default-seeding; push via bridge.
+  if (isDc && window.__dcSetProps && window.__dcRootName) {
+    try {
+      const dpEl = document.querySelector('script[data-dc-script]');
+      const meta = JSON.parse((dpEl && dpEl.getAttribute('data-props')) || '{}');
+      const bag = {};
+      for (const k in meta)
+        if (k[0] !== '$' && meta[k] && meta[k].default !== undefined)
+          bag[k] = meta[k].default;
+      if (Object.keys(bag).length) {
+        window.__dcSetProps(window.__dcRootName(), bag);
+        await new Promise((r) => setTimeout(r, 50));
+      }
+    } catch (e) {}
+  }
+  // Reveal content gated on scroll or visibility before printing. Lazy <img>,
+  // IntersectionObserver fade-ins, and collapsed <details> don't render while
+  // off-screen, so a long page would print with them blank or closed. Open
+  // every <details>, force native-lazy images eager, and scroll the document
+  // through its full height to trip lazy-load + IO; then wait (bounded) for the
+  // newly-triggered images. Inert for deck-stage (slides aren't scroll-gated).
+  try {
+    for (const d of document.querySelectorAll('details')) d.open = true;
+    for (const img of document.querySelectorAll('img[loading="lazy"]'))
+      img.loading = 'eager';
+    const scroller = document.scrollingElement || document.documentElement;
+    const full = Math.max(scroller.scrollHeight, document.body.scrollHeight);
+    const step = window.innerHeight || 800;
+    for (let y = 0; y <= full; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    window.scrollTo(0, 0);
+    await Promise.race([
+      Promise.all(
+        [...document.images].map((img) =>
+          img.complete
+            ? null
+            : new Promise((res) => {
+                img.addEventListener('load', res, { once: true });
+                img.addEventListener('error', res, { once: true });
+              })
+        )
+      ),
+      new Promise((r) => setTimeout(r, 4000)),
+    ]);
+  } catch (e) {}
+  try { await document.fonts.ready; } catch (e) {}
+  // Jump every animation to its end state so print() never captures a slide
+  // mid-entrance. Ordering matters: the 0s-transition style must be live
+  // BEFORE data-deck-active is set so attribute-keyed transitions don't
+  // start a (now-0s) run from the pre-active base.
+  const st = document.createElement('style');
+  st.textContent = '*,*::before,*::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important}';
+  document.head.appendChild(st);
+  for (const d of document.querySelectorAll('deck-stage')) {
+    for (const c of d.children) {
+      const t = c.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+      c.setAttribute('data-deck-active', '');
+    }
+  }
+  // Re-append deck-stage's @page last so no author @page can add a margin and
+  // spill each full-bleed slide onto two sheets. Backstop for old copies.
+  if (ds) {
+    let pg = document.getElementById('deck-stage-print-page');
+    if (!pg) {
+      pg = document.createElement('style');
+      pg.textContent = '@page{size:' + (+ds.getAttribute('width') || 1920) +
+        'px ' + (+ds.getAttribute('height') || 1080) + 'px;margin:0}';
+    }
+    document.body.appendChild(pg);
+  }
+  try {
+    const sweep = () => {
+      for (const a of document.getAnimations()) {
+        try { a.finish(); } catch (e) {
+          try { a.currentTime = (a.effect && a.effect.getComputedTiming().duration) || 0; a.pause(); } catch (e2) {}
+        }
+      }
+    };
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+  } catch (e) {}
+  // Size the PDF page to the rendered design unless the file opted into
+  // standard paper via @page{size:letter|A4|…}. Decks own their own @page.
+  // Wrappers (body, …) lose padding+margin so the frame sits at (0,0); the
+  // frame itself loses only margin — its padding is INSIDE the measured
+  // rect and must stay, or content shifts and leaves a gap at bottom/right.
+  var __m = null;
+  try { __m = (() => {
+  var STAMP = true;
+  var docEl = document.documentElement;
+  var doc = { width: docEl.scrollWidth, height: docEl.scrollHeight };
+
+  var ds = document.querySelector('deck-stage');
+  if (ds) {
+    var dw = Number(ds.getAttribute('width')) || 1920;
+    var dh = Number(ds.getAttribute('height')) || 1080;
+    var n = typeof ds.length === 'number' ? ds.length : ds.children.length;
+    var idx = typeof ds.index === 'number' ? ds.index : 0;
+    var frames = [];
+    for (var i = 0; i < n; i++) frames.push({ left: 0, top: 0, width: dw, height: dh });
+    return { kind: 'deck', source: 'declared', doc: doc, frames: frames,
+      authored: frames.map(function(){return{width:true,height:true}}),
+      deck: { width: dw, height: dh, slideCount: n, index: idx },
+      signals: { paperPage: false, pxPage: false } };
+  }
+
+  // Declared kind: a doc-page tag names the kind outright, so no signal
+  // heuristics run (like the deck branch above, signals report false —
+  // they describe inferred classifications only). The tag alone is not
+  // trusted: the element must have upgraded (shadowRoot present), so a
+  // leftover tag whose script was deleted falls through to the heuristics
+  // that handle plain markup.
+  var stageSx = window.scrollX || 0, stageSy = window.scrollY || 0;
+  var dp = document.querySelector('doc-page');
+  if (dp && dp.shadowRoot) {
+    // Crop to the sheet, not the host — the desk around it is screen-only
+    // chrome that must not land in PNG exports.
+    var sheet = dp.shadowRoot.querySelector('.sheet');
+    var sr = (sheet || dp).getBoundingClientRect();
+    return { kind: 'paper-doc', source: 'declared', doc: doc,
+      frames: [{ left: sr.left + stageSx, top: sr.top + stageSy,
+        width: sr.width, height: sr.height }],
+      authored: [{ width: false, height: false }],
+      signals: { paperPage: false, pxPage: false } };
+  }
+  var paperPage = false, pxPage = false;
+  var eachRule = function (fn) {
+    for (var s = 0; s < document.styleSheets.length; s++) {
+      var rs; try { rs = document.styleSheets[s].cssRules; } catch (e) { continue; }
+      for (var r = 0; r < rs.length; r++) {
+        fn(rs[r]);
+        if (rs[r].cssRules) for (var n = 0; n < rs[r].cssRules.length; n++) fn(rs[r].cssRules[n]);
+      }
+    }
+  };
+  eachRule(function (r) {
+    if (r.type !== 6) return;
+    var m = /\bsize\s*:\s*([^;}]+)/i.exec(r.cssText || '');
+    if (!m) return;
+    if (/\b(letter|a[3-5]|legal|ledger)\b/i.test(m[1])) paperPage = true;
+    if (/\d+(?:\.\d+)?px\b/i.test(m[1])) pxPage = true;
+  });
+  var signals = { paperPage: paperPage, pxPage: pxPage };
+
+  var pxVal = function (v) {
+    var m = /^(\d+(?:\.\d+)?)px$/.exec(v || ''); return m ? +m[1] : 0;
+  };
+  var authoredPx = function (el, prop) {
+    if (pxVal(el.style[prop])) return true;
+    var attr = el.getAttribute(prop);
+    if (attr && /^\d+$/.test(attr)) return true;
+    var hit = false;
+    eachRule(function (r) {
+      if (hit || r.type !== 1 || !r.style) return;
+      try { if (el.matches(r.selectorText) && pxVal(r.style[prop])) hit = true; } catch (e) {}
+    });
+    return hit;
+  };
+
+  var el = document.body, rootPxW = false;
+  for (;;) {
+    var kids = [];
+    for (var c = 0; c < el.children.length; c++) {
+      var t = el.children[c].tagName;
+      if (t !== 'SCRIPT' && t !== 'STYLE' && t !== 'TEMPLATE') kids.push(el.children[c]);
+    }
+    if (kids.length !== 1 || !(kids[0] instanceof HTMLElement)) break;
+    if (STAMP) el.setAttribute('data-om-frame-wrap', '');
+    el = kids[0];
+    rootPxW = authoredPx(el, 'width');
+    if (rootPxW) break;
+  }
+  if (!rootPxW) rootPxW = authoredPx(el, 'width');
+
+  // @page{size:letter} alone is a flowing doc; with a px-width root it's a
+  // fixed sheet pretending to be paper — fall through and size to render.
+  if (paperPage && !rootPxW) {
+    return { kind: 'paper-doc', source: 'inferred', doc: doc, signals: signals,
+      frames: [{ left: 0, top: 0, width: doc.width, height: doc.height }],
+      authored: [{ width: false, height: false }] };
+  }
+
+  var sx = window.scrollX || 0, sy = window.scrollY || 0;
+  var rectOf = function (e) {
+    var r = e.getBoundingClientRect();
+    var oy; try { oy = getComputedStyle(e).overflowY; } catch (err) {}
+    var h = oy === 'visible' ? Math.max(r.height, e.scrollHeight || 0) : r.height;
+    return { left: r.left + sx, top: r.top + sy, width: r.width, height: h };
+  };
+
+  // Multi-frame: ≥2 visible non-fixed children, each with authored px width
+  // AND height, all within ±2px of each other. Off unless the page opts in
+  // via data-om-multi-frame on the stop element — guards against card grids
+  // and pricing tables that match the geometry but aren't separate canvases.
+  if (el.hasAttribute('data-om-multi-frame')) {
+    var cands = [];
+    for (var k = 0; k < el.children.length; k++) {
+      var ch = el.children[k];
+      var cs; try { cs = getComputedStyle(ch); } catch (e) { continue; }
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.position === 'fixed') continue;
+      var rc = rectOf(ch);
+      if (rc.width < 2 || rc.height < 2) continue;
+      if (!authoredPx(ch, 'width') || !authoredPx(ch, 'height')) continue;
+      cands.push(rc);
+    }
+    if (cands.length >= 2) {
+      var w0 = cands[0].width, h0 = cands[0].height, ok = true;
+      for (var q = 1; q < cands.length; q++)
+        if (Math.abs(cands[q].width - w0) > 2 || Math.abs(cands[q].height - h0) > 2) ok = false;
+      if (ok) return { kind: 'multi-frame', source: 'inferred', doc: doc, signals: signals,
+        frames: cands, authored: cands.map(function(){return{width:true,height:true}}) };
+    }
+  }
+
+  if (STAMP) el.setAttribute('data-om-frame', '');
+  return { kind: 'single-canvas', source: 'inferred', doc: doc, signals: signals,
+    frames: [rectOf(el)],
+    authored: [{ width: rootPxW, height: authoredPx(el, 'height') }] };
+})(); } catch (e) {}
+  var frame = null;
+  if (__m && __m.kind === 'single-canvas') {
+    var f = __m.frames && __m.frames[0];
+    if (f && f.width >= 200 && f.height >= 200) {
+      frame = f;
+      var fst = document.createElement('style');
+      fst.textContent = '@media print{@page{size:' + Math.ceil(f.width) + 'px ' +
+        Math.ceil(f.height) + 'px;margin:0}' +
+        'html,body,[data-om-frame-wrap]{padding:0!important;margin:0!important;background:none!important}' +
+        '[data-om-frame]{margin:0!important}}';
+      document.body.appendChild(fst);
+    }
+  }
+  // Relax break-inside on oversized elements. An element taller than a
+  // printable page can't honor break-inside: avoid — browsers either overflow
+  // it or push it whole to the next page, leaving a blank gap, then break it
+  // anyway at an arbitrary point. After the final layout (content revealed,
+  // animations jumped), find elements taller than a page that still compute
+  // break-inside: avoid and reset them to auto, so the browser breaks them at
+  // their children's boundaries instead (children keep their own avoid). PAGE_PX
+  // is a conservative portrait estimate at 96 CSS px/in — Letter/A4 usable
+  // height minus our 0.5in margins — so only clearly-oversized elements are
+  // touched and under-page elements still stay whole. Skipped for decks (slides
+  // are sized to the page) and for fixed-size canvases (frame set, or an author
+  // px-based @page) — runs as before for flowing docs on letter/A4.
+  try {
+    if (!ds && !frame && !(__m && __m.signals && __m.signals.pxPage)) {
+      const PAGE_PX = 1024;
+      // Our print defaults add a real @page margin only when the source has
+      // no @page of its own; computed style can't tell us (it reports screen
+      // media), so read the injected rule directly.
+      const defaults = document.querySelector('style[data-omelette-print-defaults]');
+      const pageInset = /@page\s*\{[^}]*margin/.test(defaults ? defaults.textContent || '' : '');
+      const SEL = 'section,article,figure,table,pre,blockquote,[class~="card" i],[class~="page" i],[class~="sheet" i]';
+      for (const el of document.body.querySelectorAll(SEL)) {
+        if (el instanceof HTMLElement && el.offsetHeight > PAGE_PX) {
+          el.setAttribute('data-om-oversized', '');
+          // Fake-paged docs simulate sheets with over-tall break-after:page
+          // boxes; honoring the break spills half-blank pages and ends a
+          // colored box mid-sheet. Flow them, and (only when we own the page
+          // inset) drop the redundant padding/background via the rule below.
+          const cs = getComputedStyle(el);
+          if (cs.breakAfter === 'page' || cs.pageBreakAfter === 'always') {
+            el.setAttribute('data-om-fakepage', '');
+          }
+        }
+      }
+      const ost = document.createElement('style');
+      ost.textContent = '@media print{' +
+        '[data-om-oversized]{break-inside:auto !important;page-break-inside:auto !important}' +
+        '[data-om-fakepage]{break-after:auto !important;page-break-after:auto !important}' +
+        (pageInset ? '[data-om-fakepage]{padding:0 !important;background:none !important}' : '') +
+        '}';
+      document.head.appendChild(ost);
+    }
+  } catch (e) {}
+  // macOS Preview renders Skia-PDF Luminosity soft-masks as opaque grey boxes;
+  // swap the CSS that triggers them for Preview-safe forms.
+  try {
+    for (const el of document.body.querySelectorAll('*')) {
+      const cs = getComputedStyle(el);
+
+      if (cs.boxShadow !== 'none' && cs.filter === 'none') {
+        const outs = [], kept = [];
+        for (const s of cs.boxShadow.split(/,(?![^(]*[)])/)) {
+          const t = s.trim();
+          const m = t.match(/^(rgba?[(][^)]+[)]) (-?[0-9.]+px) (-?[0-9.]+px) ([0-9.]+px) -?[0-9.]+px$/);
+          if (m && parseFloat(m[4]) > 0) outs.push('drop-shadow(' + m[2] + ' ' + m[3] + ' ' + m[4] + ' ' + m[1] + ')');
+          else kept.push(t);
+        }
+        if (outs.length) {
+          el.style.setProperty('filter', outs.join(' '), 'important');
+          el.style.setProperty('box-shadow', kept.join(', ') || 'none', 'important');
+        }
+      }
+
+      const mask = cs.maskImage && cs.maskImage !== 'none' ? cs.maskImage : cs.webkitMaskImage;
+      if (mask && mask !== 'none' && cs.filter === 'none') el.style.setProperty('filter', 'opacity(1)', 'important');
+    }
+  } catch (e) {}
+  setTimeout(() => { try { window.print(); } catch (e) {} }, 200);
+})();
+</script>
+</body>
+</html>

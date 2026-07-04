@@ -1,0 +1,386 @@
+@font-face {
+  font-family: "InterVariable";
+  src: url("https://www.tokens.xyz/fonts/InterVariable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Opacity-only fallback used under prefers-reduced-motion */
+@keyframes mf-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  /* Ink scale mirrors tokens.xyz: gray-1400 base with fixed opacity steps */
+  --color-ink: #0e0e0f;
+  --color-ink-muted: rgba(14, 14, 15, 0.72);
+  --color-ink-subtle: rgba(14, 14, 15, 0.58);
+  --color-ink-faint: rgba(14, 14, 15, 0.44);
+  --color-line: rgba(31, 31, 33, 0.12);
+  --color-line-strong: rgba(31, 31, 33, 0.2);
+  --color-line-faint: rgba(31, 31, 33, 0.04);
+  --color-surface-page: #ffffff;
+  --color-surface-soft: rgba(14, 14, 14, 0.06);
+  --color-surface-raised: #ffffff;
+  /* tokens.xyz gray-50: cool gray used for row hovers and header tints */
+  --color-hover-soft: #f5f5f8;
+  --color-hover-soft-50: rgba(245, 245, 248, 0.5);
+  --color-dark: #171717;
+  /* Semantic market colors */
+  --color-up: #51c148;
+  --color-down: #cf4040;
+  /* Down-trend chart line intentionally uses SpaceX blue instead of red */
+  --color-trend-down: #005288;
+  /* Segmented pill toggles — matches tokens.xyz live track + indicator */
+  --color-pill-track: rgba(0, 0, 0, 0.04);
+  --color-pill-indicator: #ffffff;
+  --shadow-pill-indicator: 0px 1px 3px rgba(0, 0, 0, 0.07);
+  /* Tooltips — matches tokens.xyz */
+  --tooltip-bg: var(--color-ink);
+  --tooltip-text: #ffffff;
+  --tooltip-radius: 8px;
+  --tooltip-shadow: 0px 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--color-surface-page);
+  color: var(--color-ink);
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Body copy: regular weight with tight tracking */
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+.num {
+  font-family: "InterVariable", var(--font-inter), sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.hv-tooltip-trigger {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.hv-infotip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-ink-subtle);
+  cursor: default;
+  flex-shrink: 0;
+  font: inherit;
+}
+
+.hv-infotip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+  color: inherit;
+}
+
+.hv-infotip-label .hv-infotip-icon {
+  display: inline-flex;
+  color: var(--color-ink-subtle);
+  flex-shrink: 0;
+}
+
+.hv-tooltip-popup {
+  position: fixed;
+  z-index: 50;
+  max-width: 320px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.375;
+  color: var(--tooltip-text);
+  background: var(--tooltip-bg);
+  border-radius: var(--tooltip-radius);
+  box-shadow: var(--tooltip-shadow);
+  text-wrap: pretty;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    transform 125ms cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 125ms cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform, opacity;
+}
+
+.hv-tooltip-popup[data-open="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hv-tooltip-popup {
+    transition: opacity 125ms ease;
+    transform: none;
+  }
+
+  .hv-tooltip-popup[data-open="true"] {
+    transform: none;
+  }
+}
+
+/* Reusable hover utilities — mirror the prototype's style-hover overrides */
+/* Shared easing so interactive surfaces ease on hover instead of snapping */
+.hv-switcher-tab,
+.hv-nav-link,
+.hv-search-pill,
+.hv-docs-link,
+.hv-assets-api,
+.hv-btn-dark,
+.hv-breadcrumb,
+.hv-muted-link,
+.hv-row,
+.hv-f2f3f5,
+.hv-trade-btn,
+.hv-footer-red,
+.hv-footer-outline,
+.hv-dashed,
+.hv-black10,
+.hv-jump,
+.pill-segment {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Matches tokens.xyz variant card hover: border darkens, shadow deepens */
+.hv-variant-card {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.03);
+}
+.hv-rationale-card {
+  transition: border-color 0.2s ease;
+}
+/* Matches tokens.xyz market table row hover: subtle gray-50/50 tint */
+.hv-market-row {
+  transition: background-color 0.2s ease;
+}
+
+/* Buy-module rows (mirrors tokens.xyz: gray-50 hover, press scale) */
+.hv-buy-row {
+  transition: background-color 0.15s ease-out, transform 0.15s ease-out;
+}
+.hv-buy-row:active {
+  transform: scale(0.99);
+}
+
+/* Floating "Latest Updates" market feed (mirrors tokens.xyz widget) */
+.mf-pill {
+  transition: transform 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out;
+}
+.mf-pill:active {
+  transform: scale(0.97);
+}
+.mf-settings {
+  transition: transform 0.15s ease-out, background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
+}
+.mf-settings:active {
+  transform: scale(0.97);
+}
+.mf-item {
+  transition: background-color 0.2s ease;
+}
+
+/* Hover states gated to real pointers — touch taps fire a sticky false :hover */
+@media (hover: hover) and (pointer: fine) {
+  .hv-switcher-tab:hover {
+    color: var(--color-surface-page);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .hv-nav-link:hover {
+    background: var(--color-line);
+    color: var(--color-ink);
+  }
+  .hv-search-pill:hover {
+    border-color: var(--color-line-strong);
+    color: var(--color-ink-muted);
+  }
+  .hv-docs-link:hover {
+    color: var(--color-ink);
+  }
+  .hv-assets-api:hover {
+    background: var(--color-dark);
+  }
+  .hv-btn-dark:hover {
+    background: var(--color-ink);
+  }
+  .hv-breadcrumb:hover {
+    color: var(--color-dark);
+  }
+  .hv-muted-link:hover {
+    color: var(--color-ink);
+  }
+  .hv-row:hover {
+    background: var(--color-surface-page);
+  }
+  .hv-f2f3f5:hover {
+    background: var(--color-line);
+  }
+  .hv-trade-btn:hover {
+    background: var(--color-dark);
+  }
+  .hv-footer-red:hover {
+    background: #7e0012;
+  }
+  .hv-footer-outline:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .hv-dashed:hover {
+    background: var(--color-line);
+    color: var(--color-ink);
+  }
+  .hv-black10:hover {
+    background: var(--color-surface-soft);
+  }
+  .hv-rationale-card:hover {
+    border-color: var(--color-line-strong);
+  }
+  .hv-jump:hover {
+    background: var(--color-line);
+    border-color: var(--color-line-strong);
+  }
+  .pill-segment[data-selected="false"]:hover {
+    color: var(--color-ink-muted);
+  }
+  .hv-variant-card:hover {
+    border-color: var(--color-line-strong);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.06);
+  }
+  .hv-market-row:hover {
+    background: var(--color-hover-soft-50);
+  }
+  .hv-buy-row:hover {
+    background: var(--color-hover-soft);
+  }
+  .mf-pill:hover {
+    background: var(--color-surface-raised) !important;
+    border-color: var(--color-line-strong) !important;
+  }
+  .mf-settings:hover {
+    background: var(--color-surface-raised) !important;
+    border-color: var(--color-line-strong) !important;
+    color: var(--color-ink) !important;
+  }
+  .mf-item:hover {
+    background: var(--color-hover-soft);
+  }
+  .mf-ticker-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes mf-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.mf-panel {
+  animation: mf-panel-in 0.18s ease-out;
+}
+
+@keyframes mf-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.mf-ticker-track {
+  animation: mf-ticker-scroll 24s linear infinite;
+}
+
+/* Accordion reveal — expanded content settles in to match the chevron rotation */
+.reveal {
+  animation: fadeSlide 0.18s ease-out;
+}
+
+@keyframes chart-mode-drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chart-mode-enter {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: chart-mode-drop-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* Reduced motion: keep opacity/color, drop movement + the looping marquee */
+@media (prefers-reduced-motion: reduce) {
+  .mf-panel {
+    animation: mf-fade-in 0.18s ease-out;
+  }
+  .mf-ticker-track {
+    animation: none;
+  }
+  .reveal {
+    animation: mf-fade-in 0.18s ease-out;
+  }
+  .chart-mode-enter {
+    animation: mf-fade-in 0.18s ease-out both;
+  }
+  .hv-buy-row:active,
+  .mf-pill:active,
+  .mf-settings:active {
+    transform: none;
+  }
+}
