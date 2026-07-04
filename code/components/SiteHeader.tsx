@@ -1,15 +1,27 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export default function SiteHeader() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      setScrolled(y > 1);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   return (
-    <header
-      style={{
-        background: "var(--color-surface-raised)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 16,
-        padding: "16px 24px",
-      }}
-    >
+    <>
+      <header className={`hv-site-header${scrolled ? " is-scrolled" : ""}`}>
       <a href="#" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         <svg width="24" height="24" viewBox="0 0 212 212" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -116,5 +128,7 @@ export default function SiteHeader() {
         </a>
       </nav>
     </header>
+    <div className="hv-site-header-spacer" aria-hidden="true" />
+    </>
   );
 }

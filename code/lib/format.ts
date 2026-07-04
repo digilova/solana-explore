@@ -9,6 +9,27 @@ export function fmtCount(n: number): string {
   return String(Math.round(n));
 }
 
+function parseSuffixedNumber(value: string): number {
+  const cleaned = value.replace(/[$,]/g, "").trim();
+  const match = cleaned.match(/^([\d.]+)\s*([KMB])?$/i);
+  if (!match) return 0;
+  const num = parseFloat(match[1]);
+  if (Number.isNaN(num)) return 0;
+  const suffix = match[2]?.toUpperCase();
+  if (suffix === "K") return num * 1e3;
+  if (suffix === "M") return num * 1e6;
+  if (suffix === "B") return num * 1e9;
+  return num;
+}
+
+export function parseMoney(value: string): number {
+  return parseSuffixedNumber(value);
+}
+
+export function parseCount(value: string): number {
+  return parseSuffixedNumber(value);
+}
+
 export function seeded(seed: number): () => number {
   let s = seed;
   return () => {

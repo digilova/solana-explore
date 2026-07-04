@@ -7,8 +7,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import AssetHeader from "@/components/variation-a/AssetHeader";
 import ChartCard from "@/components/variation-a/ChartCard";
 import VariantsMarkets, { type FilterKey } from "@/components/variation-a/VariantsMarkets";
-import WhereToBuy from "@/components/variation-a/WhereToBuy";
-import MarketHealthA from "@/components/variation-a/MarketHealthA";
+import LiquidityStructureA from "@/components/variation-a/LiquidityStructureA";
 import MarketFeed from "@/components/variation-a/MarketFeed";
 import type { RangeKey } from "@/lib/dataA";
 
@@ -35,11 +34,7 @@ export default function VariationAPage() {
         <AssetHeader onJump={jumpToVariants} />
         <ChartCard range={range} onSelectRange={setRange} />
         <VariantsMarkets filter={filter} onFilter={setFilter} expanded={expanded} onToggle={toggle} />
-
-        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 24, marginTop: 32, alignItems: "stretch" }}>
-          <WhereToBuy />
-          <MarketHealthA />
-        </div>
+        <LiquidityStructureA />
 
         <div style={{ marginTop: 40, paddingTop: 20, borderTop: "1px solid var(--color-line)", fontSize: 12, color: "var(--color-ink-subtle)", lineHeight: 1.6 }}>
           We use publicly available data from the blockchain, as well as data procured by our trusted data partners and related sources.
