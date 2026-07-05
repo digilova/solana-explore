@@ -1250,7 +1250,8 @@ button {
 .hv-chartv3-stat-cell {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 2px;
   padding: 24px;
   min-width: 0;
   border-right: 1px solid #e5e7eb;
@@ -1284,7 +1285,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 26px;
-  padding: 24px;
+  padding: 24px 0 0;
 }
 
 .hv-chartv3-price-head {
@@ -1293,6 +1294,7 @@ button {
   justify-content: space-between;
   gap: 12px;
   width: 100%;
+  padding: 0 24px;
 }
 
 .hv-chartv3-price-block {
@@ -1352,9 +1354,42 @@ button {
     height: auto;
   }
 
+  .hv-chartv3-price-panel {
+    order: -1;
+  }
+
   .hv-chartv3-stats-panel {
+    order: 1;
     border-right: none;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: none;
+  }
+
+  .hv-chartv3-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, auto));
+    height: auto;
+  }
+
+  .hv-chartv3-stat-cell {
+    border-right: 1px solid #e5e7eb;
     border-bottom: 1px solid #e5e7eb;
+  }
+
+  .hv-chartv3-stat-cell:nth-child(3n) {
+    border-right: 1px solid #e5e7eb;
+  }
+
+  .hv-chartv3-stat-cell:nth-child(2n) {
+    border-right: none;
+  }
+
+  .hv-chartv3-stat-cell:nth-child(n + 4) {
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .hv-chartv3-stat-cell:nth-child(n + 5) {
+    border-bottom: none;
   }
 
   .hv-chartv3-spark-wrap {
