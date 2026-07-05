@@ -24,25 +24,25 @@ export const DECISIONS: Decision[] = [
     "Standalone lower Variants section",
     "removed",
     "Removed",
-    "Fully absorbed by the single comparison module; it was the main source of repetition."
+    "Moved into the main comparison module. The old section repeated work users had already done."
   ),
   d(
     "Variant grouping inside Markets",
     "merged",
     "Merged",
-    "Markets now nest inside each variant’s expanded row — the hierarchy renders itself."
+    "Markets now sit under the variant they belong to."
   ),
   d(
     '"View 18 more" navigation',
     "changed",
     "Replaced",
-    'Inline expansion with "Show all X markets" ↔ "Show fewer markets"; user never loses page context.'
+    'Rows expand in place. Users do not have to leave the page to understand the market list.'
   ),
   d(
     'Top "5+ variants" dropdown',
     "changed",
     "Repurposed",
-    "Kept as a jump link because the chart pushes variants below the fold."
+    "Kept as a jump link because variants sit below the chart."
   ),
   d(
     "Spot / Futures / Liquidity module",
@@ -54,13 +54,13 @@ export const DECISIONS: Decision[] = [
     "Latest Updates",
     "demoted",
     "Demoted",
-    'Renamed "Market updates", moved to page bottom, capped at three items with typed tags (Listing / Activity / Issuer). Proof of activity without competing with structure.'
+    'Moved lower and capped. It shows activity without competing with the core market data.'
   ),
   d(
     "Security score",
     "changed",
     "Reframed",
-    '"Market health" with scope label (asset-wide, daily), input breakdown, and explicit "not a regulatory rating" framing.'
+    '"Market health" says what it measures and avoids sounding like a regulatory rating.'
   ),
 ];
 
@@ -73,16 +73,16 @@ export const AUDIENCES: Audience[] = [
   {
     who: "Issuers (primary)",
     value:
-      "Sees issuer identity surfaced in a familiar retail context: issuer name, access labels, verification signals, and market-health context. Answers “would my asset look credible in the existing format?” without forcing a separate issuer-first page.",
+      "They can see whether the page makes their asset look credible: issuer name, access, verification, liquidity, and market health are all visible.",
   },
   {
     who: "Retail / crypto-native investors",
     value:
-      "Nothing is taken away: chart, price, stats, and buy paths stay on top. Access labels and inline market expansion add context without burying the fast trading workflow.",
+      "They still get the chart, price, stats, venues, and trade paths first. The added context does not slow down the basic workflow.",
   },
   {
     who: "Sophisticated / institutional investors",
     value:
-      "Gains issuer, type, access, backing, verification, market depth, trades, wallets, and health-score explanation in one expandable comparison module.",
+      "They get enough structure to compare variants: issuer, backing, access, depth, trades, wallets, and health signals.",
   },
 ];

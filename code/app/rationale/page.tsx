@@ -19,16 +19,14 @@ export default function RationalePage() {
       <main style={{ maxWidth: 860, margin: "0 auto", padding: "48px 40px 96px" }}>
         <h1 style={{ margin: 0, fontSize: 32, fontWeight: 600, letterSpacing: -0.5, lineHeight: 1.2 }}>Design rationale</h1>
         <p style={{ margin: "12px 0 0", fontSize: 16, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-          Tokens.xyz SpaceX asset detail page redesign — information architecture, required explorations, and recommendation. Companion to
-          the evolved product direction and live-page audit.
+          Why the SpaceX page should change, what the redesign keeps, and what it removes.
         </p>
 
         {/* User assumptions */}
         <section style={{ marginTop: 48 }}>
-          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>1 · User assumptions</h2>
+          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>1 · Who this is for</h2>
           <p style={{ margin: "0 0 16px", fontSize: 15, lineHeight: 1.65, color: "var(--color-ink-muted)" }}>
-            The redesign assumes this page has to serve three audiences at once, with issuers as the most important audience for the
-            product strategy.
+            The page still needs to work for traders, but it should make issuers and serious buyers feel oriented sooner.
           </p>
           <div className="hv-rationale-user-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 16 }}>
             <div style={cardStyle}>
@@ -37,8 +35,8 @@ export default function RationalePage() {
               </div>
               <div style={{ fontSize: 16, fontWeight: 600, marginTop: 6 }}>Asset issuers</div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                They are evaluating whether Solana can make their tokenized asset look credible: issuer identity, structure, access rules,
-                liquidity depth, and market fragmentation need to be legible before price action.
+                They need to see identity, access rules, liquidity, and market structure quickly. A chart alone does not make the asset
+                feel credible.
               </p>
             </div>
             <div style={cardStyle}>
@@ -47,8 +45,7 @@ export default function RationalePage() {
               </div>
               <div style={{ fontSize: 16, fontWeight: 600, marginTop: 6 }}>Traders and crypto-native investors</div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                They still need fast answers: reference price, liquidity, venues, and a clean route to trade. The redesign should add
-                context without burying the familiar chart-and-market workflow.
+                They need price, liquidity, venues, and a fast path to trade. The redesign adds context without hiding the familiar flow.
               </p>
             </div>
             <div style={cardStyle}>
@@ -57,8 +54,7 @@ export default function RationalePage() {
               </div>
               <div style={{ fontSize: 16, fontWeight: 600, marginTop: 6 }}>Sophisticated investors</div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                They compare issuers, redemption terms, backing claims, trading depth, and holder activity. For them, a token ticker is
-                not enough; each variant has to read like a financial product.
+                They compare issuer, backing, restrictions, depth, and activity. A ticker is not enough.
               </p>
             </div>
           </div>
@@ -66,67 +62,62 @@ export default function RationalePage() {
 
         {/* IA */}
         <section style={{ marginTop: 48 }}>
-          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>2 · Revised information architecture</h2>
+          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>2 · Page structure</h2>
           <p style={{ margin: "0 0 16px", fontSize: 15, lineHeight: 1.65, color: "var(--color-ink-muted)" }}>
-            The current page mixes four concepts. The redesign enforces one canonical hierarchy and renders each level exactly once:
+            The current page repeats the same ideas in different places. The redesign gives each level one clear home:
           </p>
           <div style={{ background: "var(--color-surface-raised)", border: "1px solid var(--color-line)", borderRadius: 16, padding: "20px 24px", fontSize: 14, lineHeight: 1.7 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <div>
                 <strong>Asset</strong>{" "}
                 <span style={{ color: "var(--color-ink-muted)" }}>
-                  — SpaceX. Owns the reference price, aggregate stats, and market-health score. Everything asset-level is explicitly
-                  labeled &quot;across all variants&quot;.
+                  — SpaceX. Shows the reference price, aggregate stats, and market health across all variants.
                 </span>
               </div>
               <div style={{ paddingLeft: 20 }}>
                 <strong>Variant / Issuer</strong>{" "}
                 <span style={{ color: "var(--color-ink-muted)" }}>
-                  — SPCX, SPCXx, TSPX, SPACEX, SPCXon. A financial product with issuer, type, backing, and access — not just a ticker.
-                  Rendered once, in one comparison module.
+                  — SPCX, SPCXx, TSPX, SPACEX, SPCXon. Each variant gets issuer, backing, access, and market details in one place.
                 </span>
               </div>
               <div style={{ paddingLeft: 40 }}>
                 <strong>Market / Venue</strong>{" "}
                 <span style={{ color: "var(--color-ink-muted)" }}>
-                  — Orca, Meteora, Raydium, Byreal, Kamino… Lives inside the variant&apos;s expanded row; never a competing page section.
+                  — Orca, Meteora, Raydium, Byreal, Kamino. Markets live inside the relevant variant.
                 </span>
               </div>
               <div style={{ paddingLeft: 60 }}>
-                <strong>Pair</strong> <span style={{ color: "var(--color-ink-muted)" }}>— SPCX/USDC etc. A row inside a market list.</span>
+                <strong>Pair</strong> <span style={{ color: "var(--color-ink-muted)" }}>— SPCX/USDC and similar rows inside a market list.</span>
               </div>
             </div>
           </div>
           <p style={{ margin: "16px 0 0", fontSize: 15, lineHeight: 1.65, color: "var(--color-ink-muted)" }}>
-            The structural fix behind most of the PRD&apos;s problems: <strong>variants appear exactly once per page</strong>. The former
-            four appearances (header dropdown, markets groupings, standalone Variants section, variant sub-page) collapse into a single
-            expandable comparison module. The header chip becomes a jump link into it; markets nest inside it; the sub-page becomes its
-            expanded state.
+            Main rule: <strong>show each variant once</strong>. The header chip becomes a jump link. Markets sit under the variant they
+            belong to. The separate variant page becomes the expanded state.
           </p>
         </section>
 
         {/* Direction and audit */}
         <section style={{ marginTop: 48 }}>
-          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>3 · Direction and audit</h2>
+          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>3 · Direction</h2>
           <div className="hv-rationale-directions-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 16 }}>
             <Link href="/variation-a" className="hv-rationale-card" style={{ display: "block", ...cardStyle, color: "var(--color-ink)" }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-ink-subtle)", textTransform: "uppercase", letterSpacing: 0.4 }}>
                 Product direction
               </div>
-              <div style={{ fontSize: 17, fontWeight: 600, marginTop: 6 }}>Evolved current experience</div>
+              <div style={{ fontSize: 17, fontWeight: 600, marginTop: 6 }}>Keep the familiar page shape</div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                Keeps the token-page shape: chart on top, stats, then one Variants &amp; Markets module. Adds issuer identity, access
-                labels, inline market expansion, and an explained health score. Retail users lose nothing; issuers gain legibility.
+                Keep the chart, stats, and market flow. Add issuer names, access labels, inline market details, and a clearer health
+                score.
               </p>
             </Link>
             <Link href="/current-audit" className="hv-rationale-card" style={{ display: "block", ...cardStyle, color: "var(--color-ink)" }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-ink-subtle)", textTransform: "uppercase", letterSpacing: 0.4 }}>
                 Current audit
               </div>
-              <div style={{ fontSize: 17, fontWeight: 600, marginTop: 6 }}>Live-page annotation canvas</div>
+              <div style={{ fontSize: 17, fontWeight: 600, marginTop: 6 }}>Current page audit</div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                Captures the current tokens.xyz SpaceX page as an editable critique surface. Use the numbered pins to document what the
-                redesign directions are solving and where the live experience still needs context.
+                The numbered pins call out what feels confusing, repetitive, or underspecified in the current page.
               </p>
             </Link>
           </div>
@@ -134,7 +125,7 @@ export default function RationalePage() {
 
         {/* Spot/Futures/Liquidity exploration */}
         <section style={{ marginTop: 48 }}>
-          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>4 · Exploration: Spot / Futures / Liquidity</h2>
+          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>4 · Market filters</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={cardStyle}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -145,18 +136,14 @@ export default function RationalePage() {
               </div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
                 <strong>Solves:</strong> the module no longer competes with variants for attention; it&apos;s clearly a lens on markets,
-                not a different product. <strong>Clearer:</strong> what the toggle changes (the market list, nothing else). Futures
-                shows an honest empty state instead of vanishing. <strong>Tradeoff:</strong> availability per variant isn&apos;t visible
-                until you filter — you can&apos;t see at a glance that SPCXon has no pools.
+                not a different product. <strong>Tradeoff:</strong> users need to filter before they see which variants have no pools.
               </p>
             </div>
             <div style={cardStyle}>
               <span style={{ fontSize: 15, fontWeight: 600 }}>Alternative — Task-based labels (Trade / Hedge / Provide Liquidity)</span>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                <strong>Solves:</strong> maps to user intent rather than market jargon; friendliest for retail. <strong>Clearer:</strong>{" "}
-                what the user will accomplish. <strong>Tradeoff:</strong> intent labels are actions, and this page is an evaluation
-                surface — &quot;Hedge&quot; with zero futures markets is a broken promise, and institutional users distrust marketing
-                verbs on data pages. Rejected for this surface.
+                This is friendlier, but too action-heavy for an evaluation page. &quot;Hedge&quot; also breaks down when there are no futures
+                markets.
               </p>
             </div>
             <div style={cardStyle}>
@@ -167,10 +154,7 @@ export default function RationalePage() {
                 </span>
               </div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                <strong>Solves:</strong> market-type availability becomes a comparison attribute (Spot ✓ · LP ✓ · Perps —), visible per
-                variant without any interaction. <strong>Clearer:</strong> the shape of each product&apos;s market structure at a glance.
-                <strong>Tradeoff:</strong> chips add density to each row and duplicate the market filters already available in the chosen
-                direction.
+                This makes availability scannable, but adds another row of chips to an already dense table.
               </p>
             </div>
           </div>
@@ -178,7 +162,7 @@ export default function RationalePage() {
 
         {/* Dropdown exploration */}
         <section style={{ marginTop: 48 }}>
-          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>5 · Exploration: the &quot;5+ variants&quot; dropdown</h2>
+          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>5 · Variants chip</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={cardStyle}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -188,8 +172,7 @@ export default function RationalePage() {
                 </span>
               </div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                Removing it is only safe when the comparison module is already visible near the top. In the chosen direction, the chart
-                still leads the page, so the chip remains useful as a jump link.
+                Removing it hides an important signal: this asset has multiple versions. Since the chart comes first, the chip still has a job.
               </p>
             </div>
             <div style={cardStyle}>
@@ -200,17 +183,14 @@ export default function RationalePage() {
                 </span>
               </div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                The page keeps the chart on top, so variants sit below the fold; the header chip (&quot;5 variants · 4 issuers ↓&quot;)
-                preserves the current page&apos;s scent — you learn immediately that this asset is plural — but clicking scrolls to the
-                single comparison module instead of opening a redundant card list. Zero duplication, familiar affordance.
+                The chip tells users the asset is plural, then sends them to the one comparison module. No duplicate dropdown needed.
               </p>
             </div>
             <div style={cardStyle}>
               <span style={{ fontSize: 15, fontWeight: 600 }}>Alternative — Keep as quick switcher</span>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-                A compact switcher implies the page re-renders per variant — which recreates the old &quot;am I looking at asset or
-                variant data?&quot; ambiguity the IA just fixed. Worth revisiting only if per-variant sub-pages return (e.g. deep-linked
-                variant views). Rejected for now.
+                A switcher makes it unclear whether the page is showing the whole asset or one variant. That is the confusion this redesign
+                is trying to remove.
               </p>
             </div>
           </div>
@@ -224,7 +204,7 @@ export default function RationalePage() {
 
         {/* Audiences */}
         <section style={{ marginTop: 48 }}>
-          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>7 · How the direction serves each audience</h2>
+          <h2 style={{ margin: "0 0 12px", fontSize: 21, fontWeight: 600 }}>7 · Audience fit</h2>
           <AudiencesList />
         </section>
 
@@ -233,24 +213,19 @@ export default function RationalePage() {
           <h2 style={{ margin: "0 0 16px", fontSize: 21, fontWeight: 600 }}>8 · Recommendation</h2>
           <div style={{ fontSize: 15, lineHeight: 1.7, color: "rgba(255,255,255,0.85)", display: "flex", flexDirection: "column", gap: 14 }}>
             <p style={{ margin: 0 }}>
-              <strong style={{ color: "var(--color-surface-raised)" }}>Ship the evolved current experience.</strong> It fixes every named defect — variant repetition, the
-              misleading &quot;View 18 more&quot;, hidden overview data, missing access context, the competing Spot/Futures module, the
-              unexplained score — while staying recognizable to the existing audience. Low regression risk, incremental engineering,
-              immediately testable against the live page.
+              <strong style={{ color: "var(--color-surface-raised)" }}>Ship the evolved current experience.</strong> It removes repetition,
+              explains the variants, adds access context, and keeps the page recognizable.
             </p>
             <p style={{ margin: 0 }}>
-              <strong style={{ color: "var(--color-surface-raised)" }}>Tradeoffs to weigh:</strong> the page still leads with price and chart,
-              so issuer credibility has to be carried by the variant comparison module, access labels, verification signals, and market
-              health explanation. That keeps the experience familiar, but the product must be disciplined about reducing repetition below
-              the fold.
+              <strong style={{ color: "var(--color-surface-raised)" }}>Tradeoff:</strong> the chart still leads. That is good for traders,
+              but the variant module has to do more work for issuers and diligence users.
             </p>
           </div>
         </section>
 
         <div style={{ marginTop: 40, fontSize: 13, color: "var(--color-ink-subtle)", lineHeight: 1.6 }}>
-          Copy rules applied throughout: no &quot;compliant&quot; claims; access labels limited to Open / Restricted / KYC required /
-          Check issuer / Unknown; issuer statements attributed (&quot;issuer-stated&quot;); market-health score explicitly framed as not
-          a regulatory rating.
+          Copy rule: keep claims specific. Say who the issuer is, what access requires, and where data comes from. Do not imply regulatory
+          approval.
         </div>
       </main>
       </div>

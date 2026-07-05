@@ -5,7 +5,8 @@ import { useMemo } from "react";
 
 const DEFAULT_WIDTH = 800;
 const DEFAULT_HEIGHT = 168;
-const SPARK_PAD = 6;
+const SPARK_TOP_PAD = 6;
+const SPARK_BOTTOM_PAD = 30;
 const LINE_COLOR = "var(--color-trend-down)";
 
 function pathFromPoints(points: [number, number][]) {
@@ -18,19 +19,25 @@ function pathFromPoints(points: [number, number][]) {
   );
 }
 
-function mapSparkPoints(points: [number, number][], width: number, height: number, pad = SPARK_PAD) {
+function mapSparkPoints(
+  points: [number, number][],
+  width: number,
+  height: number,
+  topPad = SPARK_TOP_PAD,
+  bottomPad = SPARK_BOTTOM_PAD,
+) {
   if (points.length === 0) return [];
 
   const ys = points.map((point) => point[1]);
   const minY = Math.min(...ys);
   const maxY = Math.max(...ys);
   const span = Math.max(maxY - minY, 1);
-  const innerHeight = height - pad * 2;
+  const innerHeight = height - topPad - bottomPad;
   const sourceWidth = points[points.length - 1]?.[0] || width;
 
   return points.map(([x, y]) => {
     const px = sourceWidth > 0 ? (x / sourceWidth) * width : x;
-    const py = pad + ((maxY - y) / span) * innerHeight;
+    const py = topPad + ((maxY - y) / span) * innerHeight;
     return [px, py] as [number, number];
   });
 }
@@ -60,7 +67,7 @@ export default function AssetSparkPlot({
   const sparkPoints = useMemo(() => mapSparkPoints(chart.points, width, height), [chart.points, width, height]);
   const linePath = useMemo(() => pathFromPoints(sparkPoints), [sparkPoints]);
   const areaPath = useMemo(
-    () => `${linePath} L${width},${height - SPARK_PAD} L0,${height - SPARK_PAD} Z`,
+    () => `${linePath} L${width},${height - SPARK_BOTTOM_PAD} L0,${height - SPARK_BOTTOM_PAD} Z`,
     [linePath, width, height],
   );
   const fillId = `sparkFill${plotId}`;
@@ -75,7 +82,7 @@ export default function AssetSparkPlot({
       >
         {showFill ? (
           <defs>
-            <linearGradient id={fillId} x1="0" y1={SPARK_PAD} x2="0" y2={height - SPARK_PAD} gradientUnits="userSpaceOnUse">
+            <linearGradient id={fillId} x1="0" y1={SPARK_TOP_PAD} x2="0" y2={height - SPARK_BOTTOM_PAD} gradientUnits="userSpaceOnUse">
               <stop offset="0%" stopColor={LINE_COLOR} stopOpacity="0.14" />
               <stop offset="100%" stopColor={LINE_COLOR} stopOpacity="0" />
             </linearGradient>
