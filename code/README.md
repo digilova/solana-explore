@@ -18,17 +18,18 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 | Route | What it shows |
 |---|---|
-| `/` | Landing / switcher between the variations |
-| `/variation-a` | **Variation A — Evolved.** Familiar tokens.xyz flow with issuer signals added: reference-price chart, variants & markets table, buy module, market health, floating "Latest Updates" feed |
-| `/variation-b` | Variation B — Issuer-first layout |
+| `/` | Redirects to the evolved SpaceX page |
+| `/variation-a` | **Evolved.** Familiar tokens.xyz flow with issuer signals added: reference-price chart, variants & markets table, buy module, market health, floating "Latest Updates" feed |
+| `/current-audit` | Live-page annotation canvas for the current tokens.xyz SpaceX page |
+| `/variation-b` | Redirects to `/variation-a` |
 | `/rationale` | Design rationale notes for the redesign |
 
 ## Where things live
 
 - `app/` — one folder per route (Next.js App Router)
 - `components/variation-a/` — Variation A modules (`AssetHeader`, `ChartCard`, `VariantsMarkets`, `WhereToBuy`, `MarketHealthA`, `MarketFeed`)
-- `components/variation-b/` — Variation B modules
-- `lib/dataA.ts` / `lib/dataB.ts` — all mock data per variation (variants, market rows, chart series, health scores, feed items)
+- `components/current-audit/` — annotation canvas modules
+- `lib/dataA.ts` — mock data for the evolved page (variants, market rows, chart series, health scores, feed items)
 - `app/globals.css` — design tokens (CSS variables) and hover utilities
 - `public/avatars/` — variant logo marks
 

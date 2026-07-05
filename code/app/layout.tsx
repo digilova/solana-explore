@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SpaceX Page Redesign",
-  description: "Clickable prototype: SpaceX asset page redesign for tokens.xyz",
+  title: "SpaceX Token Markets",
+  description: "SpaceX tokenized asset market data and issuer disclosures on tokens.xyz",
 };
 
 export default function RootLayout({

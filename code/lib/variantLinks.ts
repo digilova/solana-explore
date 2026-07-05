@@ -10,6 +10,11 @@ const VARIANT_LINK_INFO: Record<string, { mint: string; issuerUrl: string; issue
 
 export type VariantLink = { label: string; href: string; title: string };
 
+export function variantMint(sym: string): string | undefined {
+  const normalized = sym === "tSpaceX" ? "TSPX" : sym;
+  return VARIANT_LINK_INFO[normalized]?.mint;
+}
+
 export function jupiterSwapUrl(mint: string): string {
   return `https://jup.ag/swap/USDC-${mint}`;
 }

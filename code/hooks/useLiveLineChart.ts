@@ -8,8 +8,8 @@ const SCROLL_PX_PER_SEC = 16;
 const TICK_MS = 1700;
 const MIN_POINTS = 48;
 const MIN_DOMAIN_SPAN = 0.32;
-const DOMAIN_PAD_RATIO = 0.1;
-const PLOT_Y_INSET = 8;
+const DOMAIN_PAD_RATIO = 0.04;
+const PLOT_Y_INSET = 4;
 
 function priceToPlotY(
   price: number,

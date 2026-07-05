@@ -1,17 +1,26 @@
 import Avatar from "@/components/Avatar";
 
-export default function AssetHeader({ onJump }: { onJump: () => void }) {
+export default function AssetHeader({
+  onJump,
+  showJump = true,
+  inline = false,
+}: {
+  onJump: () => void;
+  showJump?: boolean;
+  inline?: boolean;
+}) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: inline ? "nowrap" : "wrap" }}>
       <Avatar size={52} bg="var(--color-dark)" initials="SX" fontSize={18} src="/avatars/spacex-avatar.png" alt="SpaceX" />
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 500 }}>SpaceX</h1>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 600 }}>SpaceX</h1>
         </div>
         <div style={{ fontSize: 12, color: "var(--color-ink-muted)", marginTop: 2 }}>
           Tokenized SpaceX exposure on Solana
         </div>
       </div>
+      {showJump ? (
       <button
         onClick={onJump}
         className="hv-jump"
@@ -36,6 +45,7 @@ export default function AssetHeader({ onJump }: { onJump: () => void }) {
           <path d="M12 5v14M5 12l7 7 7-7"></path>
         </svg>
       </button>
+      ) : null}
     </div>
   );
 }
