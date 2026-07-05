@@ -20,6 +20,7 @@ export function ChartDisplayProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === "v1" || stored === "v2") setChartVersionState(stored);
+    else if (stored === "v3") setChartVersionState("v2");
     setReady(true);
   }, []);
 

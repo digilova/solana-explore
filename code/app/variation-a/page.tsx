@@ -6,10 +6,9 @@ import SiteHeader from "@/components/SiteHeader";
 import Breadcrumb from "@/components/Breadcrumb";
 import AssetHeader from "@/components/variation-a/AssetHeader";
 import ChartCard from "@/components/variation-a/ChartCard";
-import ChartCardV2 from "@/components/variation-a/ChartCardV2";
+import ChartCardV3 from "@/components/variation-a/ChartCardV3";
 import { useChartDisplay } from "@/lib/chartDisplayContext";
 import VariantsMarkets, { type FilterKey } from "@/components/variation-a/VariantsMarkets";
-import LiquidityStructureA from "@/components/variation-a/LiquidityStructureA";
 import MarketFeed from "@/components/variation-a/MarketFeed";
 import type { RangeKey } from "@/lib/dataA";
 
@@ -33,18 +32,23 @@ function VariationAPageContent() {
       <main className="hv-page-main" style={{ width: "100%", maxWidth: 1160, margin: "0 auto", padding: "24px 40px 80px", flex: 1 }}>
         <Breadcrumb items={[{ label: "Tokens", href: "#" }, { label: "SpaceX" }]} />
 
-        <AssetHeader onJump={jumpToVariants} />
+        {chartVersion !== "v2" ? (
+          <AssetHeader onJump={jumpToVariants} />
+        ) : null}
         {chartVersion === "v1" ? (
           <ChartCard range={range} onSelectRange={setRange} />
         ) : (
-          <ChartCardV2 range={range} onSelectRange={setRange} />
+          <ChartCardV3
+            range={range}
+            onSelectRange={setRange}
+            header={<AssetHeader onJump={jumpToVariants} showJump={false} inline />}
+          />
         )}
         <VariantsMarkets filter={filter} onFilter={setFilter} expanded={expanded} onToggle={toggle} />
-        <LiquidityStructureA />
 
         <div style={{ marginTop: 40, paddingTop: 20, borderTop: "1px solid var(--color-line)", fontSize: 12, color: "var(--color-ink-subtle)", lineHeight: 1.6 }}>
           We use publicly available data from the blockchain, as well as data procured by our trusted data partners and related sources.
-          Prototype note: headline figures are from tokens.xyz (Jul 2026); detail rows in expanded market lists are illustrative.
+          Market and issuer details are aggregated from available sources and should be verified before trading.
         </div>
       </main>
 
@@ -55,7 +59,7 @@ function VariationAPageContent() {
 
 export default function VariationAPage() {
   return (
-    <PrototypeShell active="a" note="Evolved current experience — familiar flow, issuer signals added">
+    <PrototypeShell active="a" note="Familiar flow with issuer and market signals added">
       <VariationAPageContent />
     </PrototypeShell>
   );

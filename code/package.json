@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "capture-audit": "node scripts/capture-audit-screenshot.mjs",
+    "promote-audit": "node scripts/promote-audit-annotations.mjs",
     "start": "next start",
     "lint": "eslint"
   },

@@ -563,10 +563,10 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
             </mask>
           </defs>
           {yTicks.map((t, i) => (
-            <line key={i} x1={0} y1={t.y} x2={PLOT_LINE_WIDTH} y2={t.y} stroke="var(--color-line)" strokeWidth={1} strokeDasharray="2 4"></line>
+            <line key={i} x1={0} y1={t.y} x2={PLOT_LINE_WIDTH} y2={t.y} stroke="var(--color-line)" strokeWidth={1} strokeDasharray="2 4" vectorEffect="non-scaling-stroke"></line>
           ))}
           {hover && (
-            <line x1={hover.viewX} y1={PLOT_TOP} x2={hover.viewX} y2={PLOT_BOTTOM} stroke="var(--color-line-strong)" strokeWidth={1} />
+            <line x1={hover.viewX} y1={PLOT_TOP} x2={hover.viewX} y2={PLOT_BOTTOM} stroke="var(--color-line-strong)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
           )}
           <g clipPath="url(#chartPlotClipA)">
           {mode === "line" && (
@@ -576,7 +576,7 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
             <g key={`${mode}-${modeDropKey}`} className={modeDropKey > 0 ? "chart-mode-enter" : undefined}>
               {mode === "line" ? (
                 <>
-                  <path d={linePath} fill="none" stroke={lineChartColor} strokeWidth={1.5} strokeLinejoin="round"></path>
+                  <path d={linePath} fill="none" stroke={lineChartColor} strokeWidth={1.5} strokeLinejoin="round" vectorEffect="non-scaling-stroke"></path>
                 </>
               ) : (
                 displayCandles.map((c, i) => {
@@ -586,7 +586,7 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
                   const bodyBottom = Math.max(c.open, c.close);
                   return (
                     <g key={i}>
-                      <line x1={c.x} y1={c.high} x2={c.x} y2={c.low} stroke={color} strokeWidth={1.4}></line>
+                      <line x1={c.x} y1={c.high} x2={c.x} y2={c.low} stroke={color} strokeWidth={1.4} vectorEffect="non-scaling-stroke"></line>
                       <rect x={c.x - candleWidth / 2} y={bodyTop} width={candleWidth} height={Math.max(2, bodyBottom - bodyTop)} fill={color} rx={1}></rect>
                     </g>
                   );
@@ -605,6 +605,7 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
               strokeOpacity={0.35}
               strokeWidth={1}
               strokeDasharray="4 4"
+              vectorEffect="non-scaling-stroke"
             />
           )}
           {hover && (

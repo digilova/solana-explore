@@ -1,10 +1,12 @@
 import { seeded, fmt, fmtCount } from "./format";
 import { variantLinks } from "./variantLinks";
+import { marketTradeUrl } from "./marketLinks";
 
 export interface MarketRowA {
   venue: string;
   pair: string;
   price: string;
+  priceChange: string;
   liq: string;
   vol: string;
   trades: string;
@@ -55,6 +57,7 @@ export interface VariantDefA {
   avatarBg: string;
   img: string;
   price: string;
+  priceChange: string;
   liq: string;
   vol: string;
   access: string;
@@ -79,39 +82,62 @@ export const ACCESS_KIND_TOOLTIPS: Record<AccessKindA, string> = {
 };
 
 function mkRow(venue: string, pair: string, liq: number, vol: number, trades: number, wallets: number, price: number): MarketRowA {
+  const change = ((price / 189.32 - 1) * 100).toFixed(2);
   return {
     venue,
     pair,
     price: fmt(price),
+    priceChange: `${Number(change) >= 0 ? "+" : ""}${change}%`,
     liq: fmt(liq),
     vol: fmt(vol),
     trades: fmtCount(trades),
     wallets: fmtCount(wallets),
-    href: "#" + venue.toLowerCase() + "-" + pair.toLowerCase().replace("/", "-"),
+    href: marketTradeUrl(venue, pair),
   };
 }
 
 function tail(sym: string, count: number, startLiq: number, startVol: number, seed: number, basePrice: number): MarketRowA[] {
-  const venues = ["Orca", "Raydium", "Meteora", "Byreal", "Kamino", "Sunrise"];
-  const quotes = ["USDC", "USDT", "SOL", "USDC", "JitoSOL", "USDC"];
+  const combos = [
+    ["Raydium", "USDT"],
+    ["Meteora", "SOL"],
+    ["Byreal", "SOL"],
+    ["Kamino", "JitoSOL"],
+    ["Sunrise", "USDC"],
+    ["Orca", "USDT"],
+    ["Raydium", "SOL"],
+    ["Meteora", "USDT"],
+    ["Byreal", "USDT"],
+    ["Kamino", "USDC"],
+    ["Sunrise", "SOL"],
+    ["Orca", "SOL"],
+    ["Raydium", "USDC"],
+    ["Meteora", "mSOL"],
+    ["Byreal", "JitoSOL"],
+    ["Kamino", "SOL"],
+    ["Sunrise", "USDT"],
+    ["Orca", "mSOL"],
+    ["Raydium", "JitoSOL"],
+    ["Meteora", "bSOL"],
+  ] as const;
   const rnd = seeded(seed);
   const rows: MarketRowA[] = [];
   let liq = startLiq;
   let vol = startVol;
   for (let i = 0; i < count; i++) {
+    const [venue, quote] = combos[i % combos.length];
     liq *= 0.45 + rnd() * 0.25;
     vol *= 0.4 + rnd() * 0.3;
     const price = basePrice * (0.985 + rnd() * 0.03);
-    rows.push(mkRow(venues[i % 6], sym + "/" + quotes[i % 6], liq, vol, Math.max(2, vol / 900), Math.max(1, vol / 3200), price));
+    rows.push(mkRow(venue, sym + "/" + quote, liq, vol, Math.max(2, vol / 900), Math.max(1, vol / 3200), price));
   }
   return rows;
 }
 
 function verification(rugRisk: string): VariantVerificationA[] {
   return [
-    { label: "CoinGecko", status: "verified", note: "Listed profile, illustrative in prototype." },
-    { label: "Jupiter", status: "verified", note: "Routable market, illustrative in prototype." },
-    { label: "RugCheck", status: "risk", note: `risk: ${rugRisk} — illustrative prototype signal.` },
+    { label: "CoinGecko", status: "verified", note: "Listed token profile." },
+    { label: "Jupiter", status: "verified", note: "Routable market." },
+    { label: "RugCheck", status: "risk", note: `Risk score: ${rugRisk}.` },
   ];
 }
 
@@ -131,6 +157,7 @@ export function getVariantDefsA(): VariantDefA[] {
       avatarBg: "#171717",
       img: "https://img.fotofolio.xyz/?url=https%3A%2F%2Fbackpack.exchange%2Fapi%2Fstock-logo%2FSPCX",
       price: "$189.42",
+      priceChange: "-2.84%",
       liq: "$7.03M",
       vol: "$29.49M",
       access: "KYC Required",
@@ -139,14 +166,14 @@ export function getVariantDefsA(): VariantDefA[] {
       accessHint: "Backpack Securities requires identity verification to mint or redeem. On-chain trading may have different rules.",
       details: {
         description:
-          "SPCX is the deepest SpaceX-linked variant in this prototype, with issuer-stated tokenized equity exposure and KYC requirements for minting or redemption.",
+          "SPCX is the deepest SpaceX-linked variant, with issuer-stated tokenized equity exposure and KYC requirements for minting or redemption.",
         facts: [
           {
             k: "Backing",
             v: "Backed 1:1 (issuer-stated)",
             tip: "Issuer-stated backing should be checked against the latest issuer disclosure before relying on it.",
           },
-          { k: "Domicile", v: "Not specified", tip: "No structured disclosure found in this prototype dataset." },
+          { k: "Issuer location", v: "Not specified", tip: "No structured disclosure found in available issuer data." },
         ],
         verification: verification("81/100"),
         links: [],
@@ -175,6 +202,7 @@ export function getVariantDefsA(): VariantDefA[] {
       avatarBg: "#3D6B99",
       img: "https://xstocks-metadata.backed.fi/logos/tokens/SPCXx.png",
       price: "$188.10",
+      priceChange: "-3.12%",
       liq: "$1.21M",
       vol: "$1.61M",
       access: "Restricted",
@@ -190,7 +218,7 @@ export function getVariantDefsA(): VariantDefA[] {
             v: "Backed 1:1 (issuer-stated)",
             tip: "Issuer-stated backing and proof-of-reserve cadence should be checked before execution.",
           },
-          { k: "Domicile", v: "Switzerland (issuer-stated)" },
+          { k: "Issuer location", v: "Switzerland (issuer-stated)" },
         ],
         verification: verification("74/100"),
         links: [],
@@ -219,6 +247,7 @@ export function getVariantDefsA(): VariantDefA[] {
       avatarBg: "#6B4E9E",
       img: "https://cdn.tesseralab.co/tessera/tokenicon_T-SpaceX.svg",
       price: "$187.65",
+      priceChange: "-2.45%",
       liq: "$611.06K",
       vol: "$912.76K",
       access: "Check Issuer",
@@ -229,8 +258,8 @@ export function getVariantDefsA(): VariantDefA[] {
         description:
           "TSPX appears as a pre-IPO exposure variant with meaningful liquidity but less complete structure disclosure, making issuer verification the key diligence step.",
         facts: [
-          { k: "Backing", v: "Not specified", tip: "No reserve report or audit found in this prototype dataset." },
-          { k: "Domicile", v: "Not specified", tip: "Check issuer docs before relying on this field." },
+          { k: "Backing", v: "Not specified", tip: "No reserve report or audit found in available issuer data." },
+          { k: "Issuer location", v: "Not specified", tip: "Check issuer docs before relying on this field." },
         ],
         verification: verification("58/100"),
         links: [],
@@ -256,6 +285,7 @@ export function getVariantDefsA(): VariantDefA[] {
       avatarBg: "#A8552E",
       img: "https://prestocks.com/logos/spacex.png",
       price: "$190.05",
+      priceChange: "+1.05%",
       liq: "$33.62K",
       vol: "$80.82K",
       access: "Check Issuer",
@@ -266,8 +296,8 @@ export function getVariantDefsA(): VariantDefA[] {
         description:
           "SPACEX by PreStocks broadens venue coverage but has thin primary liquidity and limited structured disclosures, so it reads as a higher-diligence variant.",
         facts: [
-          { k: "Backing", v: "Not specified", tip: "No reserve report or audit found in this prototype dataset." },
-          { k: "Domicile", v: "Not specified", tip: "Check issuer docs before relying on this field." },
+          { k: "Backing", v: "Not specified", tip: "No reserve report or audit found in available issuer data." },
+          { k: "Issuer location", v: "Not specified", tip: "Check issuer docs before relying on this field." },
         ],
         verification: verification("42/100"),
         links: [],
@@ -293,6 +323,7 @@ export function getVariantDefsA(): VariantDefA[] {
       avatarBg: "#2E7D6B",
       img: "https://cdn.ondo.finance/tokens/logos/spcxon_160x160.png",
       price: "$186.20",
+      priceChange: "-0.62%",
       liq: "$132.77",
       vol: "$15.45K",
       access: "Restricted",
@@ -308,7 +339,7 @@ export function getVariantDefsA(): VariantDefA[] {
             v: "Backed (issuer-stated)",
             tip: "Issuer publishes backing verification; check report date before relying on it.",
           },
-          { k: "Domicile", v: "Not specified", tip: "No structured disclosure found in this prototype dataset." },
+          { k: "Issuer location", v: "Not specified", tip: "No structured disclosure found in available issuer data." },
         ],
         verification: verification("35/100"),
         links: [],
@@ -338,8 +369,21 @@ export interface CandlePoint {
   close: number;
 }
 
-export function buildChart(range: RangeKey): { points: [number, number][]; candles: CandlePoint[] } {
-  const rnd = seeded(CHART_SEEDS[range] || 42);
+export function variantChartSeed(sym: string, range: RangeKey): number {
+  const base = CHART_SEEDS[range] || 42;
+  let hash = 0;
+  for (let i = 0; i < sym.length; i += 1) {
+    hash = (hash * 31 + sym.charCodeAt(i)) % 10000;
+  }
+  return base + hash + 17;
+}
+
+export function buildChart(
+  range: RangeKey,
+  seedOverride?: number,
+): { points: [number, number][]; candles: CandlePoint[] } {
+  const chartSeed = seedOverride ?? CHART_SEEDS[range] ?? 42;
+  const rnd = seeded(chartSeed);
   const n = 64;
   let y = 90;
   const pts: [number, number][] = [];
@@ -349,7 +393,7 @@ export function buildChart(range: RangeKey): { points: [number, number][]; candl
     pts.push([(i / (n - 1)) * 800, y]);
   }
 
-  const crnd = seeded((CHART_SEEDS[range] || 42) + 1000);
+  const crnd = seeded(chartSeed + 1000);
   const cn = 40;
   let value = 90;
   const candles: CandlePoint[] = [];

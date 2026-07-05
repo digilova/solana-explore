@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { ChartDisplayProvider, useChartDisplay, type ChartDisplayVersion } from "@/lib/chartDisplayContext";
+import {
+  MarketsTableDisplayProvider,
+  useMarketsTableDisplay,
+  type MarketsTableDisplayVersion,
+} from "@/lib/marketsTableDisplayContext";
 
-export type PrototypeView = "a" | "b" | "rationale";
+export type PrototypeView = "a" | "current-audit" | "rationale";
 
 const NAV: { key: PrototypeView; href: string; label: string }[] = [
-  { key: "a", href: "/variation-a", label: "A · Evolved" },
-  { key: "b", href: "/variation-b", label: "B · Insto-first" },
+  { key: "a", href: "/variation-a", label: "Redesign" },
+  { key: "current-audit", href: "/current-audit", label: "Current audit" },
   { key: "rationale", href: "/rationale", label: "Rationale" },
 ];
 
@@ -43,27 +48,77 @@ function SidebarToggle({
   );
 }
 
-function ChartDisplayControls() {
-  const { chartVersion, setChartVersion } = useChartDisplay();
+const CHART_DISPLAY_OPTIONS: { version: ChartDisplayVersion; title: string }[] = [
+  { version: "v1", title: "v1 - large chartline" },
+  { version: "v2", title: "v2-sparkline" },
+];
 
+const MARKETS_TABLE_OPTIONS: { version: MarketsTableDisplayVersion; title: string }[] = [
+  { version: "v1", title: "v1 - prioritize venue" },
+  { version: "v2", title: "v2 - pair avatars, venue last" },
+];
+
+function SidebarRadioGroup<T extends string>({
+  legend,
+  name,
+  value,
+  options,
+  onChange,
+}: {
+  legend: string;
+  name: string;
+  value: T;
+  options: { version: T; title: string }[];
+  onChange: (version: T) => void;
+}) {
   return (
     <fieldset className="hv-prototype-sidebar-subnav">
-      <legend className="hv-prototype-sidebar-subnav-heading">Chart display</legend>
+      <legend className="hv-prototype-sidebar-subnav-heading">{legend}</legend>
       <div className="hv-prototype-sidebar-subnav-radios">
-        {(["v1", "v2"] as ChartDisplayVersion[]).map((version) => (
+        {options.map(({ version, title }) => (
           <label key={version} className="hv-prototype-sidebar-radio">
             <input
               type="radio"
-              name="chart-display-version"
+              name={name}
               value={version}
-              checked={chartVersion === version}
-              onChange={() => setChartVersion(version)}
+              checked={value === version}
+              onChange={() => onChange(version)}
             />
-            <span>{version}</span>
+            <span className="hv-prototype-sidebar-radio-copy">
+              <span className="hv-prototype-sidebar-radio-title">{title}</span>
+            </span>
           </label>
         ))}
       </div>
     </fieldset>
+  );
+}
+
+function ChartDisplayControls() {
+  const { chartVersion, setChartVersion } = useChartDisplay();
+
+  return (
+    <SidebarRadioGroup
+      legend="Chart display"
+      name="chart-display-version"
+      value={chartVersion}
+      options={CHART_DISPLAY_OPTIONS}
+      onChange={setChartVersion}
+    />
+  );
+}
+
+function MarketsTableControls() {
+  const { tableVersion, setTableVersion } = useMarketsTableDisplay();
+
+  return (
+    <SidebarRadioGroup
+      legend="Markets table"
+      name="markets-table-display-version"
+      value={tableVersion}
+      options={MARKETS_TABLE_OPTIONS}
+      onChange={setTableVersion}
+    />
   );
 }
 
@@ -105,7 +160,7 @@ function PrototypeSidebarInner({
             </div>
           </div>
 
-          <nav className="hv-prototype-sidebar-nav" aria-label="Prototype views">
+          <nav className="hv-prototype-sidebar-nav" aria-label="Product views">
             {NAV.map((item) => {
               const isActive = item.key === active;
               return (
@@ -117,7 +172,12 @@ function PrototypeSidebarInner({
                   >
                     {item.label}
                   </Link>
-                  {item.key === "a" && isActive ? <ChartDisplayControls /> : null}
+                  {item.key === "a" && isActive ? (
+                    <>
+                      <ChartDisplayControls />
+                      <MarketsTableControls />
+                    </>
+                  ) : null}
                 </div>
               );
             })}
@@ -156,9 +216,11 @@ export function PrototypeShell({
 }) {
   return (
     <ChartDisplayProvider>
-      <PrototypeSidebarInner active={active} note={note}>
-        {children}
-      </PrototypeSidebarInner>
+      <MarketsTableDisplayProvider>
+        <PrototypeSidebarInner active={active} note={note}>
+          {children}
+        </PrototypeSidebarInner>
+      </MarketsTableDisplayProvider>
     </ChartDisplayProvider>
   );
 }

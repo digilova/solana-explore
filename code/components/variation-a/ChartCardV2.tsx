@@ -203,6 +203,7 @@ export default function ChartCardV2({ range, onSelectRange }: ChartCardV2Props) 
 
   return (
     <section
+      className="hv-chartv2-section"
       data-screen-label="Chart v2"
       style={{
         marginTop: 40,
@@ -211,67 +212,43 @@ export default function ChartCardV2({ range, onSelectRange }: ChartCardV2Props) 
         paddingBottom: 8,
       }}
     >
-      <div
-        className="hv-chartv2-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) 320px",
-          gridTemplateRows: "auto auto 1fr auto",
-          columnGap: 70,
-          rowGap: 6,
-          alignItems: "start",
-        }}
-      >
-        <RollingPrice
-          value={CURRENT_PRICE}
-          className="num"
-          style={{ gridColumn: 1, gridRow: 1, fontSize: 34, fontWeight: 600, letterSpacing: -0.5 }}
-        />
+      <div className="hv-chartv2-grid">
+        <div className="hv-chartv2-head">
+          <div className="hv-chartv2-head-price">
+            <RollingPrice
+              value={CURRENT_PRICE}
+              className="num"
+              style={{ fontSize: 34, fontWeight: 600, letterSpacing: -0.5 }}
+            />
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                color: displayChangeColor,
+                fontSize: 13,
+                fontWeight: 600,
+              }}
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ transform: displayChgDown ? undefined : "rotate(180deg)" }}>
+                <path d="M12 20l-8-10h16z" />
+              </svg>
+              {displayChg} ({displayChangeLabel})
+            </div>
+          </div>
 
-        <InfoTip
-          tip={CHART_TOOLTIPS.priceDisclaimer(rangeLabel)}
-          label="Reference price weighted across all 5 variants."
-          style={{
-            gridColumn: 2,
-            gridRow: 1,
-            justifySelf: "end",
-            fontSize: 12,
-            color: "var(--color-ink-muted)",
-            textAlign: "right",
-            whiteSpace: "nowrap",
-          }}
-        />
-
-        <div
-          style={{
-            gridColumn: 1,
-            gridRow: 2,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 4,
-            color: displayChangeColor,
-            fontSize: 13,
-            fontWeight: 600,
-          }}
-        >
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ transform: displayChgDown ? undefined : "rotate(180deg)" }}>
-            <path d="M12 20l-8-10h16z" />
-          </svg>
-          {displayChg} ({displayChangeLabel})
+          <InfoTip
+            tip={CHART_TOOLTIPS.priceDisclaimer(rangeLabel)}
+            label="Reference price weighted across all 5 variants."
+            style={{
+              fontSize: 12,
+              color: "var(--color-ink-muted)",
+            }}
+          />
         </div>
 
-        <div
-          style={{
-            gridColumn: 1,
-            gridRow: 3,
-            minWidth: 0,
-            display: "flex",
-            flexDirection: "column",
-            minHeight: 0,
-            marginTop: 18,
-          }}
-        >
-          <div className="hv-stats-strip" style={{ display: "flex", alignItems: "stretch" }}>
+        <div className="hv-chartv2-main">
+          <div className="hv-stats-strip" style={{ display: "flex", alignItems: "stretch", flexShrink: 0 }}>
             {stats.map((stat, index) => (
               <Fragment key={stat.label}>
                 {index > 0 && <div className="hv-stats-divider" style={{ width: 1, alignSelf: "stretch", background: "var(--color-line)", margin: "0 20px" }} />}
@@ -285,79 +262,71 @@ export default function ChartCardV2({ range, onSelectRange }: ChartCardV2Props) 
             ))}
           </div>
 
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, marginTop: 20 }}>
+          <div
+            className="hv-chartv2-plot-wrap"
+            style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, marginTop: 12 }}
+          >
             <AssetChartPlot range={range} mode={mode} modeDropKey={modeDropKey} plotId="V2" fillHeight />
             <AssetChartAxisLabels range={range} />
           </div>
-        </div>
 
-        <div
-          className="hv-chart-controls"
-          style={{
-            gridColumn: 1,
-            gridRow: 4,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-            marginTop: 10,
-          }}
-        >
-          <SegmentedControl
-            ariaLabel="Chart timeframe"
-            value={range}
-            onChange={onSelectRange}
-            items={RANGE_TABS.map(({ key, label }) => ({ value: key, label }))}
-            getSegmentStyle={(selected) => ({
-              fontSize: 13,
-              padding: "6px 14px",
-              fontWeight: selected ? 600 : 400,
-            })}
-          />
-
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
+          <div
+            className="hv-chart-controls"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              marginTop: 20,
+              flexShrink: 0,
+            }}
+          >
             <SegmentedControl
-              ariaLabel="Chart type"
-              compact
-              value={mode}
-              onChange={setMode}
-              items={[
-                { value: "line", content: <LineIcon active={mode === "line"} />, ariaLabel: "Line chart" },
-                { value: "candle", content: <CandleIcon active={mode === "candle"} />, ariaLabel: "Candlestick chart" },
-              ]}
+              ariaLabel="Chart timeframe"
+              value={range}
+              onChange={onSelectRange}
+              items={RANGE_TABS.map(({ key, label }) => ({ value: key, label }))}
+              getSegmentStyle={(selected) => ({
+                fontSize: 13,
+                padding: "6px 14px",
+                fontWeight: selected ? 600 : 400,
+              })}
             />
 
-            <button
-              type="button"
-              aria-label="Share"
-              style={{
-                border: "none",
-                cursor: "pointer",
-                width: 36,
-                height: 36,
-                borderRadius: 9999,
-                background: PILL_BG,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <ShareIcon />
-            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
+              <SegmentedControl
+                ariaLabel="Chart type"
+                compact
+                value={mode}
+                onChange={setMode}
+                items={[
+                  { value: "line", content: <LineIcon active={mode === "line"} />, ariaLabel: "Line chart" },
+                  { value: "candle", content: <CandleIcon active={mode === "candle"} />, ariaLabel: "Candlestick chart" },
+                ]}
+              />
+
+              <button
+                type="button"
+                aria-label="Share"
+                style={{
+                  border: "none",
+                  cursor: "pointer",
+                  width: 36,
+                  height: 36,
+                  borderRadius: 9999,
+                  background: PILL_BG,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ShareIcon />
+              </button>
+            </div>
           </div>
         </div>
 
-        <div
-          style={{
-            gridColumn: 2,
-            gridRow: "2 / 5",
-            marginTop: 18,
-            minHeight: 0,
-            alignSelf: "stretch",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        <div className="hv-chartv2-buy">
           <BuyPanel />
         </div>
       </div>

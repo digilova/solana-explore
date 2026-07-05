@@ -3,6 +3,9 @@ import Avatar from "@/components/Avatar";
 import InfoTip from "@/components/InfoTip";
 import SegmentedControl from "@/components/SegmentedControl";
 import Tooltip from "@/components/Tooltip";
+import { marketTradeTitle, marketTradeUrl } from "@/lib/marketLinks";
+import { useMarketsTableDisplay, type MarketsTableDisplayVersion } from "@/lib/marketsTableDisplayContext";
+import { tokenAvatarMeta } from "@/lib/tokenAvatars";
 import { venueMeta } from "@/lib/venues";
 import { verificationLogo } from "@/lib/verificationProviders";
 import { ACCESS_STYLES_A, getVariantDefsA, type AccessKindA, type MarketRowA, type VariantDefA, type VariantDetailsA } from "@/lib/dataA";
@@ -30,8 +33,23 @@ const gridCols = "1.3fr 0.9fr 0.8fr 1fr 1fr 1fr 1fr";
 type SortKey = "price" | "liq" | "vol" | "trades" | "wallets";
 type SortDir = "asc" | "desc";
 type SortState = { key: SortKey; dir: SortDir };
+type MarketColumnKey = SortKey;
 
 const DEFAULT_SORT: SortState = { key: "vol", dir: "desc" };
+const MARKET_COLUMN_OPTIONS: { key: MarketColumnKey; label: string; width: string; className?: string }[] = [
+  { key: "price", label: "Price", width: "0.95fr" },
+  { key: "liq", label: "Liquidity", width: "1fr", className: "hv-col-liq" },
+  { key: "vol", label: "Last 24hrs Vol", width: "1fr" },
+  { key: "trades", label: "Last 24hrs Trades", width: "1fr", className: "hv-col-trades" },
+  { key: "wallets", label: "Last 24hrs Wallets", width: "1fr", className: "hv-col-wallets" },
+];
+const DEFAULT_MARKET_COLUMNS: Record<MarketColumnKey, boolean> = {
+  price: true,
+  liq: true,
+  vol: true,
+  trades: true,
+  wallets: true,
+};
 
 const SORT_ACCESSORS: Record<SortKey, (row: MarketRowA) => number> = {
   price: (row) => parseMoney(row.price),
@@ -57,12 +75,85 @@ function sortCellStyle(key: SortKey, sort: SortState): CSSProperties {
   };
 }
 
+function marketGridCols(visibleColumns: Record<MarketColumnKey, boolean>, layout: MarketsTableDisplayVersion) {
+  const dataCols = MARKET_COLUMN_OPTIONS.filter((column) => visibleColumns[column.key]).map((column) => column.width);
+  if (layout === "v2") {
+    return ["1.25fr", ...dataCols, "0.95fr"].join(" ");
+  }
+  return ["1.3fr", "0.9fr", ...dataCols].join(" ");
+}
+
+function parsePair(pair: string) {
+  const [base, rest = ""] = pair.split("/");
+  const quote = rest.split(/\s+/)[0] ?? "";
+  return { base: base.trim(), quote: quote.trim() };
+}
+
+function PairWithAvatars({ pair }: { pair: string }) {
+  const { base, quote } = parsePair(pair);
+  const baseMeta = tokenAvatarMeta(base);
+  const quoteMeta = tokenAvatarMeta(quote);
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+        <Avatar size={24} bg={baseMeta.bg} initials={baseMeta.initials} fontSize={10} src={baseMeta.src} alt={base} />
+        {quote ? (
+          <Avatar
+            size={24}
+            bg={quoteMeta.bg}
+            initials={quoteMeta.initials}
+            fontSize={10}
+            src={quoteMeta.src}
+            alt={quote}
+            style={{ marginLeft: -8, boxShadow: "0 0 0 1.5px #ffffff" }}
+          />
+        ) : null}
+      </div>
+      <span style={{ fontSize: 12, fontWeight: 500, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        {pair}
+      </span>
+    </div>
+  );
+}
+
+function VenueCell({ venue, compact = false }: { venue: string; compact?: boolean }) {
+  const meta = venueMeta(venue);
+
+  if (compact) {
+    return (
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          minWidth: 0,
+          justifyContent: "flex-end",
+          color: "var(--color-ink-muted)",
+          fontSize: 12,
+        }}
+      >
+        <span>{meta.venue}</span>
+        <span aria-hidden="true" style={{ fontSize: "inherit", fontWeight: "inherit", lineHeight: 1 }}>
+          ↗
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+      <Avatar size={24} bg={meta.venueBg} initials={meta.venueInitial} fontSize={10} src={meta.logoSrc} alt={meta.venue} />
+      <span style={{ fontSize: 12 }}>{meta.venue}</span>
+    </div>
+  );
+}
+
 /** Inactive sort — muted up/down chevrons (Figma 113:1462) */
 function SortIconInactive() {
   return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-      <path d="M5 1.5L7.25 3.75H2.75L5 1.5Z" fill="var(--color-ink-faint)" />
-      <path d="M5 8.5L2.75 6.25H7.25L5 8.5Z" fill="var(--color-ink-faint)" />
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ color: "var(--color-ink-faint)" }}>
+      <path d="M12 20l-8-10h16z" />
     </svg>
   );
 }
@@ -73,12 +164,12 @@ function SortIconActive({ dir }: { dir: SortDir }) {
     <svg
       width="10"
       height="10"
-      viewBox="0 0 10 10"
-      fill="none"
+      viewBox="0 0 24 24"
+      fill="currentColor"
       aria-hidden="true"
-      style={{ transform: dir === "asc" ? "rotate(180deg)" : undefined }}
+      style={{ transform: dir === "asc" ? "rotate(180deg)" : undefined, color: "var(--color-ink)" }}
     >
-      <path d="M5 2.25L8 6.25H2L5 2.25Z" fill="var(--color-ink)" />
+      <path d="M12 20l-8-10h16z" />
     </svg>
   );
 }
@@ -125,10 +216,61 @@ function SortHeader({
   );
 }
 
-function StaticHeader({ label }: { label: string }) {
+function StaticHeader({ label, align = "left" }: { label: string; align?: "left" | "right" }) {
   return (
-    <span style={{ fontSize: 11, fontWeight: 400, color: "var(--color-ink-subtle)" }}>
+    <span style={{ fontSize: 11, fontWeight: 400, color: "var(--color-ink-subtle)", textAlign: align, display: "block" }}>
       {label}
+    </span>
+  );
+}
+
+function PriceChange({ value }: { value: string }) {
+  const isDown = value.trim().startsWith("-");
+  const displayValue = value.trim().replace(/^[+-]/, "");
+
+  return (
+    <span
+      className="num"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 2,
+        color: isDown ? "var(--color-down)" : "var(--color-up)",
+        fontSize: 12,
+        fontWeight: 400,
+        whiteSpace: "nowrap",
+      }}
+    >
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ transform: isDown ? undefined : "rotate(180deg)" }}>
+        <path d="M12 20l-8-10h16z" />
+      </svg>
+      {displayValue}
+    </span>
+  );
+}
+
+function MarketPriceChange({ value }: { value: string }) {
+  const isDown = value.trim().startsWith("-");
+  const displayValue = value.trim().replace(/^[+-]/, "");
+
+  return (
+    <span
+      className="num"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 2,
+        color: isDown ? "var(--color-down)" : "var(--color-up)",
+        fontSize: 11,
+        fontWeight: 400,
+        whiteSpace: "nowrap",
+      }}
+    >
+      (
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ transform: isDown ? undefined : "rotate(180deg)" }}>
+        <path d="M12 20l-8-10h16z" />
+      </svg>
+      {displayValue})
     </span>
   );
 }
@@ -138,45 +280,121 @@ function VariantMarketTable({
   sort,
   onSort,
   onCollapse,
+  visibleColumns,
+  onToggleColumn,
 }: {
   rows: MarketRowA[];
   sort: SortState;
   onSort: (key: SortKey) => void;
   onCollapse: () => void;
+  visibleColumns: Record<MarketColumnKey, boolean>;
+  onToggleColumn: (key: MarketColumnKey) => void;
 }) {
+  const { tableVersion } = useMarketsTableDisplay();
   const sortedRows = useMemo(() => sortMarketRows(rows, sort), [rows, sort]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const activeColumns = MARKET_COLUMN_OPTIONS.filter((column) => visibleColumns[column.key]);
+  const cols = marketGridCols(visibleColumns, tableVersion);
+  const pairFirst = tableVersion === "v2";
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (menuRef.current?.contains(event.target as Node)) return;
+      setMenuOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
 
   return (
     <div className="reveal hv-mkt-wrap" style={{ padding: "0 24px 16px" }}>
-      <div style={{ fontSize: 14, fontWeight: 600, color: "#2D2D2D", marginBottom: 16 }}>Markets</div>
+      <div className="hv-market-table-heading">
+        <div style={{ fontSize: 14, fontWeight: 600, color: "#2D2D2D" }}>Markets</div>
+        <div ref={menuRef} className="hv-market-columns-menu-wrap">
+          <button
+            type="button"
+            className="hv-market-columns-trigger"
+            aria-label="Market table columns"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <circle cx="8" cy="3.5" r="1.35" />
+              <circle cx="8" cy="8" r="1.35" />
+              <circle cx="8" cy="12.5" r="1.35" />
+            </svg>
+          </button>
+          {menuOpen ? (
+            <div className="hv-market-columns-menu" role="menu" aria-label="Toggle market columns">
+              <div className="hv-market-columns-title">Columns</div>
+              {MARKET_COLUMN_OPTIONS.map((column) => {
+                const checked = visibleColumns[column.key];
+                return (
+                  <label key={column.key} className="hv-market-column-option">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={checked && activeColumns.length === 1}
+                      onChange={() => onToggleColumn(column.key)}
+                    />
+                    <span>{column.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+      </div>
       <div
         className="hv-mkt-grid"
         style={{
           display: "grid",
-          gridTemplateColumns: gridCols,
+          gridTemplateColumns: cols,
           columnGap: 12,
           padding: "10px 0",
         }}
       >
-        <StaticHeader label="Venue" />
-        <StaticHeader label="Pair" />
-        <SortHeader label="Price" sortKey="price" sort={sort} onSort={onSort} />
-        <SortHeader label="Liquidity" sortKey="liq" sort={sort} onSort={onSort} className="hv-col-liq" />
-        <SortHeader label="24H Vol" sortKey="vol" sort={sort} onSort={onSort} />
-        <SortHeader label="24H Trades" sortKey="trades" sort={sort} onSort={onSort} className="hv-col-trades" />
-        <SortHeader label="24H Wallets" sortKey="wallets" sort={sort} onSort={onSort} className="hv-col-wallets" />
+        {pairFirst ? (
+          <>
+            <StaticHeader label="Pair" />
+            {activeColumns.map((column) => (
+              <SortHeader key={column.key} label={column.label} sortKey={column.key} sort={sort} onSort={onSort} className={column.className} />
+            ))}
+            <StaticHeader label="Venue" align="right" />
+          </>
+        ) : (
+          <>
+            <StaticHeader label="Venue" />
+            <StaticHeader label="Pair" />
+            {activeColumns.map((column) => (
+              <SortHeader key={column.key} label={column.label} sortKey={column.key} sort={sort} onSort={onSort} className={column.className} />
+            ))}
+          </>
+        )}
       </div>
       <div style={{ borderTop: "1px solid var(--color-line-faint)" }}>
-        {sortedRows.map((m, i) => {
-          const meta = venueMeta(m.venue);
-          return (
+        {sortedRows.map((m, i) => (
             <a
               key={`${m.venue}-${m.pair}-${i}`}
-              href={m.href}
+              href={marketTradeUrl(m.venue, m.pair)}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={marketTradeTitle(m.venue, m.pair)}
               className="hv-market-row hv-mkt-grid"
               style={{
                 display: "grid",
-                gridTemplateColumns: gridCols,
+                gridTemplateColumns: cols,
                 columnGap: 12,
                 alignItems: "center",
                 padding: "12px 0",
@@ -185,31 +403,73 @@ function VariantMarketTable({
                 cursor: "pointer",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                <Avatar size={24} bg={meta.venueBg} initials={meta.venueInitial} fontSize={10} src={meta.logoSrc} alt={meta.venue} />
-                <span style={{ fontSize: 12 }}>{meta.venue}</span>
-              </div>
-              <div style={{ fontSize: 12, fontWeight: 500, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {m.pair}
-              </div>
-              <div className="num" style={sortCellStyle("price", sort)}>
-                {m.price}
-              </div>
-              <div className="num hv-col-liq" style={sortCellStyle("liq", sort)}>
-                {m.liq}
-              </div>
-              <div className="num" style={sortCellStyle("vol", sort)}>
-                {m.vol}
-              </div>
-              <div className="num hv-col-trades" style={sortCellStyle("trades", sort)}>
-                {m.trades}
-              </div>
-              <div className="num hv-col-wallets" style={sortCellStyle("wallets", sort)}>
-                {m.wallets}
-              </div>
+              {pairFirst ? (
+                <>
+                  <PairWithAvatars pair={m.pair} />
+                  {visibleColumns.price ? (
+                    <div className="num" style={{ ...sortCellStyle("price", sort), display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: 4, flexWrap: "wrap" }}>
+                      <span>{m.price}</span>
+                      <MarketPriceChange value={m.priceChange} />
+                    </div>
+                  ) : null}
+                  {visibleColumns.liq ? (
+                    <div className="num hv-col-liq" style={sortCellStyle("liq", sort)}>
+                      {m.liq}
+                    </div>
+                  ) : null}
+                  {visibleColumns.vol ? (
+                    <div className="num" style={sortCellStyle("vol", sort)}>
+                      {m.vol}
+                    </div>
+                  ) : null}
+                  {visibleColumns.trades ? (
+                    <div className="num hv-col-trades" style={sortCellStyle("trades", sort)}>
+                      {m.trades}
+                    </div>
+                  ) : null}
+                  {visibleColumns.wallets ? (
+                    <div className="num hv-col-wallets" style={sortCellStyle("wallets", sort)}>
+                      {m.wallets}
+                    </div>
+                  ) : null}
+                  <VenueCell venue={m.venue} compact />
+                </>
+              ) : (
+                <>
+                  <VenueCell venue={m.venue} />
+                  <div style={{ fontSize: 12, fontWeight: 500, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {m.pair}
+                  </div>
+                  {visibleColumns.price ? (
+                    <div className="num" style={{ ...sortCellStyle("price", sort), display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: 4, flexWrap: "wrap" }}>
+                      <span>{m.price}</span>
+                      <MarketPriceChange value={m.priceChange} />
+                    </div>
+                  ) : null}
+                  {visibleColumns.liq ? (
+                    <div className="num hv-col-liq" style={sortCellStyle("liq", sort)}>
+                      {m.liq}
+                    </div>
+                  ) : null}
+                  {visibleColumns.vol ? (
+                    <div className="num" style={sortCellStyle("vol", sort)}>
+                      {m.vol}
+                    </div>
+                  ) : null}
+                  {visibleColumns.trades ? (
+                    <div className="num hv-col-trades" style={sortCellStyle("trades", sort)}>
+                      {m.trades}
+                    </div>
+                  ) : null}
+                  {visibleColumns.wallets ? (
+                    <div className="num hv-col-wallets" style={sortCellStyle("wallets", sort)}>
+                      {m.wallets}
+                    </div>
+                  ) : null}
+                </>
+              )}
             </a>
-          );
-        })}
+          ))}
       </div>
       <button
         onClick={onCollapse}
@@ -227,7 +487,7 @@ function VariantMarketTable({
           cursor: "pointer",
         }}
       >
-        Show fewer markets
+        Collapse markets
       </button>
     </div>
   );
@@ -724,6 +984,8 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
   const isFutures = filter === "futures";
   const defs = getVariantDefsA();
   const [sortByVariant, setSortByVariant] = useState<Record<string, SortState>>({});
+  const [visibleMarketColumns, setVisibleMarketColumns] = useState<Record<MarketColumnKey, boolean>>(DEFAULT_MARKET_COLUMNS);
+  const variantCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const toggleSort = (sym: string, key: SortKey) => {
     setSortByVariant((prev) => {
@@ -732,6 +994,32 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
         return { ...prev, [sym]: { key, dir: current.dir === "desc" ? "asc" : "desc" } };
       }
       return { ...prev, [sym]: { key, dir: "desc" } };
+    });
+  };
+
+  const toggleMarketColumn = (key: MarketColumnKey) => {
+    setVisibleMarketColumns((columns) => {
+      const visibleCount = Object.values(columns).filter(Boolean).length;
+      if (columns[key] && visibleCount === 1) return columns;
+      return { ...columns, [key]: !columns[key] };
+    });
+  };
+
+  const scrollToVariantTop = (sym: string) => {
+    const element = variantCardRefs.current[sym];
+    if (!element) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({
+      top: element.getBoundingClientRect().top + window.scrollY - 84,
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
+  };
+
+  const collapseAndScrollToVariant = (sym: string) => {
+    onToggle(sym);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => scrollToVariantTop(sym));
     });
   };
 
@@ -787,6 +1075,9 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
             return (
               <div
                 key={v.sym}
+                ref={(element) => {
+                  variantCardRefs.current[v.sym] = element;
+                }}
                 className="hv-variant-card"
                 style={{ background: "var(--color-surface-raised)", border: "1px solid var(--color-line)", borderRadius: 22, overflow: "hidden" }}
               >
@@ -818,10 +1109,12 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                       below 980px the wrapper becomes the second (stats) row. */}
                   <div className="hv-vrow-stats" style={{ display: "contents" }}>
                     <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
-                      <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
-                        {v.price}
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                        <span className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
+                          {v.price}
+                        </span>
+                        <PriceChange value={v.priceChange} />
                       </div>
-                      <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Price</div>
                     </div>
                     <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
                       <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
@@ -833,7 +1126,7 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                       <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
                         {v.vol}
                       </div>
-                      <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>24H Vol</div>
+                      <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Last 24hrs Vol</div>
                     </div>
                     <div className="hv-vrow-access" style={{ display: "flex", justifyContent: "flex-end" }}>
                       <Tooltip content={v.accessHint}>
@@ -870,7 +1163,9 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                       rows={rows}
                       sort={sort}
                       onSort={(key) => toggleSort(v.sym, key)}
-                      onCollapse={() => onToggle(v.sym)}
+                      onCollapse={() => collapseAndScrollToVariant(v.sym)}
+                      visibleColumns={visibleMarketColumns}
+                      onToggleColumn={toggleMarketColumn}
                     />
                   </>
                 )}

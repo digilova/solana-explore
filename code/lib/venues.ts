@@ -27,6 +27,21 @@ const VENUE_LOGOS: Record<string, string> = {
   Titan: "https://www.tokens.xyz/logos/popular/titan.png",
 };
 
+const VENUE_URLS: Record<string, string> = {
+  Meteora: "https://app.meteora.ag/",
+  Orca: "https://www.orca.so/",
+  Raydium: "https://raydium.io/swap/",
+  Byreal: "https://www.byreal.io/",
+  Kamino: "https://app.kamino.finance/",
+  Sunrise: "https://sunrise.xyz/",
+  OMFG: "https://omfg.so/",
+  Titan: "https://titan.exchange/",
+};
+
+export function venueUrl(name: string): string {
+  return VENUE_URLS[name] ?? "#";
+}
+
 export function venueMeta(name: string): VenueMeta {
   return {
     venue: name,

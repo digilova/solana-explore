@@ -2,16 +2,16 @@
 
 import { useLiveLineChart } from "@/hooks/useLiveLineChart";
 import { buildChart, formatChartScrubLabel, getChartAxisLabels, getChartScrubTime, PERIOD_MAP, type RangeKey } from "@/lib/dataA";
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 export type ChartPlotMode = "line" | "candle";
 
 const CURRENT_PRICE = 188.87;
-const PLOT_TOP = 8;
-const PLOT_BOTTOM = 190;
-const PLOT_Y_INSET = 8;
+const PLOT_TOP = 4;
+const PLOT_BOTTOM = 280;
+const PLOT_Y_INSET = 4;
 const PLOT_RIGHT = 800;
-const CHART_VIEW_HEIGHT = PLOT_BOTTOM + 4;
+const CHART_VIEW_HEIGHT = PLOT_BOTTOM + 2;
 const AXIS_GUTTER = 56;
 const PLOT_AXIS_GAP = 10;
 const PLOT_LINE_WIDTH = PLOT_RIGHT - AXIS_GUTTER - PLOT_AXIS_GAP;
@@ -21,7 +21,7 @@ const LIVE_BADGE_GAP = 10;
 const MARKER_DOT_PX = 8;
 const PRICE_SPAN = 30;
 const Y_TICK_COUNT = 5;
-const Y_DOMAIN_PAD = 0.1;
+const Y_DOMAIN_PAD = 0.04;
 const LINE_ANIM_MS = 420;
 const CHART_SCALE = PLOT_LINE_WIDTH / PLOT_RIGHT;
 
@@ -129,60 +129,18 @@ function lerpCandles(from: PlottedCandle[], to: PlottedCandle[], t: number): Plo
   }));
 }
 
-type ChartFrameLayout = {
-  width: number;
-  height: number;
-  scale: number;
-  offsetX: number;
-  offsetY: number;
-};
-
-function measureChartFrameLayout(width: number, height: number, fillHeight: boolean): ChartFrameLayout {
-  const scale = fillHeight
-    ? Math.max(width / PLOT_RIGHT, height / CHART_VIEW_HEIGHT)
-    : Math.min(width / PLOT_RIGHT, height / CHART_VIEW_HEIGHT);
-  const contentWidth = PLOT_RIGHT * scale;
-  const contentHeight = CHART_VIEW_HEIGHT * scale;
-
+/* Overlays use the same aspect-ratio content box as the SVG viewBox. */
+function viewPointToContentPosition(viewX: number, viewY: number) {
   return {
-    width,
-    height,
-    scale,
-    offsetX: (width - contentWidth) / 2,
-    offsetY: (height - contentHeight) / 2,
+    left: `${(viewX / PLOT_RIGHT) * 100}%`,
+    top: `${(viewY / CHART_VIEW_HEIGHT) * 100}%`,
   };
 }
 
-function viewPointToOverlayPosition(viewX: number, viewY: number, layout: ChartFrameLayout) {
-  const x = layout.offsetX + viewX * layout.scale;
-  const y = layout.offsetY + viewY * layout.scale;
-
-  return {
-    left: `${(x / layout.width) * 100}%`,
-    top: `${(y / layout.height) * 100}%`,
-  };
-}
-
-function clientXToViewX(clientX: number, frameRect: DOMRect, layout: ChartFrameLayout) {
-  const localX = clientX - frameRect.left - layout.offsetX;
-  const contentWidth = PLOT_RIGHT * layout.scale;
-
-  if (localX < 0 || localX > contentWidth) return null;
-
-  return (localX / contentWidth) * PLOT_RIGHT;
-}
-
-function chartMarkerStyle(viewX: number, viewY: number, layout: ChartFrameLayout | null): CSSProperties {
-  const position = layout
-    ? viewPointToOverlayPosition(viewX, viewY, layout)
-    : {
-        left: `${(viewX / PLOT_RIGHT) * 100}%`,
-        top: `${(viewY / CHART_VIEW_HEIGHT) * 100}%`,
-      };
-
+function chartMarkerStyle(viewX: number, viewY: number): CSSProperties {
   return {
     position: "absolute",
-    ...position,
+    ...viewPointToContentPosition(viewX, viewY),
     transform: "translate(-50%, -50%)",
     width: MARKER_DOT_PX,
     height: MARKER_DOT_PX,
@@ -190,42 +148,6 @@ function chartMarkerStyle(viewX: number, viewY: number, layout: ChartFrameLayout
     boxSizing: "border-box",
     pointerEvents: "none",
   };
-}
-
-function useChartFrameLayout(frameRef: RefObject<HTMLDivElement | null>, fillHeight: boolean) {
-  const [layout, setLayout] = useState<ChartFrameLayout | null>(null);
-
-  useEffect(() => {
-    const el = frameRef.current;
-    if (!el) return;
-
-    const update = () => {
-      const { width, height } = el.getBoundingClientRect();
-      if (width <= 0 || height <= 0) return;
-
-      setLayout((prev) => {
-        const next = measureChartFrameLayout(width, height, fillHeight);
-        if (
-          prev &&
-          prev.width === next.width &&
-          prev.height === next.height &&
-          prev.scale === next.scale &&
-          prev.offsetX === next.offsetX &&
-          prev.offsetY === next.offsetY
-        ) {
-          return prev;
-        }
-        return next;
-      });
-    };
-
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [frameRef, fillHeight]);
-
-  return layout;
 }
 
 function useChartMorph<T>(
@@ -328,9 +250,8 @@ export function AssetChartPlot({
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [hover, setHover] = useState<ChartHover | null>(null);
   const plotRef = useRef<HTMLDivElement>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const pointerXRef = useRef<number | null>(null);
-  const frameLayout = useChartFrameLayout(frameRef, fillHeight);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -441,19 +362,20 @@ export function AssetChartPlot({
 
   const scrubAtClientX = useCallback(
     (clientX: number) => {
-      const frame = frameRef.current;
-      if (!frame) return;
+      const content = contentRef.current;
+      if (!content) return;
 
-      const rect = frame.getBoundingClientRect();
-      const layout =
-        frameLayout ?? measureChartFrameLayout(rect.width, rect.height, fillHeight);
-      const viewX = clientXToViewX(clientX, rect, layout);
+      const rect = content.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
 
-      if (viewX == null) {
+      const plotWidthPx = rect.width * (PLOT_LINE_WIDTH / PLOT_RIGHT);
+      const offsetX = clientX - rect.left;
+      if (offsetX < 0 || offsetX > plotWidthPx) {
         setHover(null);
         return;
       }
 
+      const viewX = (offsetX / rect.width) * PLOT_RIGHT;
       const dataX = viewX / CHART_SCALE;
       const fraction = dataX / PLOT_RIGHT;
       const timeLabel = formatChartScrubLabel(range, getChartScrubTime(range, fraction));
@@ -485,7 +407,7 @@ export function AssetChartPlot({
         timeLabel,
       });
     },
-    [mode, displayLinePoints, displayCandles, range, scrubDomainMin, scrubDomainMax, frameLayout, fillHeight],
+    [mode, displayLinePoints, displayCandles, range, scrubDomainMin, scrubDomainMax],
   );
 
   useEffect(() => {
@@ -502,21 +424,14 @@ export function AssetChartPlot({
   const fadeId = `chartFillFade${plotId}`;
   const maskId = `chartFillMask${plotId}`;
 
-  const frameStyle: CSSProperties = fillHeight
-    ? { position: "relative", width: "100%", height: "100%", flex: 1, minHeight: 0 }
-    : {
-        position: "relative",
-        width: "100%",
-        aspectRatio: `${PLOT_RIGHT} / ${CHART_VIEW_HEIGHT}`,
-      };
+  const contentStyle: CSSProperties = {
+    position: "relative",
+    width: "100%",
+    aspectRatio: `${PLOT_RIGHT} / ${CHART_VIEW_HEIGHT}`,
+    flexShrink: 0,
+  };
 
-  const overlayPosition = (viewX: number, viewY: number) =>
-    frameLayout
-      ? viewPointToOverlayPosition(viewX, viewY, frameLayout)
-      : {
-          left: `${(viewX / PLOT_RIGHT) * 100}%`,
-          top: `${(viewY / CHART_VIEW_HEIGHT) * 100}%`,
-        };
+  const overlayPosition = (viewX: number, viewY: number) => viewPointToContentPosition(viewX, viewY);
 
   return (
     <div
@@ -525,10 +440,11 @@ export function AssetChartPlot({
         position: "relative",
         cursor: "crosshair",
         flex: fillHeight ? 1 : undefined,
-        minHeight: fillHeight ? 180 : undefined,
+        minHeight: fillHeight ? 0 : undefined,
         width: "100%",
         display: fillHeight ? "flex" : undefined,
         flexDirection: fillHeight ? "column" : undefined,
+        justifyContent: fillHeight ? "flex-start" : undefined,
       }}
       onMouseMove={(event) => {
         pointerXRef.current = event.clientX;
@@ -539,13 +455,13 @@ export function AssetChartPlot({
         setHover(null);
       }}
     >
-      <div ref={frameRef} style={frameStyle}>
-      <svg
-        className="hv-chart-svg"
-        viewBox={`0 0 ${PLOT_RIGHT} ${CHART_VIEW_HEIGHT}`}
-        style={{ width: "100%", height: "100%", display: "block", pointerEvents: "none" }}
-        preserveAspectRatio={fillHeight ? "xMidYMid slice" : "xMidYMid meet"}
-      >
+      <div ref={contentRef} className="hv-chart-frame hv-chart-content" style={contentStyle}>
+        <svg
+          className="hv-chart-svg"
+          viewBox={`0 0 ${PLOT_RIGHT} ${CHART_VIEW_HEIGHT}`}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", pointerEvents: "none" }}
+          preserveAspectRatio="xMidYMid meet"
+        >
         <defs>
           <clipPath id={clipId}>
             <rect x="0" y={PLOT_TOP} width={PLOT_LINE_WIDTH} height={PLOT_BOTTOM - PLOT_TOP} />
@@ -563,17 +479,35 @@ export function AssetChartPlot({
           </mask>
         </defs>
         {yTicks.map((tick, index) => (
-          <line key={index} x1={0} y1={tick.y} x2={PLOT_LINE_WIDTH} y2={tick.y} stroke="var(--color-line)" strokeWidth={1} strokeDasharray="2 4" />
+          <line
+            key={index}
+            x1={0}
+            y1={tick.y}
+            x2={PLOT_LINE_WIDTH}
+            y2={tick.y}
+            stroke="var(--color-line)"
+            strokeWidth={1}
+            strokeDasharray="2 4"
+            vectorEffect="non-scaling-stroke"
+          />
         ))}
         {hover && (
-          <line x1={hover.viewX} y1={PLOT_TOP} x2={hover.viewX} y2={PLOT_BOTTOM} stroke="var(--color-line-strong)" strokeWidth={1} />
+          <line
+            x1={hover.viewX}
+            y1={PLOT_TOP}
+            x2={hover.viewX}
+            y2={PLOT_BOTTOM}
+            stroke="var(--color-line-strong)"
+            strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
+          />
         )}
         <g clipPath={`url(#${clipId})`}>
           {mode === "line" && <path d={viewAreaPath} fill={`url(#${patternId})`} mask={`url(#${maskId})`} />}
           <g transform={`scale(${CHART_SCALE} 1)`}>
             <g key={`${mode}-${modeDropKey}`} className={modeDropKey > 0 ? "chart-mode-enter" : undefined}>
               {mode === "line" ? (
-                <path d={linePath} fill="none" stroke={lineChartColor} strokeWidth={1.5} strokeLinejoin="round" />
+                <path d={linePath} fill="none" stroke={lineChartColor} strokeWidth={1.5} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
               ) : (
                 displayCandles.map((candle, index) => {
                   const up = candle.close < candle.open;
@@ -582,7 +516,7 @@ export function AssetChartPlot({
                   const bodyBottom = Math.max(candle.open, candle.close);
                   return (
                     <g key={index}>
-                      <line x1={candle.x} y1={candle.high} x2={candle.x} y2={candle.low} stroke={color} strokeWidth={1.4} />
+                      <line x1={candle.x} y1={candle.high} x2={candle.x} y2={candle.low} stroke={color} strokeWidth={1.4} vectorEffect="non-scaling-stroke" />
                       <rect x={candle.x - candleWidth / 2} y={bodyTop} width={candleWidth} height={Math.max(2, bodyBottom - bodyTop)} fill={color} rx={1} />
                     </g>
                   );
@@ -601,13 +535,14 @@ export function AssetChartPlot({
             strokeOpacity={0.35}
             strokeWidth={1}
             strokeDasharray="4 4"
+            vectorEffect="non-scaling-stroke"
           />
         )}
       </svg>
       {hover && (
         <div
           style={{
-            ...chartMarkerStyle(hover.viewX, hover.dotY, frameLayout),
+            ...chartMarkerStyle(hover.viewX, hover.dotY),
             background: lineChartColor,
             border: "2px solid var(--color-surface-raised)",
           }}
@@ -616,7 +551,7 @@ export function AssetChartPlot({
       {mode === "line" && !hover && (
         <div
           style={{
-            ...chartMarkerStyle(markerViewX, markerViewY, frameLayout),
+            ...chartMarkerStyle(markerViewX, markerViewY),
             background: "var(--color-surface-raised)",
             border: `2px solid ${lineChartColor}`,
           }}

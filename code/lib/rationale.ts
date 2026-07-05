@@ -42,13 +42,13 @@ export const DECISIONS: Decision[] = [
     'Top "5+ variants" dropdown',
     "changed",
     "Repurposed",
-    "Jump link in A (chart pushes variants below fold); removed in B (comparison is the second section)."
+    "Kept as a jump link because the chart pushes variants below the fold."
   ),
   d(
     "Spot / Futures / Liquidity module",
     "merged",
     "Merged",
-    "Filter tabs inside Markets in A; per-variant availability chips in B. No longer a competing module."
+    "Filter tabs now live inside Markets. No longer a competing module."
   ),
   d(
     "Latest Updates",
@@ -66,24 +66,23 @@ export const DECISIONS: Decision[] = [
 
 export interface Audience {
   who: string;
-  a: string;
-  b: string;
+  value: string;
 }
 
 export const AUDIENCES: Audience[] = [
   {
     who: "Issuers (primary)",
-    a: "Sees their identity surfaced in a familiar retail context: issuer column, access labels, exec-quality badge. Answers “would my asset look credible in the existing format?”",
-    b: "The page is built around their evaluation: product-sheet cards, structure disclosures, fragmentation honesty, ecosystem proof, and a direct “bring an asset to Solana” path.",
+    value:
+      "Sees issuer identity surfaced in a familiar retail context: issuer name, access labels, verification signals, and market-health context. Answers “would my asset look credible in the existing format?” without forcing a separate issuer-first page.",
   },
   {
     who: "Retail / crypto-native investors",
-    a: "Nothing is taken away — chart, price, stats, and buy paths stay on top; access labels prevent surprise KYC walls at the venue.",
-    b: "Price is one click deeper but compare-then-trade is arguably safer: access and structure are visible before venue selection.",
+    value:
+      "Nothing is taken away: chart, price, stats, and buy paths stay on top. Access labels and inline market expansion add context without burying the fast trading workflow.",
   },
   {
     who: "Sophisticated / institutional investors",
-    a: "Gains issuer, type, and access columns plus richer expanded market data (trades, wallets) that the overview previously hid.",
-    b: "Best fit: instrument type, backing, redemption, domicile, concentration analysis, and per-venue depth — the diligence checklist in page form.",
+    value:
+      "Gains issuer, type, access, backing, verification, market depth, trades, wallets, and health-score explanation in one expandable comparison module.",
   },
 ];
