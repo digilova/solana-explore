@@ -2,12 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  AUDIT_2047_CROP_STORAGE_VERSION,
   AUDIT_CROPPED_VARIANTS_STORAGE_VERSION,
   AUDIT_EXTENDED_STORAGE_VERSION,
+  AUDIT_PROVIDED_FULLPAGE_STORAGE_VERSION,
   AUDIT_STORAGE_KEY,
   AUDIT_PREVIOUS_STORAGE_VERSION,
   AUDIT_STORAGE_VERSION,
   AUDIT_STORAGE_VERSION_KEY,
+  TOKENS_XYZ_AUDIT_2047_CROP_HEIGHT,
   TOKENS_XYZ_AUDIT_CROPPED_VARIANTS_HEIGHT,
   TOKENS_XYZ_AUDIT_EXTENDED_HEIGHT,
   TOKENS_XYZ_AUDIT_IMAGE_HEIGHT,
@@ -43,7 +46,7 @@ function readStoredAnnotations() {
     if (!Array.isArray(parsed) || !parsed.every(isAnnotation)) return cloneSeedAuditAnnotations();
     const annotations = parsed.map((annotation) => ({ ...annotation }));
     const version = window.localStorage.getItem(AUDIT_STORAGE_VERSION_KEY);
-    if (version === AUDIT_STORAGE_VERSION) return annotations;
+    if (version === AUDIT_STORAGE_VERSION) return mergeMissingSeedAnnotations(annotations);
 
     const sourceHeight =
       version === AUDIT_PREVIOUS_STORAGE_VERSION
@@ -52,15 +55,46 @@ function readStoredAnnotations() {
           ? TOKENS_XYZ_AUDIT_EXTENDED_HEIGHT
           : version === AUDIT_CROPPED_VARIANTS_STORAGE_VERSION
             ? TOKENS_XYZ_AUDIT_CROPPED_VARIANTS_HEIGHT
-            : TOKENS_XYZ_AUDIT_LEGACY_HEIGHT;
+            : version === AUDIT_2047_CROP_STORAGE_VERSION
+              ? TOKENS_XYZ_AUDIT_2047_CROP_HEIGHT
+              : version === AUDIT_PROVIDED_FULLPAGE_STORAGE_VERSION
+                ? TOKENS_XYZ_AUDIT_IMAGE_HEIGHT
+              : TOKENS_XYZ_AUDIT_LEGACY_HEIGHT;
     const yRatio = sourceHeight / TOKENS_XYZ_AUDIT_IMAGE_HEIGHT;
-    return annotations.map((annotation) => ({
+    const migrated = annotations.map((annotation) => ({
       ...annotation,
       yPct: clampPct(annotation.yPct * yRatio),
     }));
+    return mergeMissingSeedAnnotations(migrated);
   } catch {
     return cloneSeedAuditAnnotations();
   }
+}
+
+function mergeMissingSeedAnnotations(annotations: AuditAnnotation[]) {
+  const deduped = dedupeAnnotations(annotations);
+  const seenIds = new Set(deduped.map((annotation) => annotation.id));
+  const seenText = new Set(deduped.map((annotation) => normalizeAnnotationText(annotation.text)));
+  const missingSeeds = cloneSeedAuditAnnotations().filter((annotation) => {
+    return !seenIds.has(annotation.id) && !seenText.has(normalizeAnnotationText(annotation.text));
+  });
+  return missingSeeds.length > 0 ? [...deduped, ...missingSeeds] : deduped;
+}
+
+function dedupeAnnotations(annotations: AuditAnnotation[]) {
+  const seenIds = new Set<string>();
+  const seenText = new Set<string>();
+  return annotations.filter((annotation) => {
+    const textKey = normalizeAnnotationText(annotation.text);
+    if (seenIds.has(annotation.id) || seenText.has(textKey)) return false;
+    seenIds.add(annotation.id);
+    seenText.add(textKey);
+    return true;
+  });
+}
+
+function normalizeAnnotationText(text: string) {
+  return text.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
 function clampPct(value: number) {

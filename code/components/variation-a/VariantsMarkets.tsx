@@ -152,8 +152,9 @@ function VenueCell({ venue, compact = false }: { venue: string; compact?: boolea
 /** Inactive sort — muted up/down chevrons (Figma 113:1462) */
 function SortIconInactive() {
   return (
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style={{ color: "var(--color-ink-faint)" }}>
-      <path d="M12 20l-8-10h16z" />
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+      <path d="M5 1.5L7.25 3.75H2.75L5 1.5Z" fill="var(--color-ink-faint)" />
+      <path d="M5 8.5L2.75 6.25H7.25L5 8.5Z" fill="var(--color-ink-faint)" />
     </svg>
   );
 }
@@ -164,12 +165,12 @@ function SortIconActive({ dir }: { dir: SortDir }) {
     <svg
       width="10"
       height="10"
-      viewBox="0 0 24 24"
-      fill="currentColor"
+      viewBox="0 0 10 10"
+      fill="none"
       aria-hidden="true"
-      style={{ transform: dir === "asc" ? "rotate(180deg)" : undefined, color: "var(--color-ink)" }}
+      style={{ transform: dir === "asc" ? "rotate(180deg)" : undefined }}
     >
-      <path d="M12 20l-8-10h16z" />
+      <path d="M5 2.25L8 6.25H2L5 2.25Z" fill="var(--color-ink)" />
     </svg>
   );
 }
