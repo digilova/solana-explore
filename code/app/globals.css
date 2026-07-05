@@ -48,14 +48,14 @@
   --color-dark: #171717;
   /* Semantic market colors */
   --color-up: #51c148;
-  --color-down: #cf4040;
+  --color-down: #ef4444;
+  --color-down-soft: rgba(255, 160, 152, 0.2);
   /* Down-trend chart line intentionally uses SpaceX blue instead of red */
   --color-trend-down: #005288;
   /* Segmented pill toggles — matches tokens.xyz live track + indicator */
   --color-pill-track: rgba(0, 0, 0, 0.04);
   --color-pill-indicator: #ffffff;
   --shadow-pill-indicator: 0px 1px 3px rgba(0, 0, 0, 0.07);
-  --switcher-bar-height: 44px;
   /* Tooltips — matches tokens.xyz */
   --tooltip-bg: var(--color-ink);
   --tooltip-text: #ffffff;
@@ -99,11 +99,11 @@ button {
 }
 
 .hv-site-header {
-  position: fixed;
-  top: var(--switcher-bar-height);
-  left: 0;
-  right: 0;
+  position: sticky;
+  top: 0;
   z-index: 40;
+  width: 100%;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -122,11 +122,6 @@ button {
   box-shadow: inset 0 -1px 0 var(--color-line);
 }
 
-.hv-site-header-spacer {
-  height: 72px;
-  flex-shrink: 0;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .hv-site-header {
     transition: none;
@@ -141,13 +136,16 @@ button {
 
 .hv-tooltip-trigger {
   display: inline-flex;
-  vertical-align: middle;
+  align-items: baseline;
+  vertical-align: baseline;
 }
 
 .hv-infotip-trigger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 1em;
+  height: 1em;
   padding: 0;
   margin: 0;
   border: none;
@@ -156,26 +154,46 @@ button {
   cursor: default;
   flex-shrink: 0;
   font: inherit;
+  line-height: 1;
+  vertical-align: baseline;
+  align-self: baseline;
 }
 
 .hv-infotip-label {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 4px;
   cursor: default;
   color: inherit;
+  line-height: 1.5;
 }
 
 .hv-infotip-label .hv-infotip-icon {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-ink-subtle);
   flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  align-self: baseline;
+  transform: translateY(0.08em);
+}
+
+.hv-infotip-icon svg {
+  width: 1em;
+  height: 1em;
+  display: block;
+}
+
+.hv-infotip-trigger .hv-infotip-icon {
+  transform: translateY(0.08em);
 }
 
 .hv-tooltip-popup {
   position: fixed;
   z-index: 50;
-  max-width: 320px;
+  max-width: 250px;
   padding: 6px 10px;
   font-size: 12px;
   font-weight: 400;
@@ -187,7 +205,7 @@ button {
   text-wrap: pretty;
   pointer-events: none;
   opacity: 0;
-  transform: scale(0.96);
+  transform: translateY(4px);
   transition:
     transform 125ms cubic-bezier(0.23, 1, 0.32, 1),
     opacity 125ms cubic-bezier(0.23, 1, 0.32, 1);
@@ -196,7 +214,7 @@ button {
 
 .hv-tooltip-popup[data-open="true"] {
   opacity: 1;
-  transform: scale(1);
+  transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -207,6 +225,217 @@ button {
 
   .hv-tooltip-popup[data-open="true"] {
     transform: none;
+  }
+}
+
+/* Prototype shell — Claude-style dismissible sidebar */
+.hv-prototype-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+}
+
+.hv-prototype-sidebar {
+  flex-shrink: 0;
+  width: 0;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  transition: width 0.22s cubic-bezier(0.23, 1, 0.32, 1);
+  background: var(--color-hover-soft);
+  border-right: 1px solid transparent;
+}
+
+.hv-prototype-sidebar[data-open="true"] {
+  width: 260px;
+  border-right-color: var(--color-line-faint);
+}
+
+.hv-prototype-sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 16px 12px 12px;
+}
+
+.hv-prototype-sidebar-header {
+  padding: 4px 8px 16px;
+}
+
+.hv-prototype-sidebar-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.3;
+}
+
+.hv-prototype-sidebar-subtitle {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-ink-subtle);
+  line-height: 1.4;
+}
+
+.hv-prototype-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 4px;
+}
+
+.hv-prototype-sidebar-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.hv-prototype-sidebar-subnav {
+  margin: 2px 0 8px 10px;
+  padding: 0 0 4px 12px;
+  border: none;
+  border-left: 1px solid var(--color-line-faint);
+  min-width: 0;
+}
+
+.hv-prototype-sidebar-subnav-heading {
+  display: block;
+  width: 100%;
+  padding: 4px 8px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-subtle);
+}
+
+.hv-prototype-sidebar-subnav-radios {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hv-prototype-sidebar-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.hv-prototype-sidebar-radio input[type="radio"] {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  accent-color: var(--color-ink);
+  cursor: pointer;
+}
+
+.hv-prototype-sidebar-radio:hover {
+  background: rgba(14, 14, 15, 0.05);
+  color: var(--color-ink);
+}
+
+.hv-prototype-sidebar-radio:has(input:checked) {
+  background: rgba(14, 14, 15, 0.07);
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.hv-prototype-sidebar-link {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-ink-muted);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.hv-prototype-sidebar-link:hover {
+  background: rgba(14, 14, 15, 0.05);
+  color: var(--color-ink);
+}
+
+.hv-prototype-sidebar-link.is-active {
+  background: rgba(14, 14, 15, 0.07);
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.hv-prototype-sidebar-note {
+  margin: 16px 8px 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-ink-subtle);
+}
+
+.hv-prototype-sidebar-footer {
+  margin-top: auto;
+  padding: 8px 4px 0;
+}
+
+.hv-prototype-sidebar-toggle,
+.hv-prototype-sidebar-fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-ink-subtle);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.hv-prototype-sidebar-toggle {
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.hv-prototype-sidebar-toggle:hover,
+.hv-prototype-sidebar-fab:hover {
+  background: rgba(14, 14, 15, 0.06);
+  color: var(--color-ink);
+}
+
+.hv-prototype-sidebar-toggle-label {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.hv-prototype-sidebar-fab {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 70;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  justify-content: center;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-line);
+  box-shadow: 0 4px 16px rgba(23, 23, 23, 0.08);
+}
+
+.hv-prototype-shell-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hv-prototype-sidebar {
+    transition: none;
   }
 }
 
@@ -236,6 +465,39 @@ button {
 .hv-variant-card {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.03);
+}
+
+.rolling-digit {
+  display: inline-block;
+  height: 1em;
+  max-height: 1em;
+  overflow: hidden;
+  vertical-align: baseline;
+  line-height: 1;
+  position: relative;
+}
+
+.rolling-digit-inner {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.rolling-digit-row {
+  display: block;
+  height: 1em;
+  line-height: 1em;
+}
+
+.rolling-digit-static {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rolling-digit-inner {
+    transition: none !important;
+    will-change: auto;
+  }
 }
 .hv-rationale-card {
   transition: border-color 0.2s ease;
@@ -420,6 +682,175 @@ button {
   .hv-liquidity-structure-grid,
   .hv-token-detail-grid {
     grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Variation A responsive breakpoints.
+   Desktop is the source of truth (inline styles); these override below 980px.
+   980px — variant header stacks to two rows; markets table drops to 5 columns.
+   900px — site-header search pill gives up its fixed width.
+   768px — stats strip becomes a 3-column grid; chart gets a floor height.
+   640px — markets table drops to 4 columns; paddings tighten; gauge stacks.
+   560px — site-header chrome compacts (icon search, no Docs).
+--------------------------------------------------------------------------- */
+
+@media (max-width: 980px) {
+  /* The prototype review sidebar is a desktop evaluation tool — at tablet and
+     below it would crush the page it exists to showcase. */
+  .hv-prototype-sidebar,
+  .hv-prototype-sidebar-fab {
+    display: none !important;
+  }
+
+  /* Variant card header: row 1 = identity + markets chip, row 2 = stats */
+  .hv-vrow {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+  }
+  .hv-vrow-id {
+    order: 1;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .hv-vrow-markets {
+    order: 2;
+    flex: 0 0 auto;
+  }
+  .hv-vrow-stats {
+    display: flex !important;
+    order: 3;
+    flex: 1 1 100%;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding-top: 2px;
+  }
+  .hv-vrow-stat {
+    align-items: flex-start !important;
+    text-align: left !important;
+  }
+  .hv-vrow-access {
+    margin-left: auto;
+  }
+
+  /* Markets table: hide 24H Trades / 24H Wallets */
+  .hv-mkt-grid {
+    grid-template-columns: 1.3fr 0.9fr 0.8fr 1fr 1fr !important;
+  }
+  .hv-col-trades,
+  .hv-col-wallets {
+    display: none !important;
+  }
+
+  /* ChartCardV2: buy panel stacks under the chart. Children carry explicit
+     inline gridColumn placement, so reset those too or they spawn an
+     implicit second column. */
+  .hv-chartv2-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 24px !important;
+  }
+  .hv-chartv2-grid > * {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Search pill: fixed 320px width doesn't fit between logo and nav */
+  .hv-search-pill {
+    width: auto !important;
+    flex: 0 1 260px;
+    min-width: 0;
+  }
+  .hv-search-kbd {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hv-page-main {
+    padding: 20px 20px 64px !important;
+  }
+  /* Stats strip: dividerless 3-column grid instead of one long row */
+  .hv-stats-strip {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px 16px;
+  }
+  .hv-stats-divider {
+    display: none !important;
+  }
+  /* Keep the plot tall enough that y-axis labels don't collide */
+  .hv-chart-svg {
+    min-height: 190px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Markets table: 4 columns — Venue, Pair, Price, 24H Vol */
+  .hv-mkt-grid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 0.8fr 0.9fr !important;
+  }
+  .hv-col-liq {
+    display: none !important;
+  }
+  .hv-mkt-wrap {
+    padding: 0 16px 16px !important;
+  }
+
+  /* Cards and bands tighten */
+  .hv-vrow {
+    padding: 16px !important;
+  }
+  .hv-token-detail-grid {
+    padding: 16px 12px 24px !important;
+  }
+  .hv-detail-card {
+    padding: 16px !important;
+  }
+
+  /* Health gauge stacks above its metric bars */
+  .hv-health-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    justify-items: center;
+  }
+  .hv-health-details {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    gap: 16px;
+  }
+
+  /* Chart range/type controls may need two rows */
+  .hv-chart-controls {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hv-page-main {
+    padding: 16px 16px 56px !important;
+  }
+  .hv-site-header {
+    padding: 12px 16px;
+    gap: 10px;
+  }
+  .hv-search-text {
+    display: none !important;
+  }
+  .hv-docs-link {
+    display: none !important;
+  }
+  .mf-root {
+    right: 16px !important;
+    bottom: 16px !important;
+  }
+  /* Two-column stats on phones */
+  .hv-stats-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 

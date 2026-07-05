@@ -8,13 +8,20 @@ const SCROLL_PX_PER_SEC = 16;
 const TICK_MS = 1700;
 const MIN_POINTS = 48;
 const MIN_DOMAIN_SPAN = 0.32;
-const DOMAIN_WINDOW = 14;
-const DOMAIN_PAD_RATIO = 0.06;
+const DOMAIN_PAD_RATIO = 0.1;
+const PLOT_Y_INSET = 8;
 
-type LivePoint = { x: number; price: number; targetPrice: number };
-
-function seedFromPoints(points: [number, number][], anchorPrice: number): LivePoint[] {
-  return points.map(([x]) => ({ x, price: anchorPrice, targetPrice: anchorPrice }));
+function priceToPlotY(
+  price: number,
+  domainMin: number,
+  domainMax: number,
+  plotTop: number,
+  plotBottom: number,
+) {
+  const span = Math.max(domainMax - domainMin, 0.01);
+  const innerTop = plotTop + PLOT_Y_INSET;
+  const innerBottom = plotBottom - PLOT_Y_INSET;
+  return innerTop + ((domainMax - price) / span) * (innerBottom - innerTop);
 }
 
 function toSvgPoints(
@@ -24,10 +31,9 @@ function toSvgPoints(
   plotTop: number,
   plotBottom: number,
 ): [number, number][] {
-  const span = Math.max(domainMax - domainMin, 0.01);
   return points.map((p) => [
     p.x,
-    plotTop + ((domainMax - p.price) / span) * (plotBottom - plotTop),
+    priceToPlotY(p.price, domainMin, domainMax, plotTop, plotBottom),
   ]);
 }
 
@@ -41,9 +47,8 @@ function targetDomain(prices: number[]) {
     return { min: 0, max: 1 };
   }
 
-  const recent = prices.slice(-DOMAIN_WINDOW);
-  let min = Math.min(...recent);
-  let max = Math.max(...recent);
+  let min = Math.min(...prices);
+  let max = Math.max(...prices);
   const mid = (min + max) / 2;
 
   if (max - min < MIN_DOMAIN_SPAN) {
@@ -53,6 +58,31 @@ function targetDomain(prices: number[]) {
 
   const pad = (max - min) * DOMAIN_PAD_RATIO;
   return { min: min - pad, max: max + pad };
+}
+
+function resolveDomain(
+  currentMin: number,
+  currentMax: number,
+  required: { min: number; max: number },
+) {
+  let nextMin = currentMin;
+  let nextMax = currentMax;
+
+  // Snap outward instantly so the line is never clipped (Liveline-style).
+  if (required.max > nextMax) nextMax = required.max;
+  if (required.min < nextMin) nextMin = required.min;
+
+  // Ease inward only when the full series fits the tighter range.
+  if (required.max < nextMax) nextMax += (required.max - nextMax) * DOMAIN_LERP_SPEED;
+  if (required.min > nextMin) nextMin += (required.min - nextMin) * DOMAIN_LERP_SPEED;
+
+  return { min: Math.min(nextMin, required.min), max: Math.max(nextMax, required.max) };
+}
+
+type LivePoint = { x: number; price: number; targetPrice: number };
+
+function seedFromPoints(points: [number, number][], anchorPrice: number): LivePoint[] {
+  return points.map(([x]) => ({ x, price: anchorPrice, targetPrice: anchorPrice }));
 }
 
 export function useLiveLineChart(
@@ -131,9 +161,12 @@ export function useLiveLineChart(
 
       displayPriceRef.current += (targetPriceRef.current - displayPriceRef.current) * LERP_SPEED;
 
-      const nextDomain = targetDomain(pts.map((p) => p.price));
-      domainMinRef.current += (nextDomain.min - domainMinRef.current) * DOMAIN_LERP_SPEED;
-      domainMaxRef.current += (nextDomain.max - domainMaxRef.current) * DOMAIN_LERP_SPEED;
+      const allPrices = pts.flatMap((p) => [p.price, p.targetPrice]);
+      allPrices.push(displayPriceRef.current, targetPriceRef.current);
+      const required = targetDomain(allPrices);
+      const nextDomain = resolveDomain(domainMinRef.current, domainMaxRef.current, required);
+      domainMinRef.current = nextDomain.min;
+      domainMaxRef.current = nextDomain.max;
 
       setFrame({
         points: toSvgPoints(pts, domainMinRef.current, domainMaxRef.current, plotTop, plotBottom),

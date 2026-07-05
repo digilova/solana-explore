@@ -1,9 +1,11 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import InfoTip from "@/components/InfoTip";
+import RollingPrice from "@/components/RollingPrice";
 import SegmentedControl from "@/components/SegmentedControl";
 import { useLiveLineChart } from "@/hooks/useLiveLineChart";
+import { useLivePrice } from "@/hooks/useLivePrice";
 import { PERIOD_MAP, STATS_BASE, CHART_TOOLTIPS, buildChart, formatChartScrubLabel, getChartAxisLabels, getChartScrubTime, type RangeKey } from "@/lib/dataA";
 
 const RANGE_TABS: { key: RangeKey; label: string }[] = [
@@ -25,16 +27,22 @@ const CANDLE_DOWN_COLOR = "var(--color-down)";
 const PRICE_CHANGE_DOWN_COLOR = "var(--color-down)";
 
 const CURRENT_PRICE = 188.87;
-const PLOT_TOP = 20;
+const PLOT_TOP = 8;
 const PLOT_BOTTOM = 190;
+const CHART_VIEW_HEIGHT = PLOT_BOTTOM + 4;
+const PLOT_Y_INSET = 8;
 const PLOT_RIGHT = 800;
 const AXIS_GUTTER = 56;
+const PLOT_AXIS_GAP = 10;
 const PLOT_WIDTH = PLOT_RIGHT - AXIS_GUTTER;
+const PLOT_LINE_WIDTH = PLOT_WIDTH - PLOT_AXIS_GAP;
 const LIVE_BADGE_W = 68;
 const LIVE_BADGE_H = 22;
+const LIVE_BADGE_GAP = 10;
 const MARKER_DOT_PX = 8;
 const PRICE_SPAN = 30;
 const Y_TICK_COUNT = 5;
+const Y_DOMAIN_PAD = 0.1;
 
 function LineIcon({ active }: { active: boolean }) {
   return (
@@ -130,7 +138,7 @@ function easeOutCubic(t: number) {
 }
 
 const LINE_ANIM_MS = 420;
-const CHART_SCALE = PLOT_WIDTH / PLOT_RIGHT;
+const CHART_SCALE = PLOT_LINE_WIDTH / PLOT_RIGHT;
 
 type PlottedCandle = { x: number; open: number; high: number; low: number; close: number };
 
@@ -161,7 +169,16 @@ function interpolateLineAtX(points: [number, number][], x: number): [number, num
 
 function priceFromPlotY(y: number, domainMin: number, domainMax: number) {
   const span = Math.max(domainMax - domainMin, 0.01);
-  return domainMax - ((y - PLOT_TOP) / (PLOT_BOTTOM - PLOT_TOP)) * span;
+  const innerTop = PLOT_TOP + PLOT_Y_INSET;
+  const innerBottom = PLOT_BOTTOM - PLOT_Y_INSET;
+  return domainMax - ((y - innerTop) / (innerBottom - innerTop)) * span;
+}
+
+function plotYForPrice(price: number, domainMin: number, domainMax: number) {
+  const span = Math.max(domainMax - domainMin, 0.01);
+  const innerTop = PLOT_TOP + PLOT_Y_INSET;
+  const innerBottom = PLOT_BOTTOM - PLOT_Y_INSET;
+  return innerTop + ((domainMax - price) / span) * (innerBottom - innerTop);
 }
 
 function lerp(a: number, b: number, t: number) {
@@ -243,6 +260,7 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
   const [modeDropKey, setModeDropKey] = useState(0);
   const [hover, setHover] = useState<ChartHover | null>(null);
   const plotRef = useRef<HTMLDivElement>(null);
+  const pointerXRef = useRef<number | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -271,11 +289,14 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
   ];
 
   const isDown = period.chg.trim().startsWith("-");
-  const chgAbs = period.chg.replace(/^[+-]/, "");
   const trendColor = isDown ? DOWN_COLOR : UP_COLOR;
   const lineChartColor = DOWN_COLOR;
-  const priceChangeColor = isDown ? PRICE_CHANGE_DOWN_COLOR : UP_COLOR;
   const rangeLabel = RANGE_TABS.find((t) => t.key === range)?.label ?? range;
+  const changeSource = range === "LIVE" ? PERIOD_MAP["1D"] : period;
+  const displayChg = changeSource.chg.replace(/^[+-]/, "");
+  const displayChgDown = changeSource.chg.trim().startsWith("-");
+  const displayChangeColor = displayChgDown ? PRICE_CHANGE_DOWN_COLOR : UP_COLOR;
+  const displayChangeLabel = range === "LIVE" ? "24H" : rangeLabel;
 
   const plotCenter = (PLOT_TOP + PLOT_BOTTOM) / 2;
   const pricePerPx = PRICE_SPAN / (PLOT_BOTTOM - PLOT_TOP);
@@ -287,10 +308,13 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
   const priceMin = Math.min(...activePrices);
   const priceMax = Math.max(...activePrices);
   const priceStep = niceStep(Math.max(1, priceMax - priceMin) / (Y_TICK_COUNT - 1));
-  const domainMin = Math.max(0, Math.floor(priceMin / priceStep) * priceStep);
-  const domainMax = Math.ceil(priceMax / priceStep) * priceStep;
+  const domainMinRaw = Math.max(0, Math.floor(priceMin / priceStep) * priceStep);
+  const domainMaxRaw = Math.ceil(priceMax / priceStep) * priceStep;
+  const yPad = (domainMaxRaw - domainMinRaw) * Y_DOMAIN_PAD;
+  const domainMin = Math.max(0, domainMinRaw - yPad);
+  const domainMax = domainMaxRaw + yPad;
   const domainSpan = Math.max(1, domainMax - domainMin);
-  const mapY = (value: number) => PLOT_TOP + ((domainMax - priceFromValue(value)) / domainSpan) * (PLOT_BOTTOM - PLOT_TOP);
+  const mapY = (value: number) => plotYForPrice(priceFromValue(value), domainMin, domainMax);
 
   const linePoints = useMemo(
     () => chart.points.map(([x, y]) => [x, mapY(y)] as [number, number]),
@@ -310,6 +334,7 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
 
   const lineSessionKey = `${range}-line`;
   const candleSessionKey = `${range}-candle`;
+  const liveHeaderPrice = useLivePrice(CURRENT_PRICE, !prefersReducedMotion);
   const liveEnabled = range === "LIVE" && mode === "line" && !prefersReducedMotion;
   const { points: liveLinePoints, displayPrice, domainMin: liveDomainMin, domainMax: liveDomainMax } = useLiveLineChart(
     linePoints,
@@ -326,88 +351,101 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
 
   const displayLinePoints = liveEnabled ? liveLinePoints : mode === "line" ? animatedLinePoints : linePoints;
   const displayCandles = mode === "candle" ? animatedCandles : plottedCandles;
-  const headerPrice = liveEnabled ? displayPrice : CURRENT_PRICE;
+  const headerPrice = liveHeaderPrice;
   const linePath = pathFromPoints(displayLinePoints);
-  const areaPath = linePath + ` L${PLOT_RIGHT},220 L0,220 Z`;
+  const viewLinePoints = useMemo(
+    () => displayLinePoints.map(([x, y]) => [x * CHART_SCALE, y] as [number, number]),
+    [displayLinePoints],
+  );
+  const viewAreaPath = pathFromPoints(viewLinePoints) + ` L${PLOT_LINE_WIDTH},${PLOT_BOTTOM} L0,${PLOT_BOTTOM} Z`;
+
+  const lastPoint = displayLinePoints[displayLinePoints.length - 1];
+  const lastCandle = displayCandles[displayCandles.length - 1];
+  const markerX = mode === "candle" ? lastCandle.x : lastPoint[0];
+  const markerY = mode === "candle" ? lastCandle.close : lastPoint[1];
+  const markerViewX = markerX * CHART_SCALE;
+  const markerViewY = markerY;
+  const liveBadgeViewLeft = (() => {
+    const preferRight = markerViewX + LIVE_BADGE_GAP;
+    if (preferRight + LIVE_BADGE_W <= PLOT_LINE_WIDTH - 4) return preferRight;
+    return Math.max(4, markerViewX - LIVE_BADGE_W - LIVE_BADGE_GAP);
+  })();
 
   const yTicks = (() => {
     if (liveEnabled) {
       const span = Math.max(liveDomainMax - liveDomainMin, 0.05);
       const step = niceStep(span / (Y_TICK_COUNT - 1));
-      const tickMax = Math.ceil(liveDomainMax / step) * step;
-      const tickMin = Math.floor(liveDomainMin / step) * step;
-      const tickSpan = Math.max(step, tickMax - tickMin);
       return Array.from({ length: Y_TICK_COUNT }, (_, i) => {
-        const price = tickMax - i * step;
-        const y = PLOT_TOP + ((tickMax - price) / tickSpan) * (PLOT_BOTTOM - PLOT_TOP);
+        const price = liveDomainMax - i * step;
+        const y = plotYForPrice(price, liveDomainMin, liveDomainMax);
         return { y, price };
-      }).filter((tick) => tick.price >= tickMin);
+      }).filter((tick) => tick.price >= liveDomainMin - step * 0.01);
     }
 
     return Array.from({ length: Y_TICK_COUNT }, (_, i) => {
       const price = domainMax - i * priceStep;
-      const y = PLOT_TOP + ((domainMax - price) / domainSpan) * (PLOT_BOTTOM - PLOT_TOP);
+      const y = plotYForPrice(price, domainMin, domainMax);
       return { y, price };
     }).filter((tick) => tick.price >= domainMin);
   })();
 
   const candleWidth = PLOT_RIGHT / chart.candles.length - 4;
-  const lastPoint = displayLinePoints[displayLinePoints.length - 1];
-  const lastCandle = displayCandles[displayCandles.length - 1];
-  const markerX = mode === "candle" ? lastCandle.x : lastPoint[0];
-  const markerY = mode === "candle" ? lastCandle.close : lastPoint[1];
-  const liveBadgeMaxLeft = PLOT_RIGHT - AXIS_GUTTER - LIVE_BADGE_W - 8;
-  const liveBadgeLeft =
-    liveEnabled && markerX + 10 > liveBadgeMaxLeft ? markerX - LIVE_BADGE_W - 10 : markerX + 10;
-  const liveBadgeTop = markerY - LIVE_BADGE_H / 2;
 
   const scrubDomainMin = liveEnabled ? liveDomainMin : domainMin;
   const scrubDomainMax = liveEnabled ? liveDomainMax : domainMax;
 
-  const handleChartPointer = (clientX: number) => {
-    const plot = plotRef.current;
-    if (!plot) return;
+  const scrubAtClientX = useCallback(
+    (clientX: number) => {
+      const plot = plotRef.current;
+      if (!plot) return;
 
-    const rect = plot.getBoundingClientRect();
-    const plotWidthPx = rect.width * CHART_SCALE;
-    const offsetX = clientX - rect.left;
-    if (offsetX < 0 || offsetX > plotWidthPx) {
-      setHover(null);
-      return;
-    }
+      const rect = plot.getBoundingClientRect();
+      const plotWidthPx = rect.width * (PLOT_LINE_WIDTH / PLOT_RIGHT);
+      const offsetX = clientX - rect.left;
+      if (offsetX < 0 || offsetX > plotWidthPx) {
+        setHover(null);
+        return;
+      }
 
-    const viewX = (offsetX / rect.width) * PLOT_RIGHT;
-    const dataX = viewX / CHART_SCALE;
-    const fraction = dataX / PLOT_RIGHT;
-    const timeLabel = formatChartScrubLabel(range, getChartScrubTime(range, fraction));
+      const viewX = (offsetX / rect.width) * PLOT_RIGHT;
+      const dataX = viewX / CHART_SCALE;
+      const fraction = dataX / PLOT_RIGHT;
+      const timeLabel = formatChartScrubLabel(range, getChartScrubTime(range, fraction));
 
-    if (mode === "line") {
-      const hit = interpolateLineAtX(displayLinePoints, dataX);
-      if (!hit) return;
+      if (mode === "line") {
+        const hit = interpolateLineAtX(displayLinePoints, dataX);
+        if (!hit) return;
+        setHover({
+          viewX: hit[0] * CHART_SCALE,
+          dataX: hit[0],
+          dotY: hit[1],
+          price: priceFromPlotY(hit[1], scrubDomainMin, scrubDomainMax),
+          timeLabel,
+        });
+        return;
+      }
+
+      const nearest = displayCandles.reduce<(typeof displayCandles)[number] | null>((best, candle) => {
+        if (!best) return candle;
+        return Math.abs(candle.x - dataX) < Math.abs(best.x - dataX) ? candle : best;
+      }, null);
+      if (!nearest) return;
+
       setHover({
-        viewX,
-        dataX,
-        dotY: hit[1],
-        price: priceFromPlotY(hit[1], scrubDomainMin, scrubDomainMax),
+        viewX: nearest.x * CHART_SCALE,
+        dataX: nearest.x,
+        dotY: nearest.close,
+        price: priceFromPlotY(nearest.close, scrubDomainMin, scrubDomainMax),
         timeLabel,
       });
-      return;
-    }
+    },
+    [mode, displayLinePoints, displayCandles, range, scrubDomainMin, scrubDomainMax],
+  );
 
-    const nearest = displayCandles.reduce<(typeof displayCandles)[number] | null>((best, candle) => {
-      if (!best) return candle;
-      return Math.abs(candle.x - dataX) < Math.abs(best.x - dataX) ? candle : best;
-    }, null);
-    if (!nearest) return;
-
-    setHover({
-      viewX: nearest.x * CHART_SCALE,
-      dataX: nearest.x,
-      dotY: nearest.close,
-      price: priceFromPlotY(nearest.close, scrubDomainMin, scrubDomainMax),
-      timeLabel,
-    });
-  };
+  useEffect(() => {
+    if (pointerXRef.current == null) return;
+    scrubAtClientX(pointerXRef.current);
+  }, [scrubAtClientX, displayLinePoints, displayCandles]);
 
   useEffect(() => {
     setHover(null);
@@ -425,20 +463,33 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
     >
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
-            <span className="num" style={{ fontSize: 34, fontWeight: 600, letterSpacing: -0.5 }}>
-              ${headerPrice.toFixed(2)}
-            </span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: priceChangeColor, fontSize: 13, fontWeight: 600 }}>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ transform: isDown ? undefined : "rotate(180deg)" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
+            {prefersReducedMotion ? (
+              <span className="num" style={{ fontSize: 34, fontWeight: 600, letterSpacing: -0.5 }}>
+                ${headerPrice.toFixed(2)}
+              </span>
+            ) : (
+              <RollingPrice
+                value={headerPrice}
+                className="num"
+                style={{ fontSize: 34, fontWeight: 600, letterSpacing: -0.5 }}
+              />
+            )}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: displayChangeColor, fontSize: 13, fontWeight: 600 }}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ transform: displayChgDown ? undefined : "rotate(180deg)" }}>
                 <path d="M12 20l-8-10h16z"></path>
               </svg>
-              {chgAbs} ({rangeLabel})
+              {displayChg} ({displayChangeLabel})
             </span>
           </div>
+          <InfoTip
+            tip={CHART_TOOLTIPS.priceDisclaimer(rangeLabel)}
+            label="Weighted reference price across 5 variants."
+            style={{ fontSize: 12, color: "var(--color-ink-muted)", marginTop: 6 }}
+          />
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="hv-chart-controls" style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <SegmentedControl
             ariaLabel="Chart timeframe"
             value={range}
@@ -481,51 +532,50 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
         </div>
       </div>
 
-      <div style={{ marginTop: 20 }}>
+      <div style={{ marginTop: 12 }}>
         <div
           ref={plotRef}
           style={{ position: "relative", cursor: "crosshair" }}
-          onMouseMove={(e) => handleChartPointer(e.clientX)}
-          onMouseLeave={() => setHover(null)}
-        >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: `${(AXIS_GUTTER / PLOT_RIGHT) * 100}%`,
-            display: "flex",
-            justifyContent: "flex-start",
-            pointerEvents: "none",
-            zIndex: 2,
+          onMouseMove={(e) => {
+            pointerXRef.current = e.clientX;
+            scrubAtClientX(e.clientX);
+          }}
+          onMouseLeave={() => {
+            pointerXRef.current = null;
+            setHover(null);
           }}
         >
-          <div style={{ pointerEvents: "auto" }}>
-            <InfoTip
-              tip={CHART_TOOLTIPS.priceDisclaimer(rangeLabel)}
-              label="Weighted reference price across 5 variants."
-              style={{ fontSize: 12, color: "var(--color-ink-muted)" }}
-            />
-          </div>
-        </div>
-        <svg viewBox={`0 0 ${PLOT_RIGHT} 220`} style={{ width: "100%", height: "auto", display: "block", pointerEvents: "none" }} preserveAspectRatio="none">
+        <svg className="hv-chart-svg" viewBox={`0 0 ${PLOT_RIGHT} ${CHART_VIEW_HEIGHT}`} style={{ width: "100%", height: "auto", display: "block", pointerEvents: "none", overflow: "hidden" }} preserveAspectRatio="none">
           <defs>
-            <linearGradient id="chartFillA" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={lineChartColor} stopOpacity={0.14}></stop>
-              <stop offset="100%" stopColor={lineChartColor} stopOpacity={0}></stop>
+            <clipPath id="chartPlotClipA">
+              <rect x="0" y={PLOT_TOP} width={PLOT_LINE_WIDTH} height={PLOT_BOTTOM - PLOT_TOP} />
+            </clipPath>
+            <pattern id="chartDotPatternA" width="2" height="2" patternUnits="userSpaceOnUse">
+              <circle cx="1" cy="1" r="0.5" fill={lineChartColor} opacity="0.42" />
+            </pattern>
+            <linearGradient id="chartFillFadeA" gradientUnits="userSpaceOnUse" x1="0" y1={PLOT_TOP} x2="0" y2={PLOT_BOTTOM}>
+              <stop offset="0%" stopColor="white" stopOpacity="1" />
+              <stop offset="55%" stopColor="white" stopOpacity="0.32" />
+              <stop offset="100%" stopColor="white" stopOpacity="0" />
             </linearGradient>
+            <mask id="chartFillMaskA">
+              <rect x="0" y={PLOT_TOP} width={PLOT_LINE_WIDTH} height={PLOT_BOTTOM - PLOT_TOP} fill="url(#chartFillFadeA)" />
+            </mask>
           </defs>
           {yTicks.map((t, i) => (
-            <line key={i} x1={0} y1={t.y} x2={PLOT_WIDTH} y2={t.y} stroke="var(--color-line)" strokeWidth={1} strokeDasharray="2 4"></line>
+            <line key={i} x1={0} y1={t.y} x2={PLOT_LINE_WIDTH} y2={t.y} stroke="var(--color-line)" strokeWidth={1} strokeDasharray="2 4"></line>
           ))}
           {hover && (
             <line x1={hover.viewX} y1={PLOT_TOP} x2={hover.viewX} y2={PLOT_BOTTOM} stroke="var(--color-line-strong)" strokeWidth={1} />
+          )}
+          <g clipPath="url(#chartPlotClipA)">
+          {mode === "line" && (
+            <path d={viewAreaPath} fill="url(#chartDotPatternA)" mask="url(#chartFillMaskA)" />
           )}
           <g transform={`scale(${CHART_SCALE} 1)`}>
             <g key={`${mode}-${modeDropKey}`} className={modeDropKey > 0 ? "chart-mode-enter" : undefined}>
               {mode === "line" ? (
                 <>
-                  <path d={areaPath} fill="url(#chartFillA)"></path>
                   <path d={linePath} fill="none" stroke={lineChartColor} strokeWidth={1.5} strokeLinejoin="round"></path>
                 </>
               ) : (
@@ -542,57 +592,67 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
                   );
                 })
               )}
-              {!hover && (
-                <line x1={0} y1={markerY} x2={PLOT_RIGHT} y2={markerY} stroke={mode === "line" ? lineChartColor : trendColor} strokeOpacity={0.35} strokeWidth={1} strokeDasharray="4 4"></line>
-              )}
-              {hover && (
-                <ellipse
-                  cx={hover.dataX}
-                  cy={hover.dotY}
-                  rx={MARKER_R / CHART_SCALE}
-                  ry={MARKER_R}
-                  fill={lineChartColor}
-                  stroke="var(--color-surface-raised)"
-                  strokeWidth={2 / CHART_SCALE}
-                />
-              )}
-              {mode === "line" && !hover && (
-                <ellipse
-                  cx={markerX}
-                  cy={markerY}
-                  rx={MARKER_R / CHART_SCALE}
-                  ry={MARKER_R}
-                  fill="var(--color-surface-raised)"
-                  stroke={lineChartColor}
-                  strokeWidth={2 / CHART_SCALE}
-                />
-              )}
-              {mode === "line" && !hover && liveEnabled && (
-                    <g transform={`translate(${Math.max(8, liveBadgeLeft)}, ${liveBadgeTop})`}>
-                      <rect width={LIVE_BADGE_W} height={LIVE_BADGE_H} rx={11} fill={lineChartColor} />
-                      <text
-                        x={LIVE_BADGE_W / 2}
-                        y={15}
-                        textAnchor="middle"
-                        fill="white"
-                        fontSize={11}
-                        fontWeight={600}
-                        style={{ fontFamily: "inherit", fontVariantNumeric: "tabular-nums" }}
-                      >
-                        ${displayPrice.toFixed(2)}
-                      </text>
-                    </g>
-                  )}
             </g>
           </g>
+          </g>
+          {!hover && (
+            <line
+              x1={0}
+              y1={markerViewY}
+              x2={PLOT_LINE_WIDTH}
+              y2={markerViewY}
+              stroke={mode === "line" ? lineChartColor : trendColor}
+              strokeOpacity={0.35}
+              strokeWidth={1}
+              strokeDasharray="4 4"
+            />
+          )}
+          {hover && (
+            <ellipse
+              cx={hover.viewX}
+              cy={hover.dotY}
+              rx={MARKER_R}
+              ry={MARKER_R}
+              fill={lineChartColor}
+              stroke="var(--color-surface-raised)"
+              strokeWidth={2}
+            />
+          )}
+          {mode === "line" && !hover && (
+            <ellipse
+              cx={markerViewX}
+              cy={markerViewY}
+              rx={MARKER_R}
+              ry={MARKER_R}
+              fill="var(--color-surface-raised)"
+              stroke={lineChartColor}
+              strokeWidth={2}
+            />
+          )}
+          {mode === "line" && !hover && liveEnabled && (
+            <g transform={`translate(${liveBadgeViewLeft}, ${markerViewY - LIVE_BADGE_H / 2})`}>
+              <rect width={LIVE_BADGE_W} height={LIVE_BADGE_H} rx={11} fill={lineChartColor} />
+              <text
+                x={LIVE_BADGE_W / 2}
+                y={15}
+                textAnchor="middle"
+                fill="white"
+                fontSize={11}
+                fontWeight={600}
+                style={{ fontFamily: "inherit", fontVariantNumeric: "tabular-nums" }}
+              >
+                ${displayPrice.toFixed(2)}
+              </text>
+            </g>
+          )}
         </svg>
         {hover && (
           <div
             style={{
               position: "absolute",
               left: `${(hover.viewX / PLOT_RIGHT) * 100}%`,
-              top: 8,
-              transform: "translateX(-50%)",
+              top: `${(hover.dotY / CHART_VIEW_HEIGHT) * 100}%`,
+              transform: "translate(-50%, calc(-100% - 10px))",
               display: "flex",
               alignItems: "center",
               gap: 6,
@@ -626,7 +686,7 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
               style={{
                 position: "absolute",
                 right: 0,
-                top: `${(t.y / 220) * 100}%`,
+                top: `${(t.y / CHART_VIEW_HEIGHT) * 100}%`,
                 transform: "translateY(-50%)",
                 fontSize: 12,
                 lineHeight: 1,
@@ -639,17 +699,17 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
           ))}
         </div>
         </div>
-        <div style={{ borderBottom: "1px solid var(--color-line)", display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--color-ink-faint)", paddingBottom: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--color-ink-faint)", marginTop: 4 }}>
           {ticks.map((t, i) => (
             <span key={`${range}-${i}-${t}`}>{t}</span>
           ))}
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "stretch", marginTop: 30 }}>
+      <div className="hv-stats-strip" style={{ display: "flex", alignItems: "stretch", marginTop: 30 }}>
         {stats.map((s, i) => (
           <Fragment key={s.label}>
-            {i > 0 && <div style={{ width: 1, alignSelf: "stretch", background: "var(--color-line)", margin: "0 24px" }} />}
+            {i > 0 && <div className="hv-stats-divider" style={{ width: 1, alignSelf: "stretch", background: "var(--color-line)", margin: "0 24px" }} />}
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "12px 0" }}>
               <div className="num" style={{ fontSize: 17, fontWeight: 600 }}>
                 {s.value}

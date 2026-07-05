@@ -36,8 +36,8 @@ export interface VariantDef {
 }
 
 export const ACCESS_STYLES: Record<AccessKind, { bg: string; color: string }> = {
-  kyc: { bg: "rgba(255,160,152,0.28)", color: "#9E0016" },
-  restricted: { bg: "rgba(249,36,52,0.1)", color: "#CF4040" },
+  kyc: { bg: "var(--color-down-soft)", color: "var(--color-down)" },
+  restricted: { bg: "var(--color-down-soft)", color: "var(--color-down)" },
   check: { bg: "#F2F3F5", color: "rgba(45,45,45,0.65)" },
 };
 
@@ -265,7 +265,7 @@ export const HEALTH_MAP: Record<string, number> = {
 };
 
 export function healthColor(n: number): string {
-  return n >= 65 ? "#51C148" : n >= 40 ? "#C99A2E" : "#CF4040";
+  return n >= 65 ? "#51C148" : n >= 40 ? "#C99A2E" : "var(--color-down)";
 }
 
 export const ECO_STATS = [
@@ -302,15 +302,15 @@ export const HEALTH_VARIANTS = [
   { sym: "SPCX", score: 84, color: "#51C148" },
   { sym: "SPCXx", score: 76, color: "#51C148" },
   { sym: "TSPX", score: 58, color: "#C99A2E" },
-  { sym: "SPACEX", score: 31, color: "#CF4040" },
-  { sym: "SPCXon", score: 12, color: "#CF4040" },
+  { sym: "SPACEX", score: 31, color: "var(--color-down)" },
+  { sym: "SPCXon", score: 12, color: "var(--color-down)" },
 ];
 
 export const SCORE_INPUTS = [
   { label: "Liquidity depth", grade: "Healthy", width: "78%", color: "#51C148" },
   { label: "Volume consistency", grade: "Healthy", width: "82%", color: "#51C148" },
   { label: "Venue diversity", grade: "Healthy", width: "70%", color: "#51C148" },
-  { label: "Liquidity concentration", grade: "Weak", width: "34%", color: "#CF4040" },
+  { label: "Liquidity concentration", grade: "Weak", width: "34%", color: "var(--color-down)" },
 ];
 
 export function buildSparkPath(): string {

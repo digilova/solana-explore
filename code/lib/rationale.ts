@@ -1,8 +1,8 @@
 type DecisionKind = "removed" | "merged" | "demoted" | "changed";
 
 const TAG_STYLES: Record<DecisionKind, { bg: string; color: string }> = {
-  removed: { bg: "rgba(249,36,52,0.1)", color: "#CF4040" },
-  merged: { bg: "rgba(255,160,152,0.28)", color: "#9E0016" },
+  removed: { bg: "var(--color-down-soft)", color: "var(--color-down)" },
+  merged: { bg: "var(--color-down-soft)", color: "var(--color-down)" },
   demoted: { bg: "#F2F3F5", color: "rgba(45,45,45,0.65)" },
   changed: { bg: "rgba(81,193,72,0.15)", color: "#4AA651" },
 };

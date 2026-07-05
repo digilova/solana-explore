@@ -43,14 +43,14 @@ export default function LiquidityStructure() {
             style={{
               marginTop: 16,
               padding: "12px 14px",
-              background: "rgba(255,160,152,0.14)",
+              background: "var(--color-down-soft)",
               borderRadius: 12,
               fontSize: 13,
               lineHeight: 1.5,
               color: "var(--color-ink-muted)",
             }}
           >
-            <strong style={{ color: "#9E0016" }}>Concentration note:</strong> 79% of liquidity sits in one variant (SPCX). Deep liquidity
+            <strong style={{ color: "var(--color-down)" }}>Concentration note:</strong> 79% of liquidity sits in one variant (SPCX). Deep liquidity
             exists, but it is not evenly distributed — relevant for execution on smaller variants.
           </div>
         </div>

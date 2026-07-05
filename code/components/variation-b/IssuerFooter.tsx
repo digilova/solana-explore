@@ -23,7 +23,7 @@ export default function IssuerFooter() {
           <a
             href="#"
             className="hv-footer-red"
-            style={{ background: "#9E0016", color: "var(--color-surface-raised)", fontSize: 14, fontWeight: 500, padding: "10px 20px", borderRadius: 9999 }}
+            style={{ background: "var(--color-down)", color: "var(--color-surface-raised)", fontSize: 14, fontWeight: 500, padding: "10px 20px", borderRadius: 9999 }}
           >
             Talk to the team
           </a>
