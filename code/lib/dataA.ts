@@ -1,4 +1,5 @@
 import { seeded, fmt, fmtCount } from "./format";
+import { variantLinks } from "./variantLinks";
 
 export interface MarketRowA {
   venue: string;
@@ -66,8 +67,8 @@ export interface VariantDefA {
 }
 
 export const ACCESS_STYLES_A: Record<AccessKindA, { bg: string; color: string }> = {
-  kyc: { bg: "rgba(255,160,152,0.28)", color: "#9E0016" },
-  restricted: { bg: "rgba(255,160,152,0.28)", color: "#9E0016" },
+  kyc: { bg: "var(--color-down-soft)", color: "var(--color-down)" },
+  restricted: { bg: "var(--color-down-soft)", color: "var(--color-down)" },
   check: { bg: "rgba(14,14,14,0.06)", color: "#555555" },
 };
 
@@ -106,13 +107,6 @@ function tail(sym: string, count: number, startLiq: number, startVol: number, se
   return rows;
 }
 
-const placeholderLinks = [
-  { label: "Explorer", href: "#", title: "Explorer link pending real mint address." },
-  { label: "Orb", href: "#", title: "Orb profile link pending real token profile." },
-  { label: "Issuer docs", href: "#", title: "Issuer documentation link pending source URL." },
-  { label: "Mint", href: "#", title: "Mint address pending verified on-chain address." },
-];
-
 function verification(rugRisk: string): VariantVerificationA[] {
   return [
     { label: "CoinGecko", status: "verified", note: "Listed profile, illustrative in prototype." },
@@ -147,17 +141,15 @@ export function getVariantDefsA(): VariantDefA[] {
         description:
           "SPCX is the deepest SpaceX-linked variant in this prototype, with issuer-stated tokenized equity exposure and KYC requirements for minting or redemption.",
         facts: [
-          { k: "Instrument", v: "Tokenized equity" },
           {
             k: "Backing",
             v: "Backed 1:1 (issuer-stated)",
             tip: "Issuer-stated backing should be checked against the latest issuer disclosure before relying on it.",
           },
-          { k: "Redemption", v: "Via issuer, KYC required" },
           { k: "Domicile", v: "Not specified", tip: "No structured disclosure found in this prototype dataset." },
         ],
         verification: verification("81/100"),
-        links: placeholderLinks,
+        links: [],
         health: health(84, "Established", [
           { label: "Liquidity", value: "$7.03M", grade: "Healthy", width: "94%" },
           { label: "Distribution", value: "20 markets", grade: "Healthy", width: "86%" },
@@ -193,17 +185,15 @@ export function getVariantDefsA(): VariantDefA[] {
         description:
           "SPCXx gives SpaceX exposure through Backed's xStocks structure, with stronger disclosure coverage than smaller variants but explicit geographic restrictions.",
         facts: [
-          { k: "Instrument", v: "Tokenized equity" },
           {
             k: "Backing",
             v: "Backed 1:1 (issuer-stated)",
             tip: "Issuer-stated backing and proof-of-reserve cadence should be checked before execution.",
           },
-          { k: "Redemption", v: "Via issuer, eligibility applies" },
           { k: "Domicile", v: "Switzerland (issuer-stated)" },
         ],
         verification: verification("74/100"),
-        links: placeholderLinks,
+        links: [],
         health: health(76, "Established", [
           { label: "Liquidity", value: "$1.21M", grade: "Healthy", width: "72%" },
           { label: "Distribution", value: "20 markets", grade: "Healthy", width: "82%" },
@@ -239,13 +229,11 @@ export function getVariantDefsA(): VariantDefA[] {
         description:
           "TSPX appears as a pre-IPO exposure variant with meaningful liquidity but less complete structure disclosure, making issuer verification the key diligence step.",
         facts: [
-          { k: "Instrument", v: "Pre-IPO exposure" },
           { k: "Backing", v: "Not specified", tip: "No reserve report or audit found in this prototype dataset." },
-          { k: "Redemption", v: "Not specified", tip: "No structured redemption disclosure found in this prototype dataset." },
           { k: "Domicile", v: "Not specified", tip: "Check issuer docs before relying on this field." },
         ],
         verification: verification("58/100"),
-        links: placeholderLinks,
+        links: [],
         health: health(58, "Developing", [
           { label: "Liquidity", value: "$611.06K", grade: "Watch", width: "56%" },
           { label: "Distribution", value: "11 markets", grade: "Watch", width: "58%" },
@@ -278,13 +266,11 @@ export function getVariantDefsA(): VariantDefA[] {
         description:
           "SPACEX by PreStocks broadens venue coverage but has thin primary liquidity and limited structured disclosures, so it reads as a higher-diligence variant.",
         facts: [
-          { k: "Instrument", v: "Pre-IPO exposure" },
           { k: "Backing", v: "Not specified", tip: "No reserve report or audit found in this prototype dataset." },
-          { k: "Redemption", v: "Not specified", tip: "No structured redemption disclosure found in this prototype dataset." },
           { k: "Domicile", v: "Not specified", tip: "Check issuer docs before relying on this field." },
         ],
         verification: verification("42/100"),
-        links: placeholderLinks,
+        links: [],
         health: health(31, "Speculative", [
           { label: "Liquidity", value: "$33.62K", grade: "Weak", width: "28%" },
           { label: "Distribution", value: "20 markets", grade: "Healthy", width: "76%" },
@@ -317,17 +303,15 @@ export function getVariantDefsA(): VariantDefA[] {
         description:
           "SPCXon is a permissioned Ondo tokenized equity variant with very limited tracked liquidity, making access terms and issuer controls the main evaluation points.",
         facts: [
-          { k: "Instrument", v: "Tokenized equity" },
           {
             k: "Backing",
             v: "Backed (issuer-stated)",
             tip: "Issuer publishes backing verification; check report date before relying on it.",
           },
-          { k: "Redemption", v: "Via issuer, permissioned" },
           { k: "Domicile", v: "Not specified", tip: "No structured disclosure found in this prototype dataset." },
         ],
         verification: verification("35/100"),
-        links: placeholderLinks,
+        links: [],
         health: health(12, "Thin market", [
           { label: "Liquidity", value: "$132.77", grade: "Weak", width: "8%" },
           { label: "Distribution", value: "2 markets", grade: "Weak", width: "14%" },
@@ -338,7 +322,7 @@ export function getVariantDefsA(): VariantDefA[] {
       spot: [mkRow("Meteora", "SPCXon/USDT", 143.71, 0, 0, 0, 186.25), mkRow("Meteora", "SPCXon/USDC", 7.25, 0, 0, 0, 186.15)],
       pools: [],
     },
-  ];
+  ].map((v) => ({ ...v, details: { ...v.details, links: variantLinks(v.sym) } })) as VariantDefA[];
 }
 
 export type RangeKey = "LIVE" | "1D" | "1W" | "30D" | "ALL";

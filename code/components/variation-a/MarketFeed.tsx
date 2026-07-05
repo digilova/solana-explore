@@ -73,6 +73,7 @@ export default function MarketFeed() {
   return (
     <div
       data-screen-label="Latest updates feed"
+      className="mf-root"
       style={{
         position: "fixed",
         right: 32,

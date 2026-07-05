@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 
 type Side = "top" | "bottom";
 
+const TOOLTIP_MS = 125;
+
 interface TooltipProps {
   content: string;
   children: ReactNode;
@@ -19,12 +21,19 @@ export default function Tooltip({ content, children, side = "top" }: TooltipProp
   const id = useId();
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
-  const [open, setOpen] = useState(false);
+  const [shown, setShown] = useState(false);
+  const [active, setActive] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const [resolvedSide, setResolvedSide] = useState<Side>(side);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (active || !shown) return;
+    const t = window.setTimeout(() => setShown(false), TOOLTIP_MS);
+    return () => clearTimeout(t);
+  }, [active, shown]);
 
   const reposition = useCallback(() => {
     const trigger = triggerRef.current;
@@ -56,14 +65,14 @@ export default function Tooltip({ content, children, side = "top" }: TooltipProp
   }, [side]);
 
   useLayoutEffect(() => {
-    if (!open) return;
+    if (!shown) return;
     reposition();
     const frame = requestAnimationFrame(reposition);
     return () => cancelAnimationFrame(frame);
-  }, [open, content, reposition]);
+  }, [shown, content, reposition]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!shown) return;
     const onLayout = () => reposition();
     window.addEventListener("scroll", onLayout, true);
     window.addEventListener("resize", onLayout);
@@ -71,20 +80,23 @@ export default function Tooltip({ content, children, side = "top" }: TooltipProp
       window.removeEventListener("scroll", onLayout, true);
       window.removeEventListener("resize", onLayout);
     };
-  }, [open, reposition]);
+  }, [shown, reposition]);
 
-  const show = () => setOpen(true);
-  const hide = () => setOpen(false);
+  const show = () => {
+    setShown(true);
+    requestAnimationFrame(() => setActive(true));
+  };
+  const hide = () => setActive(false);
 
   const popup =
     mounted &&
-    open &&
+    shown &&
     createPortal(
       <div
         ref={popupRef}
         id={id}
         role="tooltip"
-        data-open="true"
+        data-open={active ? "true" : "false"}
         data-side={resolvedSide}
         className="hv-tooltip-popup"
         style={{ top: coords.top, left: coords.left }}
@@ -99,7 +111,7 @@ export default function Tooltip({ content, children, side = "top" }: TooltipProp
       <span
         ref={triggerRef}
         className="hv-tooltip-trigger"
-        aria-describedby={open ? id : undefined}
+        aria-describedby={active ? id : undefined}
         onMouseEnter={show}
         onMouseLeave={hide}
         onFocus={show}

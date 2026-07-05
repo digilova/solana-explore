@@ -35,7 +35,7 @@ export default function EcosystemSummary() {
             <span className="num" style={{ fontSize: 24, fontWeight: 600 }}>
               $188.87
             </span>
-            <span style={{ color: "#CF4040", fontSize: 13, fontWeight: 600 }}>−3.07% 24H</span>
+            <span style={{ color: "var(--color-down)", fontSize: 13, fontWeight: 600 }}>−3.07% 24H</span>
           </div>
           <svg viewBox="0 0 200 44" style={{ width: "100%", height: 44, display: "block", marginTop: 8 }} preserveAspectRatio="none">
             <path d={sparkPath} fill="none" stroke="#F92434" strokeWidth={1.8} strokeLinejoin="round"></path>

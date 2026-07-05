@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import SwitcherBar from "@/components/SwitcherBar";
+import { PrototypeShell } from "@/components/PrototypeSidebar";
 import DecisionsTable from "@/components/rationale/DecisionsTable";
 import AudiencesList from "@/components/rationale/AudiencesList";
 
@@ -13,8 +13,8 @@ const cardStyle: CSSProperties = {
 
 export default function RationalePage() {
   return (
-    <div data-screen-label="Design Rationale" style={{ minHeight: "100vh" }}>
-      <SwitcherBar active="rationale" note="" />
+    <PrototypeShell active="rationale" note="">
+      <div data-screen-label="Design Rationale" style={{ minHeight: "100vh" }}>
 
       <main style={{ maxWidth: 860, margin: "0 auto", padding: "48px 40px 96px" }}>
         <h1 style={{ margin: 0, fontSize: 32, fontWeight: 600, letterSpacing: -0.5, lineHeight: 1.2 }}>Design rationale</h1>
@@ -79,7 +79,7 @@ export default function RationalePage() {
               </p>
             </Link>
             <Link href="/variation-b" className="hv-rationale-card" style={{ display: "block", ...cardStyle, color: "var(--color-ink)" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#9E0016", textTransform: "uppercase", letterSpacing: 0.4 }}>Variation B</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--color-down)", textTransform: "uppercase", letterSpacing: 0.4 }}>Variation B</div>
               <div style={{ fontSize: 17, fontWeight: 600, marginTop: 6 }}>Insto-first reframe</div>
               <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
                 Leads with ecosystem summary (5 variants · 4 issuers · $8.89M liquidity), demotes price to a compact module, and treats
@@ -223,6 +223,7 @@ export default function RationalePage() {
           a regulatory rating.
         </div>
       </main>
-    </div>
+      </div>
+    </PrototypeShell>
   );
 }

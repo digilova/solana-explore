@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SwitcherBar from "@/components/SwitcherBar";
+import { PrototypeShell } from "@/components/PrototypeSidebar";
 import SiteHeader from "@/components/SiteHeader";
 import Breadcrumb from "@/components/Breadcrumb";
 import EcosystemSummary from "@/components/variation-b/EcosystemSummary";
@@ -35,8 +35,8 @@ export default function VariationBPage() {
   const panelRows = panelDef ? panelDef.rows.concat(panelDef.extra ?? []) : [];
 
   return (
-    <div data-screen-label="Variation B" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <SwitcherBar active="b" note="Insto-first reframe — evaluation surface for tokenized assets" />
+    <PrototypeShell active="b" note="Insto-first reframe — evaluation surface for tokenized assets">
+      <div data-screen-label="Variation B" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", flex: 1 }}>
       <SiteHeader />
 
       <main style={{ width: "100%", maxWidth: 1160, margin: "0 auto", padding: "24px 40px 80px", flex: 1 }}>
@@ -75,6 +75,7 @@ export default function VariationBPage() {
       {panelSym && <MarketsPanel sym={panelSym} rows={panelRows} open={panelOpen} onClose={closePanel} />}
 
       <IssuerFooter />
-    </div>
+      </div>
+    </PrototypeShell>
   );
 }

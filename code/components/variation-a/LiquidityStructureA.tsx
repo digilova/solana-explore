@@ -1,11 +1,11 @@
 import { LIQ_SHARES, VENUE_DEPTH } from "@/lib/dataB";
 
 const cardStyle = {
-  background: "var(--color-surface-raised)",
-  border: "1px solid var(--color-line)",
-  borderRadius: 22,
+  background: "#FAFAFA",
+  border: "1px solid var(--color-line-faint)",
+  borderRadius: 20,
   padding: 24,
-  boxShadow: "rgba(23, 23, 23, 0.04) 0px 1px 2px",
+  minWidth: 0,
 } as const;
 
 export default function LiquidityStructureA() {
@@ -23,7 +23,7 @@ export default function LiquidityStructureA() {
         }}
       >
         <div style={cardStyle}>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>Liquidity share by variant</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#2D2D2D", marginBottom: 16 }}>Liquidity share by variant</div>
           <div style={{ display: "flex", height: 14, borderRadius: 9999, overflow: "hidden", gap: 2 }}>
             {LIQ_SHARES.map((ls) => (
               <div
@@ -63,20 +63,20 @@ export default function LiquidityStructureA() {
             style={{
               marginTop: 16,
               padding: "12px 14px",
-              background: "rgba(255,160,152,0.14)",
+              background: "var(--color-down-soft)",
               borderRadius: 12,
               fontSize: 13,
               lineHeight: 1.5,
               color: "var(--color-ink-muted)",
             }}
           >
-            <strong style={{ color: "#9E0016" }}>Concentration note:</strong> 79% of liquidity sits in one variant (SPCX). Deep liquidity
+            <strong style={{ color: "var(--color-down)" }}>Concentration note:</strong> 79% of liquidity sits in one variant (SPCX). Deep liquidity
             exists, but it is not evenly distributed — relevant for execution on smaller variants.
           </div>
         </div>
 
         <div style={cardStyle}>
-          <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>Top trading exchanges</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#2D2D2D", marginBottom: 16 }}>Top trading exchanges</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {VENUE_DEPTH.map((vd) => (
               <div key={vd.name}>

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Avatar from "@/components/Avatar";
 import InfoTip from "@/components/InfoTip";
 import SegmentedControl from "@/components/SegmentedControl";
 import Tooltip from "@/components/Tooltip";
 import { venueMeta } from "@/lib/venues";
+import { verificationLogo } from "@/lib/verificationProviders";
 import { ACCESS_STYLES_A, getVariantDefsA, type AccessKindA, type MarketRowA, type VariantDefA, type VariantDetailsA } from "@/lib/dataA";
 import { parseCount, parseMoney } from "@/lib/format";
 
@@ -46,6 +47,16 @@ function sortMarketRows(rows: MarketRowA[], sort: SortState) {
   return [...rows].sort((a, b) => mult * (accessor(a) - accessor(b)));
 }
 
+function sortCellStyle(key: SortKey, sort: SortState): CSSProperties {
+  const active = sort.key === key;
+  return {
+    textAlign: "right",
+    fontSize: 12,
+    fontWeight: active ? 600 : 400,
+    color: active ? "var(--color-ink)" : "var(--color-ink-muted)",
+  };
+}
+
 /** Inactive sort — muted up/down chevrons (Figma 113:1462) */
 function SortIconInactive() {
   return (
@@ -77,18 +88,20 @@ function SortHeader({
   sortKey,
   sort,
   onSort,
+  className,
 }: {
   label: string;
   sortKey: SortKey;
   sort: SortState;
   onSort: (key: SortKey) => void;
+  className?: string;
 }) {
   const active = sort.key === sortKey;
 
   return (
     <button
       type="button"
-      className="hv-market-sort"
+      className={className ? `hv-market-sort ${className}` : "hv-market-sort"}
       onClick={() => onSort(sortKey)}
       style={{
         display: "flex",
@@ -134,8 +147,10 @@ function VariantMarketTable({
   const sortedRows = useMemo(() => sortMarketRows(rows, sort), [rows, sort]);
 
   return (
-    <div className="reveal" style={{ padding: "0 24px 16px" }}>
+    <div className="reveal hv-mkt-wrap" style={{ padding: "0 24px 16px" }}>
+      <div style={{ fontSize: 14, fontWeight: 600, color: "#2D2D2D", marginBottom: 16 }}>Markets</div>
       <div
+        className="hv-mkt-grid"
         style={{
           display: "grid",
           gridTemplateColumns: gridCols,
@@ -146,10 +161,10 @@ function VariantMarketTable({
         <StaticHeader label="Venue" />
         <StaticHeader label="Pair" />
         <SortHeader label="Price" sortKey="price" sort={sort} onSort={onSort} />
-        <SortHeader label="Liquidity" sortKey="liq" sort={sort} onSort={onSort} />
+        <SortHeader label="Liquidity" sortKey="liq" sort={sort} onSort={onSort} className="hv-col-liq" />
         <SortHeader label="24H Vol" sortKey="vol" sort={sort} onSort={onSort} />
-        <SortHeader label="24H Trades" sortKey="trades" sort={sort} onSort={onSort} />
-        <SortHeader label="24H Wallets" sortKey="wallets" sort={sort} onSort={onSort} />
+        <SortHeader label="24H Trades" sortKey="trades" sort={sort} onSort={onSort} className="hv-col-trades" />
+        <SortHeader label="24H Wallets" sortKey="wallets" sort={sort} onSort={onSort} className="hv-col-wallets" />
       </div>
       <div style={{ borderTop: "1px solid var(--color-line-faint)" }}>
         {sortedRows.map((m, i) => {
@@ -158,7 +173,7 @@ function VariantMarketTable({
             <a
               key={`${m.venue}-${m.pair}-${i}`}
               href={m.href}
-              className="hv-market-row"
+              className="hv-market-row hv-mkt-grid"
               style={{
                 display: "grid",
                 gridTemplateColumns: gridCols,
@@ -177,19 +192,19 @@ function VariantMarketTable({
               <div style={{ fontSize: 12, fontWeight: 500, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {m.pair}
               </div>
-              <div className="num" style={{ textAlign: "right", fontSize: 12, fontWeight: 600 }}>
+              <div className="num" style={sortCellStyle("price", sort)}>
                 {m.price}
               </div>
-              <div className="num" style={{ textAlign: "right", fontSize: 12, fontWeight: 600 }}>
+              <div className="num hv-col-liq" style={sortCellStyle("liq", sort)}>
                 {m.liq}
               </div>
-              <div className="num" style={{ textAlign: "right", fontSize: 12, color: "var(--color-ink-muted)" }}>
+              <div className="num" style={sortCellStyle("vol", sort)}>
                 {m.vol}
               </div>
-              <div className="num" style={{ textAlign: "right", fontSize: 12, color: "var(--color-ink-muted)" }}>
+              <div className="num hv-col-trades" style={sortCellStyle("trades", sort)}>
                 {m.trades}
               </div>
-              <div className="num" style={{ textAlign: "right", fontSize: 12, color: "var(--color-ink-muted)" }}>
+              <div className="num hv-col-wallets" style={sortCellStyle("wallets", sort)}>
                 {m.wallets}
               </div>
             </a>
@@ -225,42 +240,55 @@ function VerificationIcon({
   label: string;
   status: VariantDetailsA["verification"][number]["status"];
 }) {
-  const color = status === "verified" ? "var(--color-up)" : status === "risk" ? "#C99A2E" : "var(--color-ink-faint)";
-  const initial = label === "CoinGecko" ? "C" : label === "Jupiter" ? "J" : label === "RugCheck" ? "R" : label.charAt(0);
+  const [broken, setBroken] = useState(false);
+  const logoSrc = verificationLogo(label);
+  const initials = (label === "CoinGecko" ? "CG" : label === "Jupiter" ? "JU" : label === "RugCheck" ? "RC" : label.slice(0, 2)).toUpperCase();
+  const statusRing =
+    status === "verified"
+      ? "0 0 0 1.5px var(--color-up)"
+      : status === "risk"
+        ? "0 0 0 1.5px #C99A2E"
+        : undefined;
+
+  const shell: CSSProperties = {
+    width: 26,
+    height: 26,
+    borderRadius: "50%",
+    background: "var(--color-hover-soft)",
+    flexShrink: 0,
+    overflow: "hidden",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: statusRing,
+    fontSize: 10,
+    fontWeight: 600,
+    color: "var(--color-ink-muted)",
+    lineHeight: 1,
+  };
+
+  if (!logoSrc || broken) {
+    return (
+      <span aria-hidden="true" style={shell}>
+        {initials}
+      </span>
+    );
+  }
 
   return (
-    <span
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       aria-hidden="true"
+      src={logoSrc}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      onError={() => setBroken(true)}
       style={{
-        width: 24,
-        height: 24,
-        borderRadius: "50%",
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: color,
-        color: "#fff",
-        flexShrink: 0,
-        fontSize: 11,
-        fontWeight: 700,
-        lineHeight: 1,
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.45)",
+        ...shell,
+        objectFit: "cover",
       }}
-    >
-      {status === "risk" ? (
-        <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
-          <path d="M6 1.2L10.8 10H1.2L6 1.2Z" fill="currentColor" opacity="0.95" />
-          <path d="M6 4.3V6.7" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
-          <path d="M6 8.4H6.01" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-      ) : initial === "J" ? (
-        <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
-          <path d="M9.8 3.3L5 8.1L2.6 5.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      ) : (
-        initial
-      )}
-    </span>
+    />
   );
 }
 
@@ -272,11 +300,14 @@ function DetailLinks({ links }: { links: VariantDetailsA["links"] }) {
           key={link.label}
           href={link.href}
           title={link.title}
+          target="_blank"
+          rel="noopener noreferrer"
           className={index === 0 ? "hv-trade-btn" : "hv-f2f3f5"}
           style={{
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
+            gap: 4,
             height: 32,
             padding: "0 12px",
             borderRadius: 9999,
@@ -284,12 +315,15 @@ function DetailLinks({ links }: { links: VariantDetailsA["links"] }) {
             background: index === 0 ? "var(--color-ink)" : "var(--color-surface-raised)",
             color: index === 0 ? "var(--color-surface-raised)" : "var(--color-ink-muted)",
             fontSize: 12,
-            fontWeight: 500,
-            fontFamily: link.label === "Mint" ? "monospace" : undefined,
+            fontWeight: 400,
+            lineHeight: "18px",
             whiteSpace: "nowrap",
           }}
         >
           {link.label}
+          <span aria-hidden="true" style={{ fontSize: "inherit", fontWeight: "inherit", lineHeight: 1 }}>
+            ↗
+          </span>
         </a>
       ))}
     </div>
@@ -299,61 +333,60 @@ function DetailLinks({ links }: { links: VariantDetailsA["links"] }) {
 function TokenDetailsCard({ v }: { v: VariantDefA }) {
   return (
     <div
+      className="hv-detail-card"
       style={{
-        background: "var(--color-surface-raised)",
-        border: "1px solid var(--color-line)",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        background: "#FAFAFA",
+        border: "1px solid var(--color-line-faint)",
         borderRadius: 20,
         padding: 24,
         minWidth: 0,
-        boxShadow: "0px 1px 1px rgba(23, 23, 23, 0.03)",
       }}
     >
-      <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-subtle)", textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 16 }}>
-        Token variant detail
+      <div style={{ fontSize: 14, fontWeight: 600, color: "#2D2D2D", marginBottom: 16 }}>
+        Details
       </div>
+
+      <p
+        style={{
+          margin: "0 0 16px",
+          width: "100%",
+          color: "var(--color-ink)",
+          fontWeight: 400,
+          fontSize: 12,
+          lineHeight: "18px",
+        }}
+      >
+        {v.details.description}
+      </p>
 
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          border: "1px solid var(--color-line)",
-          borderRadius: 14,
-          overflow: "hidden",
-          background: "var(--color-surface-raised)",
         }}
       >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(112px, 0.9fr) minmax(0, 1.35fr)",
-            gap: 14,
-            padding: "10px 12px",
-            borderBottom: "1px solid var(--color-line-faint)",
-            fontSize: 12,
-            lineHeight: "18px",
-          }}
-        >
-          <span style={{ color: "var(--color-ink-subtle)" }}>About</span>
-          <span style={{ color: "var(--color-ink-muted)", fontWeight: 400 }}>{v.details.description}</span>
-        </div>
-        {v.details.facts.map((fact) => (
+        {v.details.facts.map((fact, index) => (
           <div
             key={fact.k}
             style={{
               display: "grid",
               gridTemplateColumns: "minmax(112px, 0.9fr) minmax(0, 1.35fr)",
               gap: 14,
-              padding: "10px 12px",
+              padding: "10px 0",
+              borderTop: index === 0 ? "1px solid var(--color-line-faint)" : undefined,
               borderBottom: "1px solid var(--color-line-faint)",
               fontSize: 12,
               lineHeight: "18px",
             }}
           >
-            <span style={{ color: "var(--color-ink-subtle)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <span style={{ color: "var(--color-ink-subtle)", display: "inline-flex", alignItems: "baseline", gap: 4 }}>
               {fact.k}
               {fact.tip && <InfoTip tip={fact.tip} />}
             </span>
-            <span style={{ color: "var(--color-ink)", fontWeight: 500, textAlign: "right" }}>{fact.v}</span>
+            <span style={{ color: "var(--color-ink)", fontWeight: 400, textAlign: "right" }}>{fact.v}</span>
           </div>
         ))}
         <div
@@ -361,7 +394,7 @@ function TokenDetailsCard({ v }: { v: VariantDefA }) {
             display: "grid",
             gridTemplateColumns: "minmax(112px, 0.9fr) minmax(0, 1.35fr)",
             gap: 14,
-            padding: "10px 12px",
+            padding: "10px 0",
             fontSize: 12,
             lineHeight: "18px",
           }}
@@ -373,14 +406,7 @@ function TokenDetailsCard({ v }: { v: VariantDefA }) {
                 <span
                   title={`${item.label}: ${item.note}`}
                   aria-label={`${item.label}: ${item.note}`}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 24,
-                    height: 24,
-                    borderRadius: "50%",
-                  }}
+                  style={{ display: "inline-flex", cursor: "default" }}
                 >
                   <VerificationIcon label={item.label} status={item.status} />
                 </span>
@@ -389,43 +415,96 @@ function TokenDetailsCard({ v }: { v: VariantDefA }) {
           </div>
         </div>
       </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "auto", paddingTop: 16 }}>
+        <DetailLinks links={v.details.links} />
+      </div>
     </div>
   );
 }
 
+// Figma health palette (node 113:2054): green / amber / red
+const HEALTH_GRADE_COLORS: Record<string, string> = {
+  Healthy: "#009C62",
+  Watch: "#C99A2E",
+  Weak: "var(--color-down)",
+};
+
 function HealthMetricRow({ metric }: { metric: VariantDetailsA["health"]["metrics"][number] }) {
-  const color = metric.grade === "Healthy" ? "var(--color-up)" : metric.grade === "Watch" ? "#C99A2E" : "var(--color-down)";
+  const color = HEALTH_GRADE_COLORS[metric.grade] ?? "#009C62";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, fontSize: 13, lineHeight: "18px" }}>
-        <span style={{ color: "var(--color-ink-subtle)", minWidth: 0 }}>
-          <span style={{ display: "block", color: "var(--color-ink-muted)" }}>{metric.label}</span>
-          <span className="num" style={{ display: "block", marginTop: 1, fontSize: 12, color: "var(--color-ink-faint)" }}>
-            {metric.value}
-          </span>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, fontSize: 12, fontWeight: 400, lineHeight: "18px" }}>
+        <span
+          title={`${metric.label}: ${metric.value}`}
+          style={{ color: "var(--color-ink-muted)", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+        >
+          {metric.label} ({metric.value})
         </span>
-        <span style={{ color, fontWeight: 500, whiteSpace: "nowrap" }}>{metric.grade}</span>
+        <span style={{ color, whiteSpace: "nowrap" }}>{metric.grade}</span>
       </div>
-      <div style={{ height: 4, borderRadius: 9999, background: "#E8EAEB", overflow: "hidden" }}>
-        <span style={{ display: "block", width: metric.width, height: "100%", borderRadius: 9999, background: color }} />
+      <div style={{ height: 4, borderRadius: 2, background: "#E8EAEB", overflow: "hidden" }}>
+        <span style={{ display: "block", width: metric.width, height: "100%", borderRadius: 2, background: color }} />
       </div>
     </div>
   );
+}
+
+// Shield-with-check for established markets; warning triangle for lower tiers.
+const HEALTH_WARNING_STATUSES = new Set(["Developing", "Speculative", "Thin market"]);
+
+function HealthWarningIcon({ color }: { color: string }) {
+  return (
+    <svg width={20} height={18} viewBox="0 0 20.8301 18.6621" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+      <path
+        d="M12.5098 1.33789L20.0879 14.541C20.332 14.9707 20.4688 15.4492 20.4688 15.9082C20.4688 17.4023 19.4629 18.5547 17.8027 18.5547L2.66602 18.5547C1.00586 18.5547 0 17.4023 0 15.9082C0 15.4492 0.117188 14.9805 0.380859 14.541L7.95898 1.33789C8.45703 0.449219 9.33594 0 10.2344 0C11.1328 0 12.002 0.449219 12.5098 1.33789ZM9.15039 14.2578C9.15039 14.834 9.6582 15.3027 10.2441 15.3027C10.8203 15.3027 11.3281 14.8438 11.3281 14.2578C11.3281 13.6621 10.8301 13.2031 10.2441 13.2031C9.64844 13.2031 9.15039 13.6719 9.15039 14.2578ZM9.31641 5.9082L9.44336 11.2207C9.45312 11.7383 9.73633 12.0312 10.2441 12.0312C10.7227 12.0312 11.0059 11.748 11.0156 11.2207L11.1621 5.91797C11.1719 5.40039 10.7617 5.01953 10.2344 5.01953C9.6875 5.01953 9.30664 5.39062 9.31641 5.9082Z"
+        fill={color}
+        fillOpacity={0.85}
+      />
+    </svg>
+  );
+}
+
+function HealthShieldIcon({ color }: { color: string }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+      <path
+        d="M9.38968 0.401189C10.4054 0.757801 13.6804 1.97028 14.7049 2.39821C15.4405 2.71025 15.8258 3.00446 15.8258 3.92274V10.6449C15.8258 13.8455 14.2233 15.1739 9.24081 17.8306C9.0219 17.9465 8.80298 18 8.66288 18C8.52277 18 8.31262 17.9554 8.08494 17.8306C3.19002 15.0223 1.5 13.8455 1.5 10.6449V3.92274C1.5 3.00446 1.89405 2.70133 2.62084 2.39821C3.64536 1.9792 6.92032 0.73997 7.94484 0.401189C8.17251 0.329866 8.41769 0.276374 8.66288 0.276374C8.90806 0.276374 9.15325 0.32095 9.38968 0.401189ZM11.3862 5.26894L7.64712 11.3848L5.86953 9.04903C5.65062 8.75482 5.45797 8.66568 5.21278 8.66568C4.80999 8.66568 4.50351 8.99554 4.50351 9.40561C4.50351 9.6018 4.58231 9.80684 4.71366 9.98514L6.91157 12.731C7.13923 13.0431 7.38442 13.159 7.68214 13.159C7.97986 13.159 8.23381 13.0163 8.41769 12.731L12.5333 6.12481C12.6471 5.94651 12.7522 5.74145 12.7522 5.5364C12.7522 5.12629 12.3931 4.85884 12.0166 4.85884C11.7802 4.85884 11.5525 4.99257 11.3862 5.26894Z"
+        fill={color}
+      />
+    </svg>
+  );
+}
+
+function HealthStatusIcon({ status, color }: { status: string; color: string }) {
+  if (HEALTH_WARNING_STATUSES.has(status)) {
+    return <HealthWarningIcon color={color} />;
+  }
+  return <HealthShieldIcon color={color} />;
 }
 
 function TokenHealthCard({ details }: { details: VariantDetailsA }) {
   const score = Math.max(0, Math.min(100, details.health.score));
-  const scoreColor = score >= 65 ? "var(--color-up)" : score >= 40 ? "#C99A2E" : "var(--color-down)";
-  const radius = 66;
+  const scoreColor = score >= 65 ? "#009C62" : score >= 40 ? "#C99A2E" : "var(--color-down)";
+  // Figma gauge (node 113:2055): 198.5px ring, 10px stroke, 260° arc with a
+  // 100° gap centered at the bottom (arc runs 140° → 40°).
+  const size = 198.5;
+  const center = size / 2;
+  const radius = 94.25;
   const circumference = 2 * Math.PI * radius;
-  const arc = circumference * 0.78;
-  const gap = circumference - arc;
-  const offset = arc * (1 - score / 100);
+  const arc = circumference * (260 / 360);
+  // Fill is its own dash from the arc start — never offset-wrapped, so no
+  // stray tail can bleed into the bottom gap.
+  const filled = arc * (score / 100);
 
   return (
     <div
+      className="hv-detail-card"
       style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
         background: "#FAFAFA",
         border: "1px solid var(--color-line-faint)",
         borderRadius: 20,
@@ -433,75 +512,81 @@ function TokenHealthCard({ details }: { details: VariantDetailsA }) {
         minWidth: 0,
       }}
     >
-      <div style={{ fontSize: 11, fontWeight: 600, color: "var(--color-ink-subtle)", textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 16 }}>
-        Market health
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "220px minmax(0, 1fr)", gap: 24, alignItems: "center" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-          <div style={{ position: "relative", width: 176, height: 156 }}>
-            <svg width="176" height="156" viewBox="0 0 176 156" aria-hidden="true">
+      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)", marginBottom: 16 }}>Market health</div>
+      <div
+        className="hv-health-grid"
+        style={{
+          flex: 1,
+          display: "grid",
+          gridTemplateColumns: `${size}px minmax(0, 1fr)`,
+          gap: 20,
+          alignItems: "center",
+          minHeight: 0,
+        }}
+      >
+        <div style={{ position: "relative", width: size, height: 210 }}>
+          <svg width={size} height={166} viewBox={`0 0 ${size} 166`} aria-hidden="true" style={{ display: "block", overflow: "visible" }}>
+            <circle
+              cx={center}
+              cy={center}
+              r={radius}
+              fill="none"
+              stroke="#E8EAEB"
+              strokeWidth={10}
+              strokeLinecap="round"
+              strokeDasharray={`${arc} ${circumference}`}
+              transform={`rotate(140 ${center} ${center})`}
+            />
+            {filled > 0 && (
               <circle
-                cx="88"
-                cy="82"
-                r={radius}
-                fill="none"
-                stroke="#E8EAEB"
-                strokeWidth="14"
-                strokeLinecap="round"
-                strokeDasharray={`${arc} ${gap}`}
-                transform="rotate(142 88 82)"
-              />
-              <circle
-                cx="88"
-                cy="82"
+                cx={center}
+                cy={center}
                 r={radius}
                 fill="none"
                 stroke={scoreColor}
-                strokeWidth="14"
+                strokeWidth={10}
                 strokeLinecap="round"
-                strokeDasharray={`${arc} ${gap}`}
-                strokeDashoffset={offset}
-                transform="rotate(142 88 82)"
+                strokeDasharray={`${filled} ${circumference}`}
+                transform={`rotate(140 ${center} ${center})`}
               />
-            </svg>
-            <div
-              style={{
-                position: "absolute",
-                inset: "46px 0 auto",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                lineHeight: 1,
-              }}
-            >
-              <span className="num" style={{ fontSize: 48, fontWeight: 300, color: "var(--color-ink)" }}>
-                {score}
-              </span>
-              <span style={{ marginTop: 7, fontSize: 13, color: "#64748B" }}>of 100</span>
-            </div>
-          </div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--color-ink)", fontSize: 14 }}>
-            <span
-              aria-hidden="true"
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: 7,
-                background: scoreColor,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#fff",
-              }}
-            >
-              <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
-                <path d="M9.8 3.3L5 8.1L2.6 5.8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+            )}
+          </svg>
+          <div
+            style={{
+              position: "absolute",
+              top: 65,
+              left: 0,
+              right: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <span className="num" style={{ fontSize: 48, fontWeight: 300, color: "#0A0A0A", lineHeight: "normal" }}>
+              {score}
             </span>
+            <span style={{ fontSize: 13, color: "#64748B", lineHeight: "normal" }}>of 100</span>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              top: 189,
+              left: 0,
+              right: 0,
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "center",
+              gap: 8,
+              color: "#2D2D2D",
+              fontSize: 14,
+              lineHeight: "21px",
+            }}
+          >
+            <HealthStatusIcon status={details.health.status} color={scoreColor} />
             {details.health.status}
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 22, minWidth: 0 }}>
+        <div className="hv-health-details" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minWidth: 0, height: "100%", minHeight: 210, padding: "6px 0" }}>
           {details.health.metrics.map((metric) => (
             <HealthMetricRow key={metric.label} metric={metric} />
           ))}
@@ -513,11 +598,10 @@ function TokenHealthCard({ details }: { details: VariantDetailsA }) {
 
 function VariantDetailsBand({ v }: { v: VariantDefA }) {
   return (
-    <div className="hv-token-detail-grid" style={{ padding: "0 24px 18px", display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 18 }}>
+    <div className="reveal hv-token-detail-grid" style={{ padding: "20px 24px 40px", display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 18, alignItems: "stretch" }}>
       <TokenDetailsCard v={v} />
-      <div style={{ display: "flex", flexDirection: "column", gap: 14, minWidth: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", minWidth: 0, height: "100%" }}>
         <TokenHealthCard details={v.details} />
-        <DetailLinks links={v.details.links} />
       </div>
     </div>
   );
@@ -708,6 +792,7 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
               >
                 <div
                   onClick={() => onToggle(v.sym)}
+                  className="hv-vrow"
                   style={{
                     display: "grid",
                     gridTemplateColumns: gridCols,
@@ -718,56 +803,62 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                     cursor: "pointer",
                   }}
                 >
-                  <div style={{ gridColumn: "1 / 3", display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0 }}>
+                  <div className="hv-vrow-id" style={{ gridColumn: "1 / 3", display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0 }}>
                     <VariantAvatar v={v} />
                     <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
-                      <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-ink)", whiteSpace: "nowrap" }}>{v.title}</div>
+                      <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {v.title}
+                      </div>
                       <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {v.sym} • {v.type}
                       </div>
                     </div>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
-                    <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
-                      {v.price}
+                  {/* display:contents keeps these as direct grid cells on desktop;
+                      below 980px the wrapper becomes the second (stats) row. */}
+                  <div className="hv-vrow-stats" style={{ display: "contents" }}>
+                    <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
+                      <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
+                        {v.price}
+                      </div>
+                      <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Price</div>
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Price</div>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
-                    <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
-                      {v.liq}
+                    <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
+                      <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
+                        {v.liq}
+                      </div>
+                      <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Liquidity</div>
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Liquidity</div>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
-                    <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
-                      {v.vol}
+                    <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
+                      <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
+                        {v.vol}
+                      </div>
+                      <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>24H Vol</div>
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>24H Vol</div>
+                    <div className="hv-vrow-access" style={{ display: "flex", justifyContent: "flex-end" }}>
+                      <Tooltip content={v.accessHint}>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            height: 27,
+                            padding: "0 10px",
+                            background: access.bg,
+                            color: access.color,
+                            fontSize: 12,
+                            fontWeight: 400,
+                            textTransform: "none",
+                            borderRadius: 9999,
+                            cursor: "default",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {v.access}
+                        </span>
+                      </Tooltip>
+                    </div>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Tooltip content={v.accessHint}>
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          height: 27,
-                          padding: "0 10px",
-                          background: access.bg,
-                          color: access.color,
-                          fontSize: 12,
-                          fontWeight: 400,
-                          textTransform: "none",
-                          borderRadius: 9999,
-                          cursor: "default",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {v.access}
-                      </span>
-                    </Tooltip>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <div className="hv-vrow-markets" style={{ display: "flex", justifyContent: "flex-end" }}>
                     <MarketsCountBadge count={rows.length} isExpanded={isExpanded} />
                   </div>
                 </div>

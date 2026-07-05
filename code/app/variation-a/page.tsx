@@ -1,20 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import SwitcherBar from "@/components/SwitcherBar";
+import { PrototypeShell } from "@/components/PrototypeSidebar";
 import SiteHeader from "@/components/SiteHeader";
 import Breadcrumb from "@/components/Breadcrumb";
 import AssetHeader from "@/components/variation-a/AssetHeader";
 import ChartCard from "@/components/variation-a/ChartCard";
+import ChartCardV2 from "@/components/variation-a/ChartCardV2";
+import { useChartDisplay } from "@/lib/chartDisplayContext";
 import VariantsMarkets, { type FilterKey } from "@/components/variation-a/VariantsMarkets";
 import LiquidityStructureA from "@/components/variation-a/LiquidityStructureA";
 import MarketFeed from "@/components/variation-a/MarketFeed";
 import type { RangeKey } from "@/lib/dataA";
 
-export default function VariationAPage() {
+function VariationAPageContent() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState<FilterKey>("spot");
   const [range, setRange] = useState<RangeKey>("1D");
+  const { chartVersion } = useChartDisplay();
 
   const toggle = (sym: string) => setExpanded((s) => ({ ...s, [sym]: !s[sym] }));
 
@@ -24,15 +27,18 @@ export default function VariationAPage() {
   };
 
   return (
-    <div data-screen-label="Variation A" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <SwitcherBar active="a" note="Evolved current experience — familiar flow, issuer signals added" />
+    <div data-screen-label="Variation A" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", flex: 1 }}>
       <SiteHeader />
 
-      <main style={{ width: "100%", maxWidth: 1160, margin: "0 auto", padding: "24px 40px 80px", flex: 1 }}>
+      <main className="hv-page-main" style={{ width: "100%", maxWidth: 1160, margin: "0 auto", padding: "24px 40px 80px", flex: 1 }}>
         <Breadcrumb items={[{ label: "Tokens", href: "#" }, { label: "SpaceX" }]} />
 
         <AssetHeader onJump={jumpToVariants} />
-        <ChartCard range={range} onSelectRange={setRange} />
+        {chartVersion === "v1" ? (
+          <ChartCard range={range} onSelectRange={setRange} />
+        ) : (
+          <ChartCardV2 range={range} onSelectRange={setRange} />
+        )}
         <VariantsMarkets filter={filter} onFilter={setFilter} expanded={expanded} onToggle={toggle} />
         <LiquidityStructureA />
 
@@ -44,5 +50,13 @@ export default function VariationAPage() {
 
       <MarketFeed />
     </div>
+  );
+}
+
+export default function VariationAPage() {
+  return (
+    <PrototypeShell active="a" note="Evolved current experience — familiar flow, issuer signals added">
+      <VariationAPageContent />
+    </PrototypeShell>
   );
 }

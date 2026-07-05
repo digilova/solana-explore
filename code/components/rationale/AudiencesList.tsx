@@ -11,7 +11,7 @@ export default function AudiencesList() {
               <span style={{ fontWeight: 600, color: "var(--color-ink)" }}>A:</span> {au.a}
             </div>
             <div>
-              <span style={{ fontWeight: 600, color: "#9E0016" }}>B:</span> {au.b}
+              <span style={{ fontWeight: 600, color: "var(--color-down)" }}>B:</span> {au.b}
             </div>
           </div>
         </div>

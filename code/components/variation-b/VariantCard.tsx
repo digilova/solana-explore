@@ -3,6 +3,7 @@ import InfoTip from "@/components/InfoTip";
 import { venueMeta } from "@/lib/venues";
 import { fmt } from "@/lib/format";
 import { ACCESS_STYLES, HEALTH_MAP, healthColor, type VariantDef } from "@/lib/dataB";
+import { variantExternalLinks } from "@/lib/variantLinks";
 
 interface VariantCardProps {
   v: VariantDef;
@@ -17,6 +18,7 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
   const hColor = healthColor(health);
   const totalMarkets = v.rows.length + (v.extra?.length ?? 0);
   const hasMore = (v.extra?.length ?? 0) > 0;
+  const externalLinks = variantExternalLinks(v.sym);
 
   return (
     <div
@@ -56,7 +58,7 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
           <div className="num" style={{ fontSize: 15, fontWeight: 600 }}>
             {v.price}
           </div>
-          <div className="num" style={{ fontSize: 12, fontWeight: 600, color: v.chgUp ? "#4AA651" : "#CF4040" }}>
+          <div className="num" style={{ fontSize: 12, fontWeight: 600, color: v.chgUp ? "#4AA651" : "var(--color-down)" }}>
             {v.chg}
           </div>
         </div>
@@ -173,7 +175,7 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
                       fontSize: 13,
                     }}
                   >
-                    <span style={{ color: "var(--color-ink-muted)", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ color: "var(--color-ink-muted)", display: "flex", alignItems: "baseline", gap: 6 }}>
                       {fx.k}
                       {fx.tip && <InfoTip tip={fx.tip} />}
                     </span>
@@ -278,10 +280,15 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
               </div>
               <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
                 <a
-                  href="#"
-                  title={`Opens Jupiter with ${v.sym} preselected — the aggregator routes the best price across venues`}
+                  href={externalLinks?.jupiter.href ?? "#"}
+                  title={externalLinks?.jupiter.title}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hv-trade-btn"
                   style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
                     background: "var(--color-ink)",
                     color: "var(--color-surface-raised)",
                     border: "1px solid #1F1F1F",
@@ -291,12 +298,19 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
                     borderRadius: 9999,
                   }}
                 >
-                  Trade {v.sym} on Jupiter ↗
+                  <span>Trade {v.sym} on Jupiter</span>
+                  <span aria-hidden="true">↗</span>
                 </a>
                 <a
-                  href="#"
+                  href={externalLinks?.issuer.href ?? "#"}
+                  title={externalLinks?.issuer.title}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hv-f2f3f5"
                   style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
                     background: "var(--color-surface-raised)",
                     color: "var(--color-ink-muted)",
                     border: "1px solid var(--color-line-strong)",
@@ -305,12 +319,19 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
                     borderRadius: 9999,
                   }}
                 >
-                  Issuer docs
+                  <span>Issuer docs</span>
+                  <span aria-hidden="true">↗</span>
                 </a>
                 <a
-                  href="#"
+                  href={externalLinks?.mint.href ?? "#"}
+                  title={externalLinks?.mint.title}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hv-f2f3f5"
                   style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
                     background: "var(--color-surface-raised)",
                     color: "var(--color-ink-muted)",
                     border: "1px solid var(--color-line-strong)",
@@ -320,7 +341,8 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
                     fontFamily: "monospace",
                   }}
                 >
-                  Mint address ↗
+                  <span>Mint address</span>
+                  <span aria-hidden="true">↗</span>
                 </a>
               </div>
             </div>
