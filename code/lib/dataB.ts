@@ -272,7 +272,7 @@ export const ECO_STATS = [
   { value: "5", label: "Variants live" },
   { value: "4", label: "Independent issuers" },
   { value: "$8.89M", label: "Combined liquidity" },
-  { value: "$32.10M", label: "24H volume" },
+  { value: "$32.10M", label: "24h vol" },
   { value: "73", label: "Tracked markets" },
 ];
 

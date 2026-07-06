@@ -73,7 +73,16 @@ export default function ChartCardV3({ range, onSelectRange, header }: ChartCardV
     };
   }, []);
 
-  const volumeLabel = range === "1D" || range === "LIVE" ? "24H volume" : period.volLabel;
+  const volumeLabel = range === "1D" || range === "LIVE" ? "24h vol" : period.volLabel;
+
+  const renderRangeControl = () => (
+    <SegmentedControl
+      ariaLabel="Chart timeframe"
+      value={range}
+      onChange={onSelectRange}
+      items={RANGE_TABS.map(({ key, label }) => ({ value: key, label }))}
+    />
+  );
 
   return (
     <section
@@ -98,17 +107,9 @@ export default function ChartCardV3({ range, onSelectRange, header }: ChartCardV
       >
         {header}
         <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginLeft: header ? "auto" : undefined }}>
-        <SegmentedControl
-          ariaLabel="Chart timeframe"
-          value={range}
-          onChange={onSelectRange}
-          items={RANGE_TABS.map(({ key, label }) => ({ value: key, label }))}
-          getSegmentStyle={(selected) => ({
-            fontSize: 13,
-            padding: "6px 14px",
-            fontWeight: selected ? 600 : 400,
-          })}
-        />
+        <div className="hv-chartv3-range-controls hv-chartv3-range-controls--bar">
+          {renderRangeControl()}
+        </div>
 
         <button
           type="button"
@@ -131,6 +132,7 @@ export default function ChartCardV3({ range, onSelectRange, header }: ChartCardV
       </div>
 
       <div className="hv-chartv3-markets-shell">
+        <div className="hv-chartv3-range-controls hv-chartv3-range-controls--shell">{renderRangeControl()}</div>
         <div className="hv-chartv3-shell hv-variant-card">
           <div className="hv-chartv3-card">
             <div className="hv-chartv3-stats-panel">

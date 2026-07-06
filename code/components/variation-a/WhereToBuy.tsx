@@ -117,11 +117,6 @@ export default function WhereToBuy() {
           value={tab}
           onChange={setTab}
           items={BUY_TABS.map(({ key, label }) => ({ value: key, label }))}
-          getSegmentStyle={() => ({
-            fontSize: 13,
-            padding: "8px 12px",
-            fontWeight: 500,
-          })}
         />
       </div>
 

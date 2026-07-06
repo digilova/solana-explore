@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import InfoTip from "@/components/InfoTip";
 import RollingPrice from "@/components/RollingPrice";
 import SegmentedControl from "@/components/SegmentedControl";
@@ -150,7 +150,25 @@ type ChartHover = {
   timeLabel: string;
 };
 
-const MARKER_R = MARKER_DOT_PX / 2;
+function viewPointToContentPosition(viewX: number, viewY: number) {
+  return {
+    left: `${(viewX / PLOT_RIGHT) * 100}%`,
+    top: `${(viewY / CHART_VIEW_HEIGHT) * 100}%`,
+  };
+}
+
+function chartMarkerStyle(viewX: number, viewY: number): CSSProperties {
+  return {
+    position: "absolute",
+    ...viewPointToContentPosition(viewX, viewY),
+    transform: "translate(-50%, -50%)",
+    width: MARKER_DOT_PX,
+    height: MARKER_DOT_PX,
+    borderRadius: "50%",
+    boxSizing: "border-box",
+    pointerEvents: "none",
+  };
+}
 
 function interpolateLineAtX(points: [number, number][], x: number): [number, number] | null {
   if (points.length === 0) return null;
@@ -489,52 +507,50 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
           />
         </div>
 
-        <div className="hv-chart-controls" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="hv-chart-controls" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%" }}>
           <SegmentedControl
             ariaLabel="Chart timeframe"
             value={range}
             onChange={onSelectRange}
             items={RANGE_TABS.map(({ key, label }) => ({ value: key, label }))}
-            getSegmentStyle={(selected) => ({
-              fontSize: 13,
-              padding: "6px 14px",
-              fontWeight: selected ? 600 : 400,
-            })}
           />
 
-          <SegmentedControl
-            ariaLabel="Chart type"
-            compact
-            value={mode}
-            onChange={setMode}
-            items={[
-              { value: "line", content: <LineIcon active={mode === "line"} />, ariaLabel: "Line chart" },
-              { value: "candle", content: <CandleIcon active={mode === "candle"} />, ariaLabel: "Candlestick chart" },
-            ]}
-          />
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
+            <SegmentedControl
+              ariaLabel="Chart type"
+              compact
+              value={mode}
+              onChange={setMode}
+              items={[
+                { value: "line", content: <LineIcon active={mode === "line"} />, ariaLabel: "Line chart" },
+                { value: "candle", content: <CandleIcon active={mode === "candle"} />, ariaLabel: "Candlestick chart" },
+              ]}
+            />
 
-          <button
-            aria-label="Share"
-            style={{
-              border: "none",
-              cursor: "pointer",
-              width: 36,
-              height: 36,
-              borderRadius: 9999,
-              background: PILL_BG,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ShareIcon />
-          </button>
+            <button
+              aria-label="Share"
+              style={{
+                border: "none",
+                cursor: "pointer",
+                width: 36,
+                height: 36,
+                borderRadius: 9999,
+                background: PILL_BG,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ShareIcon />
+            </button>
+          </div>
         </div>
       </div>
 
       <div style={{ marginTop: 12 }}>
         <div
           ref={plotRef}
+          className="hv-chart-plot"
           style={{ position: "relative", cursor: "crosshair" }}
           onMouseMove={(e) => {
             pointerXRef.current = e.clientX;
@@ -545,7 +561,20 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
             setHover(null);
           }}
         >
-        <svg className="hv-chart-svg" viewBox={`0 0 ${PLOT_RIGHT} ${CHART_VIEW_HEIGHT}`} style={{ width: "100%", height: "auto", display: "block", pointerEvents: "none", overflow: "hidden" }} preserveAspectRatio="none">
+        <div
+          className="hv-chart-content"
+          style={{
+            position: "relative",
+            width: "100%",
+            aspectRatio: `${PLOT_RIGHT} / ${CHART_VIEW_HEIGHT}`,
+          }}
+        >
+        <svg
+          className="hv-chart-svg"
+          viewBox={`0 0 ${PLOT_RIGHT} ${CHART_VIEW_HEIGHT}`}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block", pointerEvents: "none", overflow: "hidden" }}
+          preserveAspectRatio="none"
+        >
           <defs>
             <clipPath id="chartPlotClipA">
               <rect x="0" y={PLOT_TOP} width={PLOT_LINE_WIDTH} height={PLOT_BOTTOM - PLOT_TOP} />
@@ -557,6 +586,10 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
               <stop offset="0%" stopColor="white" stopOpacity="1" />
               <stop offset="55%" stopColor="white" stopOpacity="0.32" />
               <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="chartAreaGradientA" gradientUnits="userSpaceOnUse" x1="0" y1={PLOT_TOP} x2="0" y2={PLOT_BOTTOM}>
+              <stop offset="0%" stopColor={lineChartColor} stopOpacity="0.14" />
+              <stop offset="100%" stopColor={lineChartColor} stopOpacity="0" />
             </linearGradient>
             <mask id="chartFillMaskA">
               <rect x="0" y={PLOT_TOP} width={PLOT_LINE_WIDTH} height={PLOT_BOTTOM - PLOT_TOP} fill="url(#chartFillFadeA)" />
@@ -570,7 +603,10 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
           )}
           <g clipPath="url(#chartPlotClipA)">
           {mode === "line" && (
-            <path d={viewAreaPath} fill="url(#chartDotPatternA)" mask="url(#chartFillMaskA)" />
+            <>
+              <path className="hv-chart-fill-dots" d={viewAreaPath} fill="url(#chartDotPatternA)" mask="url(#chartFillMaskA)" />
+              <path className="hv-chart-fill-gradient" d={viewAreaPath} fill="url(#chartAreaGradientA)" mask="url(#chartFillMaskA)" />
+            </>
           )}
           <g transform={`scale(${CHART_SCALE} 1)`}>
             <g key={`${mode}-${modeDropKey}`} className={modeDropKey > 0 ? "chart-mode-enter" : undefined}>
@@ -608,51 +644,54 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
               vectorEffect="non-scaling-stroke"
             />
           )}
-          {hover && (
-            <ellipse
-              cx={hover.viewX}
-              cy={hover.dotY}
-              rx={MARKER_R}
-              ry={MARKER_R}
-              fill={lineChartColor}
-              stroke="var(--color-surface-raised)"
-              strokeWidth={2}
-            />
-          )}
-          {mode === "line" && !hover && (
-            <ellipse
-              cx={markerViewX}
-              cy={markerViewY}
-              rx={MARKER_R}
-              ry={MARKER_R}
-              fill="var(--color-surface-raised)"
-              stroke={lineChartColor}
-              strokeWidth={2}
-            />
-          )}
-          {mode === "line" && !hover && liveEnabled && (
-            <g transform={`translate(${liveBadgeViewLeft}, ${markerViewY - LIVE_BADGE_H / 2})`}>
-              <rect width={LIVE_BADGE_W} height={LIVE_BADGE_H} rx={11} fill={lineChartColor} />
-              <text
-                x={LIVE_BADGE_W / 2}
-                y={15}
-                textAnchor="middle"
-                fill="white"
-                fontSize={11}
-                fontWeight={600}
-                style={{ fontFamily: "inherit", fontVariantNumeric: "tabular-nums" }}
-              >
-                ${displayPrice.toFixed(2)}
-              </text>
-            </g>
-          )}
         </svg>
         {hover && (
           <div
             style={{
+              ...chartMarkerStyle(hover.viewX, hover.dotY),
+              background: lineChartColor,
+              border: "2px solid var(--color-surface-raised)",
+            }}
+          />
+        )}
+        {mode === "line" && !hover && (
+          <div
+            style={{
+              ...chartMarkerStyle(markerViewX, markerViewY),
+              background: "var(--color-surface-raised)",
+              border: `2px solid ${lineChartColor}`,
+            }}
+          />
+        )}
+        {mode === "line" && !hover && liveEnabled && (
+          <div
+            className="num"
+            style={{
               position: "absolute",
-              left: `${(hover.viewX / PLOT_RIGHT) * 100}%`,
-              top: `${(hover.dotY / CHART_VIEW_HEIGHT) * 100}%`,
+              ...viewPointToContentPosition(liveBadgeViewLeft, markerViewY),
+              transform: "translateY(-50%)",
+              width: LIVE_BADGE_W,
+              height: LIVE_BADGE_H,
+              borderRadius: LIVE_BADGE_H / 2,
+              background: lineChartColor,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: 11,
+              fontWeight: 600,
+              fontVariantNumeric: "tabular-nums",
+              pointerEvents: "none",
+            }}
+          >
+            ${displayPrice.toFixed(2)}
+          </div>
+        )}
+        {hover && (
+          <div
+            style={{
+              position: "absolute",
+              ...viewPointToContentPosition(hover.viewX, hover.dotY),
               transform: "translate(-50%, calc(-100% - 10px))",
               display: "flex",
               alignItems: "center",
@@ -671,6 +710,7 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
           </div>
         )}
         <div
+          className="hv-chart-y-axis"
           style={{
             position: "absolute",
             top: 0,
@@ -700,6 +740,7 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
           ))}
         </div>
         </div>
+        </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "var(--color-ink-faint)", marginTop: 4 }}>
           {ticks.map((t, i) => (
             <span key={`${range}-${i}-${t}`}>{t}</span>
@@ -710,8 +751,16 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
       <div className="hv-stats-strip" style={{ display: "flex", alignItems: "stretch", marginTop: 30 }}>
         {stats.map((s, i) => (
           <Fragment key={s.label}>
-            {i > 0 && <div className="hv-stats-divider" style={{ width: 1, alignSelf: "stretch", background: "var(--color-line)", margin: "0 24px" }} />}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "12px 0" }}>
+            {i > 0 && (
+              <div
+                className={`hv-stats-divider${s.label === "FDV" ? " hv-stat-fdv-divider" : ""}`}
+                style={{ width: 1, alignSelf: "stretch", background: "var(--color-line)", margin: "0 24px" }}
+              />
+            )}
+            <div
+              className={s.label === "FDV" ? "hv-stat-fdv" : undefined}
+              style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "12px 0" }}
+            >
               <div className="num" style={{ fontSize: 17, fontWeight: 600 }}>
                 {s.value}
               </div>

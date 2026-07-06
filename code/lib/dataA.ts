@@ -412,7 +412,7 @@ export function buildChart(
 
 export const PERIOD_MAP: Record<RangeKey, { volLabel: string; vol: string; chgLabel: string; chg: string }> = {
   LIVE: { volLabel: "Volume Today", vol: "$18.42M", chgLabel: "Change Today", chg: "-1.24%" },
-  "1D": { volLabel: "24H Volume", vol: "$32.10M", chgLabel: "24H Change", chg: "-3.07%" },
+  "1D": { volLabel: "24h vol", vol: "$32.10M", chgLabel: "24H Change", chg: "-3.07%" },
   "1W": { volLabel: "1W Volume", vol: "$147.6M", chgLabel: "1W Change", chg: "-5.82%" },
   "30D": { volLabel: "30D Volume", vol: "$612.3M", chgLabel: "30D Change", chg: "+4.15%" },
   ALL: { volLabel: "Total Volume", vol: "$3.94B", chgLabel: "Change (All)", chg: "+61.4%" },

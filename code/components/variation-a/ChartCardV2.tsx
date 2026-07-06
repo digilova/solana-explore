@@ -286,11 +286,6 @@ export default function ChartCardV2({ range, onSelectRange }: ChartCardV2Props) 
               value={range}
               onChange={onSelectRange}
               items={RANGE_TABS.map(({ key, label }) => ({ value: key, label }))}
-              getSegmentStyle={(selected) => ({
-                fontSize: 13,
-                padding: "6px 14px",
-                fontWeight: selected ? 600 : 400,
-              })}
             />
 
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>

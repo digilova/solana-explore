@@ -122,6 +122,11 @@ button {
   box-shadow: inset 0 -1px 0 var(--color-line);
 }
 
+.hv-assets-api {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hv-site-header {
     transition: none;
@@ -1348,7 +1353,25 @@ button {
   width: 100%;
 }
 
+.hv-chartv3-range-controls--shell {
+  display: none;
+}
+
+.hv-variants-filter--shell {
+  display: none;
+}
+
 @container chartv3 (max-width: 760px) {
+  .hv-chartv3-range-controls--bar {
+    display: none;
+  }
+
+  .hv-chartv3-range-controls--shell {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
   .hv-chartv3-card {
     grid-template-columns: minmax(0, 1fr);
     height: auto;
@@ -1411,7 +1434,8 @@ button {
 /* ---------------------------------------------------------------------------
    Variation A responsive breakpoints.
    Desktop is the source of truth (inline styles); these override below 980px.
-   980px — variant header stacks to two rows; markets table drops to 5 columns.
+   980px — markets table drops to 5 columns.
+   767px — variant header stacks to two rows.
    900px — site-header search pill gives up its fixed width.
    768px — stats strip becomes a 3-column grid; chart gets a floor height.
    640px — markets table drops to 4 columns; paddings tighten; gauge stacks.
@@ -1443,45 +1467,6 @@ button {
     min-width: 720px;
   }
 
-  /* The prototype review sidebar is a desktop evaluation tool — at tablet and
-     below it would crush the page it exists to showcase. */
-  .hv-prototype-sidebar,
-  .hv-prototype-sidebar-fab {
-    display: none !important;
-  }
-
-  /* Variant card header: row 1 = identity + markets chip, row 2 = stats  */
-  .hv-vrow {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-  }
-  .hv-vrow-id {
-    order: 1;
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  .hv-vrow-markets {
-    order: 2;
-    flex: 0 0 auto;
-  }
-  .hv-vrow-stats {
-    display: flex !important;
-    order: 3;
-    flex: 1 1 100%;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px 24px;
-    padding-top: 2px;
-  }
-  .hv-vrow-stat {
-    align-items: flex-start !important;
-    text-align: left !important;
-  }
-  .hv-vrow-access {
-    margin-left: auto;
-  }
-
   /* Markets table: hide 24H Trades / 24H Wallets */
   .hv-mkt-grid {
     grid-template-columns: 1.3fr 0.9fr 0.8fr 1fr 1fr !important;
@@ -1489,6 +1474,24 @@ button {
   .hv-col-trades,
   .hv-col-wallets {
     display: none !important;
+  }
+
+  .hv-markets-count-label {
+    display: none !important;
+  }
+  .hv-markets-count-badge {
+    width: 28px;
+    height: 28px;
+    padding: 0 !important;
+    justify-content: center;
+    gap: 0;
+  }
+  .hv-vrow {
+    grid-template-columns: 1.3fr 0.9fr 0.8fr 1fr 1fr 1fr auto !important;
+  }
+  .hv-vrow-markets {
+    width: fit-content;
+    justify-self: end;
   }
 
   .hv-chartv2-grid {
@@ -1545,22 +1548,123 @@ button {
   }
 }
 
-@media (max-width: 768px) {
-  .hv-page-main {
-    padding: 20px 20px 64px !important;
+.hv-chart-fill-gradient {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hv-docs-link {
+    display: none !important;
   }
-  /* Stats strip: dividerless 3-column grid instead of one long row */
-  .hv-stats-strip {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 8px 16px;
+
+  /* Variant card header: row 1 = identity + markets chip, row 2 = stats */
+  .hv-vrow {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    padding: 28px !important;
   }
-  .hv-stats-divider {
+  .hv-vrow-id {
+    order: 1;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .hv-vrow-markets {
+    order: 2;
+    flex: 0 0 auto;
+  }
+  .hv-vrow-stats {
+    display: flex !important;
+    order: 3;
+    flex: 1 1 100%;
+    align-items: center;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100%;
+    padding-top: 10px;
+  }
+  .hv-vrow-stat {
+    flex: 1 1 0 !important;
+    min-width: 0;
+    align-items: flex-start !important;
+    text-align: left !important;
+  }
+  .hv-vrow-stat > .num,
+  .hv-vrow-stat > div > span.num:first-child {
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    line-height: 1.1;
+    color: var(--color-ink) !important;
+  }
+  .hv-vrow-access {
     display: none !important;
   }
 }
 
+@media (max-width: 768px) {
+  .hv-page-main {
+    padding: 20px 20px 64px !important;
+  }
+  .hv-chart-plot .hv-chart-content {
+    height: 200px;
+    aspect-ratio: auto;
+  }
+  .hv-chart-plot .hv-chart-y-axis {
+    left: calc(100% * 734 / 800 + 8px);
+    width: auto;
+  }
+  .hv-chart-fill-dots {
+    display: none;
+  }
+  .hv-chart-fill-gradient {
+    display: block;
+  }
+  /* Stats strip: single compact row (FDV hidden above) */
+  .hv-stats-strip {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 0;
+  }
+  .hv-stats-strip > div:not(.hv-stats-divider):not(.hv-stat-fdv-divider) {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 0 !important;
+  }
+  .hv-stats-strip .num {
+    font-size: 14px !important;
+  }
+  .hv-stats-strip .hv-infotip-label {
+    font-size: 11px !important;
+  }
+  .hv-stats-divider {
+    display: none !important;
+  }
+  .hv-stat-fdv,
+  .hv-stat-fdv-divider {
+    display: none !important;
+  }
+  .hv-variants-shell {
+    padding: 12px !important;
+  }
+  .hv-chartv3-markets-shell {
+    padding: 12px !important;
+  }
+  .hv-variants-filter--bar {
+    display: none !important;
+  }
+  .hv-variants-filter--shell {
+    display: flex;
+    align-items: center;
+  }
+}
+
 @media (max-width: 640px) {
+  /* Asset-header jump pill ("5 variants · 4 issuers") is desktop chrome */
+  .hv-jump {
+    display: none !important;
+  }
+
   /* Markets table: 4 columns — Venue, Pair, Price, 24H Vol */
   .hv-mkt-grid {
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 0.8fr 0.9fr !important;
@@ -1574,7 +1678,7 @@ button {
 
   /* Cards and bands tighten */
   .hv-vrow {
-    padding: 16px !important;
+    padding: 20px !important;
   }
   .hv-token-detail-grid {
     padding: 16px 12px 24px !important;
@@ -1617,22 +1721,26 @@ button {
     position: static;
   }
   .hv-site-header {
+    justify-content: flex-start;
     padding: 12px 16px;
-    gap: 10px;
+    gap: 4px;
+  }
+  .hv-search-pill {
+    width: 40px !important;
+    flex: 0 0 40px;
+    padding: 0 !important;
+    justify-content: center !important;
+    margin-left: auto;
   }
   .hv-search-text {
     display: none !important;
   }
-  .hv-docs-link {
+  .hv-search-kbd {
     display: none !important;
   }
   .mf-root {
     right: 16px !important;
     bottom: 16px !important;
-  }
-  /* Two-column stats on phones */
-  .hv-stats-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
