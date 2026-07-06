@@ -45,11 +45,6 @@ function VariationAPageContent() {
           />
         )}
         <VariantsMarkets filter={filter} onFilter={setFilter} expanded={expanded} onToggle={toggle} />
-
-        <div style={{ marginTop: 40, paddingTop: 20, borderTop: "1px solid var(--color-line)", fontSize: 12, color: "var(--color-ink-subtle)", lineHeight: 1.6 }}>
-          We use publicly available data from the blockchain, as well as data procured by our trusted data partners and related sources.
-          Market and issuer details are aggregated from available sources and should be verified before trading.
-        </div>
       </main>
 
       <MarketFeed />

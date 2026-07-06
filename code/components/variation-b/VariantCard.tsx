@@ -89,7 +89,7 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 12, color: "var(--color-ink-subtle)" }}>24H Volume</div>
+          <div style={{ fontSize: 12, color: "var(--color-ink-subtle)" }}>24h vol</div>
           <div className="num" style={{ fontSize: 15, fontWeight: 600 }}>
             {v.vol}
           </div>
@@ -247,7 +247,7 @@ export default function VariantCard({ v, expanded, onToggle, onOpenPanel }: Vari
                 >
                   <span>Venue · Pair</span>
                   <span style={{ textAlign: "right" }}>Liquidity</span>
-                  <span style={{ textAlign: "right" }}>24H Vol</span>
+                  <span style={{ textAlign: "right" }}>24h vol</span>
                 </div>
                 {v.rows.map((m, i) => {
                   const meta = venueMeta(m.venue);

@@ -27,7 +27,7 @@ interface VariantsMarketsProps {
 }
 
 // Shared across the aggregate row and the expanded market table so the
-// Liquidity / 24H Vol columns line up exactly between the two.
+// Liquidity / 24h vol columns line up exactly between the two.
 const gridCols = "1.3fr 0.9fr 0.8fr 1fr 1fr 1fr 1fr";
 
 type SortKey = "price" | "liq" | "vol" | "trades" | "wallets";
@@ -39,7 +39,7 @@ const DEFAULT_SORT: SortState = { key: "vol", dir: "desc" };
 const MARKET_COLUMN_OPTIONS: { key: MarketColumnKey; label: string; width: string; className?: string }[] = [
   { key: "price", label: "Price", width: "0.95fr" },
   { key: "liq", label: "Liquidity", width: "1fr", className: "hv-col-liq" },
-  { key: "vol", label: "Last 24hrs Vol", width: "1fr" },
+  { key: "vol", label: "24h vol", width: "1fr" },
   { key: "trades", label: "Last 24hrs Trades", width: "1fr", className: "hv-col-trades" },
   { key: "wallets", label: "Last 24hrs Wallets", width: "1fr", className: "hv-col-wallets" },
 ];
@@ -823,7 +823,7 @@ function TokenHealthCard({ details }: { details: VariantDetailsA }) {
               alignItems: "center",
             }}
           >
-            <span className="num" style={{ fontSize: 48, fontWeight: 300, color: "#0A0A0A", lineHeight: "normal" }}>
+            <span className="num" style={{ fontSize: 48, fontWeight: 500, color: "#0A0A0A", lineHeight: "normal" }}>
               {score}
             </span>
             <span style={{ fontSize: 13, color: "#64748B", lineHeight: "normal" }}>of 100</span>
@@ -950,6 +950,7 @@ function MarketsCountBadge({ count, isExpanded }: { count: number; isExpanded: b
 
   return (
     <span
+      className="hv-markets-count-badge"
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -965,7 +966,9 @@ function MarketsCountBadge({ count, isExpanded }: { count: number; isExpanded: b
         whiteSpace: "nowrap",
       }}
     >
-      <span className="num">{display}</span> {display === 1 ? "Market" : "Markets"}
+      <span className="hv-markets-count-label">
+        <span className="num">{display}</span> {display === 1 ? "Market" : "Markets"}
+      </span>
       <svg
         width="12"
         height="12"
@@ -1024,26 +1027,26 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
     });
   };
 
+  const renderFilterControl = () => (
+    <SegmentedControl
+      ariaLabel="Market filter"
+      value={filter}
+      onChange={onFilter}
+      items={FILTERS.map(({ key, label }) => ({ value: key, label }))}
+    />
+  );
+
   return (
     <section id="variants-section" data-screen-label="Variants and Markets" style={{ marginTop: 68 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+      <div className="hv-variants-head" style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
         <h2 style={{ margin: 0, fontSize: 22, fontWeight: 500, color: "var(--color-ink)" }}>Variants &amp; Markets</h2>
-        <div style={{ marginLeft: "auto" }}>
-          <SegmentedControl
-            ariaLabel="Market filter"
-            value={filter}
-            onChange={onFilter}
-            items={FILTERS.map(({ key, label }) => ({ value: key, label }))}
-            getSegmentStyle={(selected) => ({
-              fontSize: 13,
-              padding: "7px 16px",
-              fontWeight: selected ? 600 : 400,
-            })}
-          />
+        <div className="hv-variants-filter hv-variants-filter--bar" style={{ marginLeft: "auto" }}>
+          {renderFilterControl()}
         </div>
       </div>
 
       <div
+        className="hv-variants-shell"
         style={{
           marginTop: 28,
           // tokens.xyz markets shell: border-light at 30% opacity
@@ -1057,6 +1060,7 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
           gap: 12,
         }}
       >
+        <div className="hv-variants-filter hv-variants-filter--shell">{renderFilterControl()}</div>
         {isFutures ? (
           <div style={{ background: "var(--color-surface-raised)", border: "1px solid var(--color-line-strong)", borderRadius: 20, padding: "48px 24px", textAlign: "center" }}>
             <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)" }}>No futures markets tracked</div>
@@ -1111,23 +1115,23 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                   <div className="hv-vrow-stats" style={{ display: "contents" }}>
                     <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                        <span className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
+                        <span className="num" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ink)" }}>
                           {v.price}
                         </span>
                         <PriceChange value={v.priceChange} />
                       </div>
                     </div>
                     <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
-                      <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
+                      <div className="num" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ink)" }}>
                         {v.liq}
                       </div>
                       <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Liquidity</div>
                     </div>
                     <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
-                      <div className="num" style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>
+                      <div className="num" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ink)" }}>
                         {v.vol}
                       </div>
-                      <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Last 24hrs Vol</div>
+                      <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>24h vol</div>
                     </div>
                     <div className="hv-vrow-access" style={{ display: "flex", justifyContent: "flex-end" }}>
                       <Tooltip content={v.accessHint}>
@@ -1174,11 +1178,6 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
             );
           })
         )}
-        <div style={{ padding: "8px 16px", fontSize: 12, fontWeight: 400, color: "var(--color-ink-subtle)", lineHeight: "18px" }}>
-          Access labels reflect issuer-stated requirements where published. Verify with the issuer before trading.
-          <br />
-          SpaceX-related tokenized variants may have different issuer, access, and regulatory characteristics.
-        </div>
       </div>
       <div style={{ height: 36 }} />
     </section>

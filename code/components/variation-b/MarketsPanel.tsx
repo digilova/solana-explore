@@ -83,7 +83,7 @@ export default function MarketsPanel({ sym, rows, open, onClose }: MarketsPanelP
         >
           <span>Venue · Pair</span>
           <span style={{ textAlign: "right" }}>Liquidity</span>
-          <span style={{ textAlign: "right" }}>24H Vol</span>
+          <span style={{ textAlign: "right" }}>24h vol</span>
         </div>
         <div style={{ flex: 1, overflowY: "auto" }}>
           {rows.map((m, i) => {

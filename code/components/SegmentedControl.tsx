@@ -31,7 +31,7 @@ type IndicatorRect = { x: number; width: number; height: number };
 
 const TRACK_STYLE: CSSProperties = {
   display: "flex",
-  gap: 4,
+  gap: 2,
   padding: 4,
   borderRadius: 9999,
   background: "var(--color-pill-track)",
@@ -114,16 +114,21 @@ export default function SegmentedControl<T extends string = string>({
     ? "none"
     : "transform 250ms cubic-bezier(0.32, 0.72, 0, 1), width 250ms cubic-bezier(0.32, 0.72, 0, 1)";
 
-  const compactStyle: CSSProperties = compact
-    ? {
-        width: 28,
-        height: 28,
-        padding: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }
-    : {};
+  const getDefaultSegmentStyle = (selected: boolean): CSSProperties =>
+    compact
+      ? {
+          width: 28,
+          height: 28,
+          padding: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }
+      : {
+          fontSize: 13,
+          padding: "6px 10px",
+          fontWeight: selected ? 600 : 400,
+        };
 
   const trackStyle: CSSProperties = fullWidth ? { ...TRACK_STYLE, width: "100%" } : TRACK_STYLE;
   const fullWidthSegmentStyle: CSSProperties = fullWidth ? { flex: 1, justifyContent: "center" } : {};
@@ -166,7 +171,7 @@ export default function SegmentedControl<T extends string = string>({
               background: "transparent",
               color: selected ? "var(--color-ink)" : "var(--color-ink-subtle)",
               transition: "color 150ms ease",
-              ...compactStyle,
+              ...getDefaultSegmentStyle(selected),
               ...fullWidthSegmentStyle,
               ...getSegmentStyle?.(selected),
             }}
