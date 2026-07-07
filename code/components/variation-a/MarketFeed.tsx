@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { MARKET_UPDATES, getVariantDefsA } from "@/lib/dataA";
 
 // Floating "Latest Updates" market feed, recreated from tokens.xyz:
@@ -69,8 +70,14 @@ function TickerPills() {
 
 export default function MarketFeed() {
   const [open, setOpen] = useState(false);
+  // Rendered into <body> so the page-content query container (which becomes a
+  // containing block for fixed descendants) can't re-anchor this floating pill.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       data-screen-label="Latest updates feed"
       className="mf-root"
@@ -240,6 +247,7 @@ export default function MarketFeed() {
           </section>
         </aside>
       )}
-    </div>
+    </div>,
+    document.body,
   );
 }

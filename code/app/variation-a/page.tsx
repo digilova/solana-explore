@@ -8,13 +8,12 @@ import AssetHeader from "@/components/variation-a/AssetHeader";
 import ChartCard from "@/components/variation-a/ChartCard";
 import ChartCardV3 from "@/components/variation-a/ChartCardV3";
 import { useChartDisplay } from "@/lib/chartDisplayContext";
-import VariantsMarkets, { type FilterKey } from "@/components/variation-a/VariantsMarkets";
+import VariantsMarkets from "@/components/variation-a/VariantsMarkets";
 import MarketFeed from "@/components/variation-a/MarketFeed";
 import type { RangeKey } from "@/lib/dataA";
 
 function VariationAPageContent() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [filter, setFilter] = useState<FilterKey>("spot");
   const [range, setRange] = useState<RangeKey>("1D");
   const { chartVersion } = useChartDisplay();
 
@@ -44,7 +43,7 @@ function VariationAPageContent() {
             header={<AssetHeader onJump={jumpToVariants} showJump={false} inline />}
           />
         )}
-        <VariantsMarkets filter={filter} onFilter={setFilter} expanded={expanded} onToggle={toggle} />
+        <VariantsMarkets expanded={expanded} onToggle={toggle} />
       </main>
 
       <MarketFeed />
