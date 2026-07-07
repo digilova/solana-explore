@@ -507,7 +507,16 @@ export default function ChartCard({ range, onSelectRange }: ChartCardProps) {
           />
         </div>
 
-        <div className="hv-chart-controls" style={{ display: "flex", alignItems: "center", gap: 10, width: "100%" }}>
+        <div
+          className="hv-chart-controls"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 10,
+            marginLeft: "auto",
+          }}
+        >
           <SegmentedControl
             ariaLabel="Chart timeframe"
             value={range}

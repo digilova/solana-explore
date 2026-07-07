@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Avatar from "@/components/Avatar";
 import InfoTip from "@/components/InfoTip";
 import SegmentedControl from "@/components/SegmentedControl";
@@ -20,36 +20,71 @@ const FILTERS: { key: FilterKey; label: string }[] = [
 ];
 
 interface VariantsMarketsProps {
-  filter: FilterKey;
-  onFilter: (f: FilterKey) => void;
   expanded: Record<string, boolean>;
   onToggle: (sym: string) => void;
 }
-
-// Shared across the aggregate row and the expanded market table so the
-// Liquidity / 24h vol columns line up exactly between the two.
-const gridCols = "1.3fr 0.9fr 0.8fr 1fr 1fr 1fr 1fr";
 
 type SortKey = "price" | "liq" | "vol" | "trades" | "wallets";
 type SortDir = "asc" | "desc";
 type SortState = { key: SortKey; dir: SortDir };
 type MarketColumnKey = SortKey;
 
+// Variant row tracks (identity min-width pushes stats right).
+const MARKET_VENUE_COL = "minmax(200px, 1fr)";
+const MARKET_PAIR_COL = "minmax(0, 0.85fr)";
+const MARKET_DATA_COL = "minmax(0, 1fr)";
+const MARKET_DATA_COL_WIDTHS: Record<MarketColumnKey, string> = {
+  price: MARKET_DATA_COL,
+  liq: MARKET_DATA_COL,
+  vol: MARKET_DATA_COL,
+  trades: MARKET_DATA_COL,
+  wallets: MARKET_DATA_COL,
+};
+const VARIANT_STATS_GAP_COL = "10px";
+// Market table tracks — equal flexible cols, full row width, no overflow bleed.
+const MARKET_TABLE_VENUE_COL = "minmax(0, 1.2fr)";
+const MARKET_TABLE_PAIR_COL = "minmax(0, 1fr)";
+const MARKET_TABLE_DATA_COL = "minmax(0, 1fr)";
+const MARKET_TABLE_DATA_COL_WIDTHS: Record<MarketColumnKey, string> = {
+  price: MARKET_TABLE_DATA_COL,
+  liq: MARKET_TABLE_DATA_COL,
+  vol: MARKET_TABLE_DATA_COL,
+  trades: MARKET_TABLE_DATA_COL,
+  wallets: MARKET_TABLE_DATA_COL,
+};
+// Variant row: badge columns shrink to content (cols 1–6 align with the table).
+const variantRowGridCols = `${MARKET_VENUE_COL} ${MARKET_PAIR_COL} ${MARKET_DATA_COL} ${MARKET_DATA_COL} ${MARKET_DATA_COL} ${VARIANT_STATS_GAP_COL} auto auto`;
+// 768–980: icon-only markets chip; vol stat visible.
+const variantRowGridColsCompact = variantRowGridCols;
+// 641–767: vol stat hidden — drop its track so stats sit next to badges.
+const variantRowGridColsMid = `${MARKET_VENUE_COL} ${MARKET_PAIR_COL} ${MARKET_DATA_COL} ${MARKET_DATA_COL} ${VARIANT_STATS_GAP_COL} auto auto`;
+
 const DEFAULT_SORT: SortState = { key: "vol", dir: "desc" };
 const MARKET_COLUMN_OPTIONS: { key: MarketColumnKey; label: string; width: string; className?: string }[] = [
-  { key: "price", label: "Price", width: "0.95fr" },
-  { key: "liq", label: "Liquidity", width: "1fr", className: "hv-col-liq" },
-  { key: "vol", label: "24h vol", width: "1fr" },
-  { key: "trades", label: "Last 24hrs Trades", width: "1fr", className: "hv-col-trades" },
-  { key: "wallets", label: "Last 24hrs Wallets", width: "1fr", className: "hv-col-wallets" },
+  { key: "price", label: "Price", width: MARKET_TABLE_DATA_COL_WIDTHS.price },
+  { key: "liq", label: "Liquidity", width: MARKET_TABLE_DATA_COL_WIDTHS.liq, className: "hv-col-liq" },
+  { key: "vol", label: "24h vol", width: MARKET_TABLE_DATA_COL_WIDTHS.vol },
+  { key: "trades", label: "24hrs Trades", width: MARKET_TABLE_DATA_COL_WIDTHS.trades, className: "hv-col-trades" },
+  { key: "wallets", label: "24hrs Wallets", width: MARKET_TABLE_DATA_COL_WIDTHS.wallets, className: "hv-col-wallets" },
 ];
-const DEFAULT_MARKET_COLUMNS: Record<MarketColumnKey, boolean> = {
-  price: true,
-  liq: true,
-  vol: true,
-  trades: true,
-  wallets: true,
-};
+function readPageContentWidth(): number {
+  if (typeof window === "undefined") return 0;
+  const shell = document.querySelector(".hv-prototype-shell-main");
+  return shell?.getBoundingClientRect().width ?? window.innerWidth;
+}
+
+const MARKET_COLUMNS_COMPACT_MAX_WIDTH = 980;
+
+function defaultMarketColumnsForWidth(contentWidth: number): Record<MarketColumnKey, boolean> {
+  const compact = contentWidth <= MARKET_COLUMNS_COMPACT_MAX_WIDTH;
+  return {
+    price: true,
+    liq: true,
+    vol: true,
+    trades: !compact,
+    wallets: !compact,
+  };
+}
 
 const SORT_ACCESSORS: Record<SortKey, (row: MarketRowA) => number> = {
   price: (row) => parseMoney(row.price),
@@ -76,11 +111,11 @@ function sortCellStyle(key: SortKey, sort: SortState): CSSProperties {
 }
 
 function marketGridCols(visibleColumns: Record<MarketColumnKey, boolean>, layout: MarketsTableDisplayVersion) {
-  const dataCols = MARKET_COLUMN_OPTIONS.filter((column) => visibleColumns[column.key]).map((column) => column.width);
+  const visible = MARKET_COLUMN_OPTIONS.filter((column) => visibleColumns[column.key]);
   if (layout === "v2") {
-    return ["1.25fr", ...dataCols, "0.95fr"].join(" ");
+    return ["1.25fr", ...visible.map((column) => column.width), "0.95fr"].join(" ");
   }
-  return ["1.3fr", "0.9fr", ...dataCols].join(" ");
+  return [MARKET_TABLE_VENUE_COL, MARKET_TABLE_PAIR_COL, ...visible.map((column) => column.width)].join(" ");
 }
 
 function parsePair(pair: string) {
@@ -144,7 +179,7 @@ function VenueCell({ venue, compact = false }: { venue: string; compact?: boolea
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
       <Avatar size={24} bg={meta.venueBg} initials={meta.venueInitial} fontSize={10} src={meta.logoSrc} alt={meta.venue} />
-      <span style={{ fontSize: 12 }}>{meta.venue}</span>
+      <span style={{ fontSize: 12, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{meta.venue}</span>
     </div>
   );
 }
@@ -278,6 +313,8 @@ function MarketPriceChange({ value }: { value: string }) {
 
 function VariantMarketTable({
   rows,
+  filter,
+  onFilter,
   sort,
   onSort,
   onCollapse,
@@ -285,6 +322,8 @@ function VariantMarketTable({
   onToggleColumn,
 }: {
   rows: MarketRowA[];
+  filter: FilterKey;
+  onFilter: (f: FilterKey) => void;
   sort: SortState;
   onSort: (key: SortKey) => void;
   onCollapse: () => void;
@@ -321,42 +360,70 @@ function VariantMarketTable({
   return (
     <div className="reveal hv-mkt-wrap" style={{ padding: "0 24px 16px" }}>
       <div className="hv-market-table-heading">
-        <div style={{ fontSize: 14, fontWeight: 600, color: "#2D2D2D" }}>Markets</div>
-        <div ref={menuRef} className="hv-market-columns-menu-wrap">
-          <button
-            type="button"
-            className="hv-market-columns-trigger"
-            aria-label="Market table columns"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <circle cx="8" cy="3.5" r="1.35" />
-              <circle cx="8" cy="8" r="1.35" />
-              <circle cx="8" cy="12.5" r="1.35" />
-            </svg>
-          </button>
-          {menuOpen ? (
-            <div className="hv-market-columns-menu" role="menu" aria-label="Toggle market columns">
-              <div className="hv-market-columns-title">Columns</div>
-              {MARKET_COLUMN_OPTIONS.map((column) => {
-                const checked = visibleColumns[column.key];
-                return (
-                  <label key={column.key} className="hv-market-column-option">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      disabled={checked && activeColumns.length === 1}
-                      onChange={() => onToggleColumn(column.key)}
-                    />
-                    <span>{column.label}</span>
-                  </label>
-                );
-              })}
-            </div>
-          ) : null}
+        <div style={{ fontSize: 14, fontWeight: 600, color: "#2D2D2D" }}>Markets ({rows.length})</div>
+        <div className="hv-market-table-controls">
+          <div className="hv-market-table-filter">
+            <SegmentedControl
+              ariaLabel="Market filter"
+              value={filter}
+              onChange={onFilter}
+              items={FILTERS.map(({ key, label }) => ({ value: key, label }))}
+            />
+          </div>
+          <div ref={menuRef} className="hv-market-columns-menu-wrap">
+            <button
+              type="button"
+              className="hv-market-columns-trigger"
+              aria-label="Market table columns"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <circle cx="8" cy="3.5" r="1.35" />
+                <circle cx="8" cy="8" r="1.35" />
+                <circle cx="8" cy="12.5" r="1.35" />
+              </svg>
+            </button>
+            {menuOpen ? (
+              <div className="hv-market-columns-menu" role="menu" aria-label="Toggle market columns">
+                <div className="hv-market-columns-title">Columns</div>
+                {MARKET_COLUMN_OPTIONS.map((column) => {
+                  const checked = visibleColumns[column.key];
+                  return (
+                    <label key={column.key} className="hv-market-column-option">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={checked && activeColumns.length === 1}
+                        onChange={() => onToggleColumn(column.key)}
+                      />
+                      <span>{column.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
+      {sortedRows.length === 0 ? (
+        <div
+          className="hv-mkt-empty"
+          style={{
+            marginTop: 4,
+            padding: "40px 24px",
+            textAlign: "center",
+            border: "1px solid var(--color-line-faint)",
+            borderRadius: 16,
+          }}
+        >
+          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--color-ink)" }}>No futures markets tracked</div>
+          <div style={{ fontSize: 13, color: "var(--color-ink-muted)", marginTop: 6, lineHeight: 1.5 }}>
+            This variant has no tracked futures or perpetuals market on Solana. Switch to Spot or Liquidity above.
+          </div>
+        </div>
+      ) : (
+        <>
       <div
         className="hv-mkt-grid"
         style={{
@@ -364,6 +431,7 @@ function VariantMarketTable({
           gridTemplateColumns: cols,
           columnGap: 12,
           padding: "10px 0",
+          width: "100%",
         }}
       >
         {pairFirst ? (
@@ -399,6 +467,7 @@ function VariantMarketTable({
                 columnGap: 12,
                 alignItems: "center",
                 padding: "12px 0",
+                width: "100%",
                 borderBottom: i === sortedRows.length - 1 ? "none" : "1px solid var(--color-line-faint)",
                 color: "var(--color-ink)",
                 cursor: "pointer",
@@ -472,6 +541,8 @@ function VariantMarketTable({
             </a>
           ))}
       </div>
+        </>
+      )}
       <button
         onClick={onCollapse}
         style={{
@@ -954,13 +1025,13 @@ function MarketsCountBadge({ count, isExpanded }: { count: number; isExpanded: b
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: 6,
-        height: 28,
-        padding: "0 10px",
+        gap: 4,
+        height: 24,
+        padding: "0 8px",
         background: "var(--color-surface-soft)",
         borderRadius: 9999,
         color: "var(--color-ink)",
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: 400,
         textTransform: "none",
         whiteSpace: "nowrap",
@@ -984,12 +1055,38 @@ function MarketsCountBadge({ count, isExpanded }: { count: number; isExpanded: b
   );
 }
 
-export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }: VariantsMarketsProps) {
-  const isFutures = filter === "futures";
+export default function VariantsMarkets({ expanded, onToggle }: VariantsMarketsProps) {
   const defs = getVariantDefsA();
   const [sortByVariant, setSortByVariant] = useState<Record<string, SortState>>({});
-  const [visibleMarketColumns, setVisibleMarketColumns] = useState<Record<MarketColumnKey, boolean>>(DEFAULT_MARKET_COLUMNS);
+  // Each variant's Spot/Liquidity/Futures toggle is local to its own markets
+  // table — switching one never affects the others or the rest of the page.
+  const [filterByVariant, setFilterByVariant] = useState<Record<string, FilterKey>>({});
+  const [visibleMarketColumns, setVisibleMarketColumns] = useState<Record<MarketColumnKey, boolean>>(() =>
+    defaultMarketColumnsForWidth(0),
+  );
   const variantCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const marketColumnsEditedRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const main = document.querySelector(".hv-prototype-shell-main");
+    const syncColumnDefaults = () => {
+      if (marketColumnsEditedRef.current) return;
+      setVisibleMarketColumns(defaultMarketColumnsForWidth(readPageContentWidth()));
+    };
+
+    syncColumnDefaults();
+
+    if (!main) {
+      window.addEventListener("resize", syncColumnDefaults);
+      return () => window.removeEventListener("resize", syncColumnDefaults);
+    }
+
+    const observer = new ResizeObserver(syncColumnDefaults);
+    observer.observe(main);
+    return () => observer.disconnect();
+  }, []);
+
+  const setVariantFilter = (sym: string, next: FilterKey) => setFilterByVariant((prev) => ({ ...prev, [sym]: next }));
 
   const toggleSort = (sym: string, key: SortKey) => {
     setSortByVariant((prev) => {
@@ -1002,6 +1099,7 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
   };
 
   const toggleMarketColumn = (key: MarketColumnKey) => {
+    marketColumnsEditedRef.current = true;
     setVisibleMarketColumns((columns) => {
       const visibleCount = Object.values(columns).filter(Boolean).length;
       if (columns[key] && visibleCount === 1) return columns;
@@ -1027,22 +1125,10 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
     });
   };
 
-  const renderFilterControl = () => (
-    <SegmentedControl
-      ariaLabel="Market filter"
-      value={filter}
-      onChange={onFilter}
-      items={FILTERS.map(({ key, label }) => ({ value: key, label }))}
-    />
-  );
-
   return (
     <section id="variants-section" data-screen-label="Variants and Markets" style={{ marginTop: 68 }}>
       <div className="hv-variants-head" style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
         <h2 style={{ margin: 0, fontSize: 22, fontWeight: 500, color: "var(--color-ink)" }}>Variants &amp; Markets</h2>
-        <div className="hv-variants-filter hv-variants-filter--bar" style={{ marginLeft: "auto" }}>
-          {renderFilterControl()}
-        </div>
       </div>
 
       <div
@@ -1060,20 +1146,10 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
           gap: 12,
         }}
       >
-        <div className="hv-variants-filter hv-variants-filter--shell">{renderFilterControl()}</div>
-        {isFutures ? (
-          <div style={{ background: "var(--color-surface-raised)", border: "1px solid var(--color-line-strong)", borderRadius: 20, padding: "48px 24px", textAlign: "center" }}>
-            <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ink)" }}>No futures markets tracked</div>
-            <div style={{ fontSize: 14, color: "var(--color-ink-muted)", marginTop: 6, lineHeight: 1.5 }}>
-              No SpaceX variant currently has a tracked futures or perpetuals market on Solana.
-              <br />
-              Spot and liquidity-pool markets are available under the other filters.
-            </div>
-          </div>
-        ) : (
-          defs.map((v) => {
+        {defs.map((v) => {
             const isExpanded = !!expanded[v.sym];
-            const rows = filter === "liquidity" ? v.pools : v.spot;
+            const variantFilter = filterByVariant[v.sym] ?? "spot";
+            const rows = variantFilter === "liquidity" ? v.pools : variantFilter === "futures" ? [] : v.spot;
             const access = ACCESS_STYLES_A[v.accessKind as AccessKindA];
             const sort = sortByVariant[v.sym] ?? DEFAULT_SORT;
 
@@ -1084,14 +1160,22 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                   variantCardRefs.current[v.sym] = element;
                 }}
                 className="hv-variant-card"
-                style={{ background: "var(--color-surface-raised)", border: "1px solid var(--color-line)", borderRadius: 22, overflow: "hidden" }}
+                style={{
+                  background: "var(--color-surface-raised)",
+                  border: "1px solid var(--color-line)",
+                  borderRadius: 22,
+                  overflow: "hidden",
+                  ["--hv-variant-row-grid" as string]: variantRowGridCols,
+                  ["--hv-variant-row-grid-compact" as string]: variantRowGridColsCompact,
+                  ["--hv-variant-row-grid-mid" as string]: variantRowGridColsMid,
+                }}
               >
                 <div
                   onClick={() => onToggle(v.sym)}
                   className="hv-vrow"
                   style={{
                     display: "grid",
-                    gridTemplateColumns: gridCols,
+                    gridTemplateColumns: variantRowGridCols,
                     columnGap: 12,
                     rowGap: 12,
                     alignItems: "center",
@@ -1099,7 +1183,7 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                     cursor: "pointer",
                   }}
                 >
-                  <div className="hv-vrow-id" style={{ gridColumn: "1 / 3", display: "flex", alignItems: "flex-start", gap: 12, minWidth: 0 }}>
+                  <div className="hv-vrow-id" style={{ gridColumn: "1 / 3", display: "flex", alignItems: "flex-start", gap: 12, minWidth: 200 }}>
                     <VariantAvatar v={v} />
                     <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
                       <div style={{ fontWeight: 600, fontSize: 14, color: "var(--color-ink)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -1111,9 +1195,9 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                     </div>
                   </div>
                   {/* display:contents keeps these as direct grid cells on desktop;
-                      below 980px the wrapper becomes the second (stats) row. */}
+                      below 640px the wrapper becomes the second (stats) row. */}
                   <div className="hv-vrow-stats" style={{ display: "contents" }}>
-                    <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
+                    <div className="hv-vrow-stat hv-vrow-stat-price" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
                         <span className="num" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ink)" }}>
                           {v.price}
@@ -1121,29 +1205,30 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                         <PriceChange value={v.priceChange} />
                       </div>
                     </div>
-                    <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
+                    <div className="hv-vrow-stat hv-vrow-stat-liq" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
                       <div className="num" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ink)" }}>
                         {v.liq}
                       </div>
                       <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>Liquidity</div>
                     </div>
-                    <div className="hv-vrow-stat" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
+                    <div className="hv-vrow-stat hv-vrow-stat-vol" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, textAlign: "right" }}>
                       <div className="num" style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ink)" }}>
                         {v.vol}
                       </div>
                       <div style={{ fontSize: 12, fontWeight: 400, color: "var(--color-ink-muted)" }}>24h vol</div>
                     </div>
-                    <div className="hv-vrow-access" style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <div className="hv-vrow-access" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
                       <Tooltip content={v.accessHint}>
                         <span
+                          className="hv-vrow-access-badge"
                           style={{
                             display: "inline-flex",
                             alignItems: "center",
-                            height: 27,
-                            padding: "0 10px",
+                            height: 24,
+                            padding: "0 8px",
                             background: access.bg,
                             color: access.color,
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: 400,
                             textTransform: "none",
                             borderRadius: 9999,
@@ -1156,7 +1241,7 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                       </Tooltip>
                     </div>
                   </div>
-                  <div className="hv-vrow-markets" style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <div className="hv-vrow-markets" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
                     <MarketsCountBadge count={rows.length} isExpanded={isExpanded} />
                   </div>
                 </div>
@@ -1166,6 +1251,8 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                     <VariantDetailsBand v={v} />
                     <VariantMarketTable
                       rows={rows}
+                      filter={variantFilter}
+                      onFilter={(next) => setVariantFilter(v.sym, next)}
                       sort={sort}
                       onSort={(key) => toggleSort(v.sym, key)}
                       onCollapse={() => collapseAndScrollToVariant(v.sym)}
@@ -1176,8 +1263,7 @@ export default function VariantsMarkets({ filter, onFilter, expanded, onToggle }
                 )}
               </div>
             );
-          })
-        )}
+          })}
       </div>
       <div style={{ height: 36 }} />
     </section>

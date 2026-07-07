@@ -403,7 +403,8 @@ button {
 }
 
 .hv-prototype-sidebar-note {
-  margin: 16px 8px 0;
+  margin: 16px 4px 0;
+  padding: 0 10px;
   font-size: 12px;
   line-height: 1.5;
   color: var(--color-ink-subtle);
@@ -462,6 +463,10 @@ button {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  /* Query container for the page content: responsive breakpoints below are
+     measured against the content area (sidebar excluded), so collapsing the
+     review sidebar re-flows the page to its wider layout. */
+  container: page / inline-size;
 }
 
 .hv-audit-page {
@@ -826,6 +831,21 @@ button {
   margin-bottom: 16px;
 }
 
+.hv-market-table-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.hv-market-table-filter {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
 .hv-market-columns-menu-wrap {
   position: relative;
   display: inline-flex;
@@ -835,21 +855,21 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   padding: 0;
-  border: 1px solid var(--color-line);
+  border: none;
   border-radius: 999px;
-  background: var(--color-surface-raised);
+  background: var(--color-pill-track);
   color: var(--color-ink-muted);
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.15s ease;
 }
 
 .hv-market-columns-trigger:hover,
 .hv-market-columns-trigger[aria-expanded="true"] {
-  background: var(--color-hover-soft);
-  border-color: var(--color-line-strong);
+  background: var(--color-pill-indicator);
+  box-shadow: var(--shadow-pill-indicator);
   color: var(--color-ink);
 }
 
@@ -1357,10 +1377,6 @@ button {
   display: none;
 }
 
-.hv-variants-filter--shell {
-  display: none;
-}
-
 @container chartv3 (max-width: 760px) {
   .hv-chartv3-range-controls--bar {
     display: none;
@@ -1420,7 +1436,7 @@ button {
   }
 }
 
-@media (max-width: 980px) {
+@container page (max-width: 980px) {
   .hv-token-detail-grid {
     grid-template-columns: minmax(0, 1fr) !important;
   }
@@ -1433,13 +1449,16 @@ button {
 
 /* ---------------------------------------------------------------------------
    Variation A responsive breakpoints.
-   Desktop is the source of truth (inline styles); these override below 980px.
-   980px — markets table drops to 5 columns.
-   767px — variant header stacks to two rows.
-   900px — site-header search pill gives up its fixed width.
-   768px — stats strip becomes a 3-column grid; chart gets a floor height.
-   640px — markets table drops to 4 columns; paddings tighten; gauge stacks.
-   560px — site-header chrome compacts (icon search, no Docs).
+   These are CONTAINER queries against the `page` container (the content area,
+   set on .hv-prototype-shell-main) — NOT the viewport. So the review sidebar's
+   width is excluded: collapsing it widens the content and re-flows the layout.
+   Widths below are content-area widths.
+   980px — tile + markets column gap 10px (641–980); Trades/Wallets off by default (user can enable).
+   900px — search pill flexes.
+   768px — stats strip becomes a compact row; chart gets a floor height.
+   767px — Docs link hides; variant tile drops 24h vol (641–767 only).
+   640px — variant header stacks to two rows; paddings tighten; gauge stacks.
+   560px — site-header chrome compacts (icon search).
 --------------------------------------------------------------------------- */
 
 /* Stats never clip: if the column is too narrow for all five (e.g. the V2
@@ -1449,7 +1468,67 @@ button {
   row-gap: 4px;
 }
 
-@media (max-width: 980px) {
+.hv-vrow-stat {
+  justify-self: end;
+  width: 100%;
+  min-width: 0;
+}
+
+.hv-vrow-id {
+  min-width: 200px;
+}
+
+.hv-vrow-access,
+.hv-vrow-markets {
+  box-sizing: border-box;
+}
+
+.hv-mkt-grid {
+  width: 100%;
+}
+
+.hv-mkt-grid > * {
+  min-width: 0;
+}
+
+.hv-mkt-grid > .num,
+.hv-mkt-grid > .hv-market-sort {
+  justify-self: end;
+  width: 100%;
+  min-width: 0;
+}
+
+@container page (min-width: 641px) {
+  .hv-variant-card .hv-vrow {
+    grid-template-columns: var(--hv-variant-row-grid) !important;
+  }
+
+  .hv-vrow-stat-price {
+    grid-column: 3;
+  }
+
+  .hv-vrow-stat-liq {
+    grid-column: 4;
+  }
+
+  .hv-vrow-stat-vol {
+    grid-column: 5;
+  }
+
+  .hv-vrow-access {
+    grid-column: 7;
+    width: fit-content;
+    justify-self: end;
+  }
+
+  .hv-vrow-markets {
+    grid-column: 8;
+    width: fit-content;
+    justify-self: end;
+  }
+}
+
+@container page (max-width: 980px) {
   .hv-audit-page {
     padding: 24px 24px 72px;
   }
@@ -1467,31 +1546,20 @@ button {
     min-width: 720px;
   }
 
-  /* Markets table: hide 24H Trades / 24H Wallets */
-  .hv-mkt-grid {
-    grid-template-columns: 1.3fr 0.9fr 0.8fr 1fr 1fr !important;
-  }
-  .hv-col-trades,
-  .hv-col-wallets {
-    display: none !important;
-  }
-
   .hv-markets-count-label {
     display: none !important;
   }
   .hv-markets-count-badge {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     padding: 0 !important;
     justify-content: center;
     gap: 0;
   }
-  .hv-vrow {
-    grid-template-columns: 1.3fr 0.9fr 0.8fr 1fr 1fr 1fr auto !important;
-  }
-  .hv-vrow-markets {
-    width: fit-content;
-    justify-self: end;
+
+  /* Icon-only markets chip: same row grid, trailing cols stay content-sized */
+  .hv-variant-card .hv-vrow {
+    grid-template-columns: var(--hv-variant-row-grid-compact) !important;
   }
 
   .hv-chartv2-grid {
@@ -1536,7 +1604,7 @@ button {
   }
 }
 
-@media (max-width: 900px) {
+@container page (max-width: 900px) {
   /* Search pill: fixed 320px width doesn't fit between logo and nav */
   .hv-search-pill {
     width: auto !important;
@@ -1552,56 +1620,46 @@ button {
   display: none;
 }
 
-@media (max-width: 767px) {
+@container page (max-width: 767px) {
   .hv-docs-link {
-    display: none !important;
-  }
-
-  /* Variant card header: row 1 = identity + markets chip, row 2 = stats */
-  .hv-vrow {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    padding: 28px !important;
-  }
-  .hv-vrow-id {
-    order: 1;
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  .hv-vrow-markets {
-    order: 2;
-    flex: 0 0 auto;
-  }
-  .hv-vrow-stats {
-    display: flex !important;
-    order: 3;
-    flex: 1 1 100%;
-    align-items: center;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    width: 100%;
-    padding-top: 10px;
-  }
-  .hv-vrow-stat {
-    flex: 1 1 0 !important;
-    min-width: 0;
-    align-items: flex-start !important;
-    text-align: left !important;
-  }
-  .hv-vrow-stat > .num,
-  .hv-vrow-stat > div > span.num:first-child {
-    font-size: 18px !important;
-    font-weight: 500 !important;
-    line-height: 1.1;
-    color: var(--color-ink) !important;
-  }
-  .hv-vrow-access {
     display: none !important;
   }
 }
 
-@media (max-width: 768px) {
+/* 641–980: tighter column gaps on variant tile + markets table */
+@container page (min-width: 641px) and (max-width: 980px) {
+  .hv-vrow {
+    column-gap: 10px !important;
+  }
+  .hv-mkt-grid {
+    column-gap: 10px !important;
+  }
+}
+
+/* 641–767: hide vol stat and collapse its grid track */
+@container page (min-width: 641px) and (max-width: 767px) {
+  .hv-variant-card .hv-vrow {
+    grid-template-columns: var(--hv-variant-row-grid-mid) !important;
+  }
+
+  .hv-vrow-stat-vol {
+    display: none !important;
+  }
+
+  .hv-vrow-access {
+    grid-column: 6;
+  }
+
+  .hv-vrow-markets {
+    grid-column: 7;
+  }
+
+  .hv-vrow-id {
+    min-width: 160px;
+  }
+}
+
+@container page (max-width: 768px) {
   .hv-page-main {
     padding: 20px 20px 64px !important;
   }
@@ -1650,35 +1708,75 @@ button {
   .hv-chartv3-markets-shell {
     padding: 12px !important;
   }
-  .hv-variants-filter--bar {
-    display: none !important;
-  }
-  .hv-variants-filter--shell {
-    display: flex;
-    align-items: center;
-  }
 }
 
-@media (max-width: 640px) {
+@container page (max-width: 640px) {
   /* Asset-header jump pill ("5 variants · 4 issuers") is desktop chrome */
   .hv-jump {
     display: none !important;
   }
 
-  /* Markets table: 4 columns — Venue, Pair, Price, 24H Vol */
-  .hv-mkt-grid {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 0.8fr 0.9fr !important;
+  .hv-market-table-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
   }
-  .hv-col-liq {
-    display: none !important;
+  .hv-market-table-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .hv-market-table-filter {
+    overflow-x: auto;
   }
   .hv-mkt-wrap {
     padding: 0 16px 16px !important;
   }
 
-  /* Cards and bands tighten */
+  /* Variant card header: row 1 = identity + markets chip, row 2 = stats */
   .hv-vrow {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
     padding: 20px !important;
+  }
+  .hv-vrow-id {
+    order: 1;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .hv-vrow-markets {
+    order: 2;
+    flex: 0 0 auto;
+    padding-left: 0;
+    width: fit-content;
+  }
+  .hv-vrow-stats {
+    display: flex !important;
+    order: 3;
+    flex: 1 1 100%;
+    align-items: center;
+    flex-wrap: nowrap !important;
+    justify-content: flex-end;
+    gap: 10px !important;
+    width: 100%;
+    margin-top: 14px;
+    padding-top: 18px;
+    border-top: 1px solid var(--color-line);
+  }
+  .hv-vrow-stat {
+    flex: 0 1 auto !important;
+    min-width: 0;
+    align-items: flex-end !important;
+    text-align: right !important;
+  }
+  .hv-vrow-stat > .num,
+  .hv-vrow-stat > div > span.num:first-child {
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    line-height: 1.1;
+    color: var(--color-ink) !important;
+  }
+  .hv-vrow-access {
+    display: none !important;
   }
   .hv-token-detail-grid {
     padding: 16px 12px 24px !important;
@@ -1706,7 +1804,7 @@ button {
   }
 }
 
-@media (max-width: 560px) {
+@container page (max-width: 560px) {
   .hv-page-main {
     padding: 16px 16px 56px !important;
   }
@@ -1738,6 +1836,11 @@ button {
   .hv-search-kbd {
     display: none !important;
   }
+}
+
+/* MarketFeed is portaled to <body> (outside the page container), so its
+   floating-pill offset stays viewport-based. */
+@media (max-width: 560px) {
   .mf-root {
     right: 16px !important;
     bottom: 16px !important;

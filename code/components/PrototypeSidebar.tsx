@@ -122,9 +122,48 @@ function MarketsTableControls() {
   );
 }
 
+function getBreakpointLabel(width: number) {
+  if (width >= 980) return "Desktop >= 980px";
+  if (width >= 900) return "Narrow 900-979px";
+  if (width >= 768) return "Tablet 768-899px";
+  if (width >= 641) return "Compact 641-767px";
+  if (width >= 561) return "Mobile 561-640px";
+  return "Small mobile <= 560px";
+}
+
+function BreakpointIndicator() {
+  const [width, setWidth] = useState<number | null>(null);
+
+  useEffect(() => {
+    const main = document.querySelector(".hv-prototype-shell-main");
+    const update = () => {
+      const measuredWidth = main?.getBoundingClientRect().width ?? window.innerWidth;
+      setWidth(Math.round(measuredWidth));
+    };
+
+    update();
+    const observer = main ? new ResizeObserver(update) : null;
+    if (main) observer?.observe(main);
+    window.addEventListener("resize", update);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  if (width === null) return null;
+
+  return (
+    <p className="hv-prototype-sidebar-note" aria-live="polite">
+      Breakpoint: {getBreakpointLabel(width)}
+      <br />
+      Content width: {width}px
+    </p>
+  );
+}
+
 function PrototypeSidebarInner({
   active,
-  note,
   children,
 }: {
   active: PrototypeView;
@@ -183,7 +222,7 @@ function PrototypeSidebarInner({
             })}
           </nav>
 
-          {note ? <p className="hv-prototype-sidebar-note">{note}</p> : null}
+          <BreakpointIndicator />
 
           <div className="hv-prototype-sidebar-footer">
             <SidebarToggle open={open} onClick={toggle} className="hv-prototype-sidebar-toggle" title="Collapse sidebar" />
